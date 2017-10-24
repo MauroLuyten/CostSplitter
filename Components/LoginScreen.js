@@ -6,7 +6,9 @@ export default class LoginScreen extends Component {
         super(props)
         this.state = {
             username: '',
-            password: ''
+            password: '', 
+            error: null,
+            loading: false
         }
     }
     static navigationOptions = {
@@ -21,6 +23,7 @@ export default class LoginScreen extends Component {
                 <TextInput
                     placeholder="Username"
                     onChangeText={(username) =>this.setState({username})}
+
                     style={styles.input}
                 />
                 <TextInput 
@@ -30,11 +33,14 @@ export default class LoginScreen extends Component {
                 />
                 <Button
                     title="Login"
-                    onPress={()=>{}}
+                    onPress={this.onLogin}
                     style={styles.input}
                 />
             </View>
         )
+    }
+    onLogin() {
+
     }
 }
 const styles = StyleSheet.create({

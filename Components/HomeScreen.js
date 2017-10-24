@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {View, Text, Button} from 'react-native'
+import {View, Text, Button, StyleSheet} from 'react-native'
 import {StackNavigator} from 'react-navigation';
 export default class HomeScreen extends Component {
     static navigationOptions = {
@@ -8,7 +8,7 @@ export default class HomeScreen extends Component {
     render(){
         const {navigate} = this.props.navigation
         return (
-            <View>
+            <View style={styles.container}>
                 <Text>
                     Test
                 </Text>
@@ -20,3 +20,13 @@ export default class HomeScreen extends Component {
         )
     }
 }
+const styles = StyleSheet.create({
+    container: {
+        
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF',
+        flex: 1
+        
+    },
+});
