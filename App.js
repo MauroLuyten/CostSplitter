@@ -16,14 +16,14 @@ import {
 } from 'react-native';
 import {StackNavigator} from 'react-navigation'
 import HomeScreen from './Components/HomeScreen'
-import ProfileScreen from './Components/ProfileScreen'
+import LoginScreen from './Components/LoginScreen'
 
 const Application = StackNavigator({
     Home: {
         screen: HomeScreen
     },
-    Profile: {
-        screen: ProfileScreen
+    Login: {
+        screen: LoginScreen
     }
 })
 

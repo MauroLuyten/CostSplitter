@@ -13,8 +13,8 @@ export default class HomeScreen extends Component {
                     Test
                 </Text>
                 <Button
-                    title="Profile"
-                    onPress={()=>navigate('Profile')}
+                    title="Login"
+                    onPress={()=>navigate('Login')}
                 />
             </View>
         )
