@@ -1,0 +1,3 @@
+rootProject.name = 'billsplitV2'
+
+include ':app'
