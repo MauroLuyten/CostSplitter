@@ -17,6 +17,8 @@ import {
 import {StackNavigator} from 'react-navigation'
 import HomeScreen from './Components/HomeScreen'
 import LoginScreen from './Components/LoginScreen'
+import {config} from './firebaseconfig'
+import firebase from 'firebase'
 
 const Application = StackNavigator({
     Home: {
@@ -28,6 +30,9 @@ const Application = StackNavigator({
 })
 
 export default class App extends Component {
+    componentWillMount() {
+        firebase.initializeApp(config)
+    }
     render() {
         return (
             < Application />
