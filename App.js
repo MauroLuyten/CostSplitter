@@ -17,8 +17,10 @@ import {
 import {StackNavigator} from 'react-navigation'
 import HomeScreen from './Components/HomeScreen'
 import LoginScreen from './Components/LoginScreen'
-import {config} from './firebaseconfig.js'
-
+import OverviewScreen from './Components/OverviewScreen'
+import EventScreen from './Components/EventScreen'
+import {firebaseApp} from './firebaseconfig.js'
+//import {withMappedNavigationProps} from 'react-navigation-props-mapper'
 
 const Application = StackNavigator({
     Home: {
@@ -26,12 +28,39 @@ const Application = StackNavigator({
     },
     Login: {
         screen: LoginScreen
+    },
+    Overview: {
+        screen: OverviewScreen
+    },
+    Event: {
+        screen: EventScreen
     }
 })
 export default class App extends Component {
-    render() {
-        return (< Application />);
+    constructor(props){
+        super(props)
+        this.state = {
+            user: firebaseApp.auth().currentUser
+        }
     }
+    render() {
+        return (< Application screenProps={this.state}/>);
+    }
+    componentDidMount() {
+        firebaseApp.auth().onAuthStateChanged(user => {
+            if(user){
+                this.setState({
+                    user: user
+                })
+            } else{
+                this.setState({
+                    user: null
+                })
+            }
+        })
+    }
+
+    
 }
 
 const styles = StyleSheet.create({
