@@ -3,6 +3,12 @@ import {View, Text, Button, StyleSheet} from 'react-native'
 import {StackNavigator} from 'react-navigation';
 import {firebaseApp} from '../firebaseconfig'
 export default class HomeScreen extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            user: null
+        }
+    }
     static navigationOptions = {
         title: 'Home'
     }
@@ -14,8 +20,9 @@ export default class HomeScreen extends Component {
                     {this.authText()}
                 </Text>
                 {this.loggedIn()
-                    ? (<Button title="Logout" onPress={this.logout()}/>)
+                    ? (<Button title="Logout" onPress={() => this.logout()}/>)
                     : (<Button title="Login" onPress={() => navigate('Login')}/>)}
+                <Button title="Overview" onPress={() => navigate('Overview')}/>
             </View>
         )
     }
@@ -28,13 +35,20 @@ export default class HomeScreen extends Component {
             : 'Not logged in'
     }
     loggedIn() {
-        return firebaseApp
-            .auth()
-            .currentUser
-            !=null
+        return firebaseApp.auth().currentUser!=null
     }
     logout() {
-        firebaseApp.auth().signOut()
+        firebaseApp
+            .auth()
+            .signOut()
+            .then(result => {
+                this.navigate('Login')
+            })
+            .catch(error => {})
+    }
+    navigate(route) {
+        const {navigate} = this.props.navigation
+        navigate(route)
     }
 }
 const styles = StyleSheet.create({
