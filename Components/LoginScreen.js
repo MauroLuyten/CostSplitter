@@ -23,7 +23,7 @@ export default class LoginScreen extends Component {
                 <Text>
                     Login / Register
                 </Text>
-                <Text s>
+                <Text>
                     {this.state.error&&this.state.error.message}
                 </Text>
                 <TextInput
@@ -63,7 +63,7 @@ export default class LoginScreen extends Component {
         if(this.isLoginValid){
             firebaseApp.auth().signInWithEmailAndPassword(`${username}@costsplitter.com`,password)
             .then(data => {
-                this.navigate('Home')
+                this.navigate('Overview')
             }).catch(error => {
                 this.setState({
                     error: error
@@ -77,6 +77,11 @@ export default class LoginScreen extends Component {
             firebaseApp.auth().createUserWithEmailAndPassword(`${username}@costsplitter.com`,password)
             .then((data) => {
                 this.navigate('Home')
+                firebaseApp.database().ref(`users/${data.uid}`).set({
+                    email: `${username}@costsplitter.com`,
+                    username: username,
+                    events: 0
+                })
             }).catch((error) => {
                 this.setState({
                     error: error
