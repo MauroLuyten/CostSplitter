@@ -7,8 +7,9 @@ export default class EventScreen extends Component{
     constructor(props){
         super(props)
         this.state = {
-            event: null,
-            uid: null
+            eventKey: null,
+            uid: null,
+            eventRef: null
         }
     }
     static navigationOptions = {
@@ -18,7 +19,7 @@ export default class EventScreen extends Component{
         return(
             <Content>
                 <View>
-                    <Text>{this.state.uid}</Text>
+                    <Text>{this.state.eventKey}</Text>
                 </View>
             </Content>
         )
@@ -27,8 +28,10 @@ export default class EventScreen extends Component{
         const uid = this.props.navigation.state.params.uid
         const eventKey = this.props.navigation.state.params.key
         this.setState({
-            uid: uid
+            uid: uid,
+            eventRef: firebaseApp.database().ref(`users/${uid}/events/${eventKey}`),
+            eventKey: eventKey
         })
-        firebaseApp.database().ref(`users/${uid}/events/${eventKey}`)
+        
     }
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, StyleSheet, ListView, FlatList, Modal, TextInput } from 'react-native'
-import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label } from 'native-base';
+import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import { firebaseApp } from '../firebaseconfig'
 import { StackNavigator } from 'react-navigation';
@@ -15,7 +15,9 @@ export default class OverviewScreen extends Component {
                 rowHasChanged: (row1, row2) => row1 !== row2
             }),
             items: [],
+            selectedEvent: null,
             addEventDialog: false,
+            removeEventDialog: false,
             newEventName: ''
         }
 
@@ -29,7 +31,7 @@ export default class OverviewScreen extends Component {
                 <Separator bordered style={styles.seperator}>
                     <Text>EVENTS</Text>
                 </Separator>
-                {this.state.items===null ?
+                {this.state.items === null ?
                     (
                         <Text>
                             No events added yet
@@ -40,8 +42,18 @@ export default class OverviewScreen extends Component {
                         style={styles.list}
                         dataArray={this.state.items}
                         renderRow={(item) =>
-                            <ListItem button style={styles.listitem} onPress={() => { this.openEvent(item._key) }}>
-                                <Text>{item.name}</Text>
+                            <ListItem button style={styles.listitem} onPress={() => { this.openEvent(item.key) }}>
+                                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <Text>{item.name}</Text>
+                                    <View>
+                                        <Badge
+                                            style={{ marginRight: 5, backgroundColor: '#5067FF' }}>
+                                            <Text onPress={() => {  {this.removeEventDialog(item.key)} }}>
+                                                X
+                                            </Text>
+                                        </Badge>
+                                    </View>
+                                </View>
                             </ListItem>
                         }>
                         ></List>
@@ -60,22 +72,37 @@ export default class OverviewScreen extends Component {
                     style={{ width: 350, height: 'auto', padding: 24 }}
                     visible={this.state.addEventDialog}>
                     <Text>New Event</Text>
-                    <Form>
-                        <Item floatingLabel>
-                            <Label>Event Name</Label>
-                            <Input  
+                    <Item floatingLabel>
+                        <Label>Event Name</Label>
+                        <Input
                             selectionColor="#5067FF"
-                                onChangeText={(text) => {this.setState({
-                                    newEventName: text 
-                                })}}
-                                autoFocus={true}/>
-                        </Item>
-                    </Form>
+                            onChangeText={(text) => {
+                                this.setState({
+                                    newEventName: text
+                                })
+                            }}
+                            autoFocus={true} />
+                    </Item>
                     <View style={styles.buttonContainer}>
                         <Button transparent small onPress={() => this.setAddEventDialog(false)}>
                             <Text style={{ color: '#5067FF' }}>Cancel</Text>
                         </Button>
                         <Button primary small onPress={() => this.addEvent()}>
+                            <Text style={{ color: 'white' }}>Confirm</Text>
+                        </Button>
+                    </View>
+                </ModalWrapper>
+                <ModalWrapper
+                    onRequestClose={() => { this.setRemoveEventDialog(false) }}
+                    style={{ width: 350, height: 'auto', padding: 24 }}
+                    visible={this.state.removeEventDialog}>
+                    <Text>Remove Event</Text>
+                    <Text>Do you want to remove {this.state.selectedEvent && this.state.selectedEvent.name} ?</Text>
+                    <View style={styles.buttonContainer}>
+                        <Button transparent small onPress={() => this.setRemoveEventDialog(false)}>
+                            <Text style={{ color: '#5067FF' }}>Cancel</Text>
+                        </Button>
+                        <Button primary small onPress={() => this.removeEvent(this.state.selectedEvent.key)}>
                             <Text style={{ color: 'white' }}>Confirm</Text>
                         </Button>
                     </View>
@@ -119,6 +146,18 @@ export default class OverviewScreen extends Component {
             uid: this.state.user.uid
         })
     }
+    removeEventDialog(eventKey) {
+        const event = this.state.items.find(event => event.key===eventKey)
+        this.setState({
+            selectedEvent: event
+        })
+        this.setRemoveEventDialog(true)
+    }
+    removeEvent(key) {
+        this.state.dataRef.child(key).remove()
+        this.setRemoveEventDialog(false)
+
+    }
     navigate(route, params) {
         const { navigate } = this.props.navigation
         navigate(route, params)
@@ -128,8 +167,13 @@ export default class OverviewScreen extends Component {
             addEventDialog: visible
         })
     }
-    addEvent(){
-        const {newEventName, user} = this.state
+    setRemoveEventDialog(visible) {
+        this.setState({
+            removeEventDialog: visible
+        })
+    }
+    addEvent() {
+        const { newEventName, user } = this.state
         firebaseApp.database().ref(`users/${user.uid}/events`).push({
             name: newEventName
         }).then(data => {
