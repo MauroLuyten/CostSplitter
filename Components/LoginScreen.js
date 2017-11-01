@@ -1,17 +1,16 @@
 import React, {Component} from 'react'
 import {View, Text, StyleSheet, TextInput, Button} from 'react-native'
-import {firebaseApp} from '../firebaseconfig'
-import {StackNavigator} from 'react-navigation';
+import {StackNavigator} from 'react-navigation'
+import { observer, inject } from 'mobx-react'
+import stateStore from '../store/store'
 
-
+@observer
 export default class LoginScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
             username: '',
             password: '',
-            error: null,
-            loading: false
         }
     }
     static navigationOptions = {
@@ -24,7 +23,7 @@ export default class LoginScreen extends Component {
                     Login / Register
                 </Text>
                 <Text>
-                    {this.state.error&&this.state.error.message}
+
                 </Text>
                 <TextInput
                     placeholder="Username"
@@ -54,6 +53,11 @@ export default class LoginScreen extends Component {
             </View>
         )
     }
+    componentWillMount(){
+        /* if(stateStore.user){
+            this.navigate('Home')
+        } */
+    }
     isLoginValid() {
         const {username, password} = this.state
         return (username !== '' && password !== '')
@@ -61,33 +65,16 @@ export default class LoginScreen extends Component {
     onLogin() {
         const {username, password} = this.state
         if(this.isLoginValid){
-            firebaseApp.auth().signInWithEmailAndPassword(`${username}@costsplitter.com`,password)
-            .then(data => {
-                this.navigate('Overview')
-            }).catch(error => {
-                this.setState({
-                    error: error
-                })
-            })
+            stateStore.login(username, password)
         }
+        this.navigate('Home')
     }
     onRegister() {
         const {username, password} = this.state
         if(this.isLoginValid){
-            firebaseApp.auth().createUserWithEmailAndPassword(`${username}@costsplitter.com`,password)
-            .then((data) => {
-                this.navigate('Home')
-                firebaseApp.database().ref(`users/${data.uid}`).set({
-                    email: `${username}@costsplitter.com`,
-                    username: username,
-                    events: 0
-                })
-            }).catch((error) => {
-                this.setState({
-                    error: error
-                })
-            })
+            stateStore.register(username, password)
         }
+        this.navigate('Home')            
     }
     navigate(route) {
         const {navigate} = this.props.navigation

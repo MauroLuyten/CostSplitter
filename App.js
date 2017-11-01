@@ -20,6 +20,8 @@ import LoginScreen from './Components/LoginScreen'
 import OverviewScreen from './Components/OverviewScreen'
 import EventScreen from './Components/EventScreen'
 import {firebaseApp} from './firebaseconfig.js'
+import stateStore from './store/store'
+import {observer} from 'mobx-react'
 //import {withMappedNavigationProps} from 'react-navigation-props-mapper'
 
 const Application = StackNavigator({
@@ -36,27 +38,19 @@ const Application = StackNavigator({
         screen: EventScreen
     }
 })
+@observer
 export default class App extends Component {
     constructor(props){
         super(props)
-        this.state = {
-            user: firebaseApp.auth().currentUser
-        }
     }
     render() {
-        return (< Application screenProps={this.state}/>);
+        return (
+            < Application screenProps={stateStore} />
+        )
     }
     componentDidMount() {
         firebaseApp.auth().onAuthStateChanged(user => {
-            if(user){
-                this.setState({
-                    user: user
-                })
-            } else{
-                this.setState({
-                    user: null
-                })
-            }
+            stateStore.setUser(user)
         })
     }
 

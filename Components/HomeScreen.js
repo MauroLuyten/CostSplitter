@@ -1,13 +1,13 @@
 import React, {Component} from 'react'
 import {View, Text, Button, StyleSheet} from 'react-native'
 import {StackNavigator} from 'react-navigation';
-import {firebaseApp} from '../firebaseconfig'
+import {observer} from 'mobx-react'
+import stateStore from '../store/store'
+
+@observer
 export default class HomeScreen extends Component {
     constructor(props) {
         super(props)
-        this.state = {
-            user: null
-        }
     }
     static navigationOptions = {
         title: 'Home'
@@ -27,24 +27,16 @@ export default class HomeScreen extends Component {
         )
     }
     authText() {
-        let uid = firebaseApp
-            .auth()
-            .currentUser
-        return uid
-            ? `Logged in as: ${uid.uid}`
+        return stateStore.user
+            ? `Logged in as: ${stateStore.user.uid}`
             : 'Not logged in'
     }
     loggedIn() {
-        return firebaseApp.auth().currentUser!=null
+        return stateStore.user
     }
     logout() {
-        firebaseApp
-            .auth()
-            .signOut()
-            .then(result => {
-                this.navigate('Login')
-            })
-            .catch(error => {})
+        stateStore.logout()
+        this.navigate('Login')
     }
     navigate(route) {
         const {navigate} = this.props.navigation
