@@ -73,6 +73,9 @@ class StateStore {
             this.error=error
         })
     }
+    getEvent(eventKey) {
+        return this.events.find(event => event.key === eventKey)
+    }
 
 }
 const stateStore = new StateStore()
