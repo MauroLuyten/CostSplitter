@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {StyleSheet, View} from 'react-native'
-import {Badge, ListView, List, ListItem, Content, Container, Text, Separator} from 'native-base';
+import {Badge, ListView, List, ListItem, Content, Container, Text, Separator, Card, Fab} from 'native-base';
 import {firebaseApp} from '../firebaseconfig'
 import stateStore from '../store/store'
 import {observer} from 'mobx-react'
@@ -22,33 +22,46 @@ export default class EventScreen extends Component{
         const event = stateStore.getEvent(this.state.eventKey)
 
         return(
-            <Content>
-                <View>
-                    <Text style={{fontSize:22, fontWeight:'bold', marginBottom:5}}>{event.name}</Text>
-                    <View style={styles.viewBorder}>
-                        <Text style={styles.textmargin}>Description:             {event.description  == null ? "/" : event.description}</Text>
-                        <Text style={styles.textmargin}>Amount:                   {event.amount == null ? "/": event.amount} {event.currency === null ? "/" : event.currency}</Text>
-                        <Text style={styles.textmargin}>Date:                         {event.date == null ? "/" : event.date}</Text>
-                    </View>
-                    <Text style={{marginTop:40, fontWeight: 'bold'}}>Splitters:                                                  paid</Text>
-                    {event.splitters == null ? (
-                        <Text>No splitters</Text>
-                    ) 
-                    :
-                    (<List style={styles.list} dataArray={event.splitters}
-                    renderRow={(splitter) => 
-                        <ListItem style={styles.listitem}>
-                            <View  style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <Text>{splitter.name}   {splitter.amount} {splitter.currency}</Text>
-                                <Badge style={{marginRight: 50, backgroundColor:"#009688"}}>
-                                       <Text>{splitter.paid === "true" ? 'V' : 'X'}</Text>
-                                </Badge>
+            <View style={{flex:1}}>
+                    <Card style={{padding:10, maxHeight:200}}>
+                        
+                            <Text style={{fontSize:22, fontWeight:'bold', marginBottom:5}}>{event.name}</Text>
+                            <View>
+                                <Text style={styles.textmargin}>Description:             {event.description  == null ? "/" : event.description}</Text> 
+                                <Text style={styles.textmargin}>Amount:                   {event.amount == null ? "/": event.amount} {event.currency === null ? "/" : event.currency}</Text>
+                                <Text style={styles.textmargin}>Date:                         {event.date == null ? "/" : event.date}</Text>
                             </View>
-                        </ListItem>
-                    }>></List>
-                )}
-                </View>
-            </Content>
+                        
+                    </Card>
+                    <View>
+                        <Text style={{marginTop:40,marginLeft:12, fontWeight: 'bold'}}>Splitters:</Text> 
+                        {event.splitters == null ? (
+                            <Text>No splitters yet</Text>
+                        ) 
+                        :
+                        (<List style={styles.list} dataArray={event.splitters}
+                        renderRow={(splitter) => 
+                            <ListItem style={styles.listitem}>
+                                <View  style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+                                    <Text>{splitter.name}   {splitter.amount} {splitter.currency}</Text>
+                                    <Badge style={{marginRight: 50, backgroundColor:"#5067FF"}}>
+                                           <Text>{splitter.paid === "true" ? 'V' : 'X'}</Text>
+                                    </Badge>
+                                </View>
+                            </ListItem>
+                        }>>
+                        </List>)}
+                    </View>
+                    <Fab
+                    active={true}
+                    direction="up"
+                    style={{ backgroundColor: '#5067FF' }}
+                    position="bottomRight"
+                    onPress={() => this.setAddSplitterDialog(true)}
+                >
+                    <Text>+</Text>
+                </Fab>
+            </View>
         )
     }
     componentWillMount() {
@@ -81,9 +94,4 @@ const styles = StyleSheet.create({
     textmargin: {
         marginTop: 17,
     },
-    viewBorder: {
-        borderRadius: 4,
-        borderWidth: 0.2,
-        borderColor: '#d6d7da',
-    }
 });
