@@ -76,6 +76,22 @@ class StateStore {
     getEvent(eventKey) {
         return this.events.find(event => event.key === eventKey)
     }
+    addSplitterToEvent(eventKey, name, currency, amount, paid) {
+        //console.warn(name)
+        //console.warn(currency)
+        //console.warn(amount)
+        //console.warn(paid)
+        firebaseApp.database().ref(`users/${this.user.uid}/events/${eventKey}/splitters`).push({
+            name: name,
+            currency: currency,
+            amount: amount,
+            paid: paid
+        })
+        .then()
+        .catch(error => {
+            this.error=error
+        })
+    }
 
 }
 const stateStore = new StateStore()

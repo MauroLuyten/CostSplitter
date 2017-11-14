@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import {StyleSheet, View} from 'react-native'
-import {Badge, ListView, List, ListItem, Content, Container, Text, Separator, Card, Fab} from 'native-base';
+import {StyleSheet, View, Alert} from 'react-native'
+import {Badge, ListView, List, ListItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button} from 'native-base';
+var ModalWrapper = require('react-native-modal-wrapper').default
 import {firebaseApp} from '../firebaseconfig'
 import stateStore from '../store/store'
 import {observer} from 'mobx-react'
@@ -12,7 +13,12 @@ export default class EventScreen extends Component{
         this.state = {
             eventKey: null,
             uid: null,
-            eventRef: null
+            eventRef: null,
+            addSplitterDialog: false,
+            newSplitterName: '',
+            newSplitterCurrency: '',
+            newSplitterAmount: 0,
+            newSplitterPaid: 'false'
         }
     }
     static navigationOptions = {
@@ -61,6 +67,53 @@ export default class EventScreen extends Component{
                 >
                     <Text>+</Text>
                 </Fab>
+                <ModalWrapper
+                        onRequestClose={() => {this.setAddSplitterDialog(false)} }
+                        style={{ width: 350, height: 'auto', padding: 24 }}
+                        visible={this.state.addSplitterDialog}>
+                    <Text>Add Splitter</Text>
+                    <Item floatingLabel>
+                        <Label>Name</Label>
+                        <Input
+                            selectionColor="#5067FF"
+                            onChangeText={(name) => {
+                                this.setState({
+                                    newSplitterName: name
+                                })
+                            }}
+                            autoFocus={true} />
+                    </Item>
+                    <Item floatingLabel>
+                        <Label>Currency</Label>
+                        <Input
+                        selectionColor="#5067FF"
+                        onChangeText={(currency) => {
+                            this.setState({
+                                newSplitterCurrency: currency
+                            })
+                        }}
+                        autoFocus={false}/>
+                    </Item>
+                   <Item floatingLabel>
+                       <Label>Amount</Label>
+                       <Input
+                       selectionColor="#5067FF"
+                       onChangeText={(amount) => {
+                           this.setState({
+                               newSplitterAmount: amount
+                           })
+                       }}
+                       autoFocus={false}/>
+                    </Item>
+                    <View style={styles.buttonContainer}>
+                        <Button transparent small onPress={() => this.setAddSplitterDialog(false)}>
+                            <Text style={{ color: '#5067FF' }}>Cancel</Text>
+                        </Button>
+                        <Button primary small onPress={() => this.addSplitter()}>
+                            <Text style={{ color: 'white' }}>Confirm</Text>
+                        </Button>
+                    </View>
+                </ModalWrapper>
             </View>
         )
     }
@@ -73,6 +126,41 @@ export default class EventScreen extends Component{
             eventKey: eventKey
         })    
     }
+    setAddSplitterDialog(visible) {
+        this.setState({
+            addSplitterDialog: visible
+        })
+    }
+    addSplitter() {
+        const {eventKey, uid, newSplitterName, newSplitterCurrency, newSplitterAmount, newSplitterPaid} = this.state;
+        if(newSplitterName && newSplitterCurrency && newSplitterAmount) {
+            if(newSplitterAmount > 0) {
+                stateStore.addSplitterToEvent(eventKey, newSplitterName, newSplitterCurrency, newSplitterAmount, newSplitterPaid)
+                this.setAddSplitterDialog(false)
+            }
+            else {
+                Alert.alert(
+                    'Wrong amount',
+                    'Amount must be positive!',
+                    [
+                      {text: 'OK', onPress: () => console.log('OK Pressed')},
+                    ],
+                    { cancelable: false }
+                  )
+            }
+        }
+        else {
+            Alert.alert(
+                'Field missing',
+                'Every field must be filled in!',
+                [
+                  {text: 'OK', onPress: () => console.log('OK Pressed')},
+                ],
+                { cancelable: false }
+              )
+        }
+    }
+    
 }
 
 
@@ -94,4 +182,9 @@ const styles = StyleSheet.create({
     textmargin: {
         marginTop: 17,
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 20
+    }
 });
