@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {View, Text, Button, StyleSheet} from 'react-native'
+import {View, Text, Button, StyleSheet, TouchableOpacity} from 'react-native'
 import {StackNavigator} from 'react-navigation';
 import {observer} from 'mobx-react'
 import stateStore from '../store/store'
@@ -10,19 +10,27 @@ export default class HomeScreen extends Component {
         super(props)
     }
     static navigationOptions = {
-        title: 'Home'
+        title: 'Home',
+        headerTitleStyle: { alignSelf: 'center'},
+        headerStyle: { backgroundColor: '#DEEFF5'},
     }
     render() {
         const {navigate} = this.props.navigation
         return (
             <View style={styles.container}>
-                <Text>
+                <Text style={styles.status}>
                     {this.authText()}
                 </Text>
-                {this.loggedIn()
-                    ? (<Button title="Logout" onPress={() => this.logout()}/>)
-                    : (<Button title="Login" onPress={() => navigate('Login')}/>)}
-                <Button title="Overview" onPress={() => navigate('Overview')}/>
+                <View style={styles.container2}>
+                    {this.loggedIn()
+                        ? (<View style={styles.button}><Button title="Logout" onPress={() => this.logout()}/></View>)
+                        : (<View style={styles.button}><Button title="Login" onPress={() => navigate('Login')}/></View>)}
+                    <View style={styles.button}>
+                        <Button title="Overview" onPress={() => navigate('Overview')}/>
+                    </View>
+                </View>
+                <TouchableOpacity>
+                    </TouchableOpacity>
             </View>
         )
     }
@@ -45,11 +53,21 @@ export default class HomeScreen extends Component {
 }
 const styles = StyleSheet.create({
     container: {
-
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: '#F5FCFF',
-        flex: 1
-
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+    },
+    container2: {
+        backgroundColor: '#A5FCFF',
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    button: {
+        padding: 10
+    },
+    status: {
+        fontSize: 20,
+        textAlign: 'center'
     }
 });
