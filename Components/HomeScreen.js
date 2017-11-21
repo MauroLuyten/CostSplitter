@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {View, Text, Button, StyleSheet, TouchableOpacity} from 'react-native'
+import {View, Text, Button, StyleSheet, TouchableOpacity, NetInfo} from 'react-native'
 import {StackNavigator} from 'react-navigation';
 import {observer} from 'mobx-react'
 import stateStore from '../store/store'
@@ -8,6 +8,10 @@ import stateStore from '../store/store'
 export default class HomeScreen extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            connectivity: "No internet connection"
+        }
+        
     }
     static navigationOptions = {
         title: 'Home',
@@ -18,6 +22,7 @@ export default class HomeScreen extends Component {
         const {navigate} = this.props.navigation
         return (
             <View style={styles.container}>
+            <Text>{this.getConnectivity()}</Text>
                 <Text style={styles.status}>
                     {this.authText()}
                 </Text>
@@ -34,6 +39,14 @@ export default class HomeScreen extends Component {
             </View>
         )
     }
+    componentWillMount() {
+        this.check_internet_connection()   
+    }
+    componentDidMount() {
+        setInterval(() => {
+            this.check_internet_connection()
+        }, 5000);
+    }
     authText() {
         return stateStore.user
             ? `Logged in as: ${stateStore.user.uid}`
@@ -49,6 +62,24 @@ export default class HomeScreen extends Component {
     navigate(route) {
         const {navigate} = this.props.navigation
         navigate(route)
+    }
+    check_internet_connection() {
+        NetInfo.isConnected.fetch().then(isConnected => {
+            if(isConnected)
+            {
+                this.setState( {
+                    connectivity: "Internet connection"
+                })
+            }
+            else {
+                this.setState({
+                    connectivity: "No internet connection"
+                })
+            }
+        });
+    }
+    getConnectivity() {
+        return this.state.connectivity
     }
 }
 const styles = StyleSheet.create({
