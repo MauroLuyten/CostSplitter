@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
-import {View, Text, Button, StyleSheet, TouchableOpacity, NetInfo} from 'react-native'
-import {StackNavigator} from 'react-navigation';
+import {View, StyleSheet, NetInfo} from 'react-native'
+import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge } from 'native-base'
+import { Col, Row, Grid } from 'react-native-easy-grid'
+import {StackNavigator} from 'react-navigation'
 import {observer} from 'mobx-react'
 import stateStore from '../store/store'
 
@@ -16,27 +18,28 @@ export default class HomeScreen extends Component {
     static navigationOptions = {
         title: 'Home',
         headerTitleStyle: { alignSelf: 'center'},
-        headerStyle: { backgroundColor: '#DEEFF5'},
+        headerStyle: { backgroundColor: '#bac2ff'},
     }
     render() {
         const {navigate} = this.props.navigation
         return (
-            <View style={styles.container}>
-            <Text>{this.getConnectivity()}</Text>
-                <Text style={styles.status}>
-                    {this.authText()}
-                </Text>
-                <View style={styles.container2}>
-                    {this.loggedIn()
-                        ? (<View style={styles.button}><Button title="Logout" onPress={() => this.logout()}/></View>)
-                        : (<View style={styles.button}><Button title="Login" onPress={() => navigate('Login')}/></View>)}
-                    <View style={styles.button}>
-                        <Button title="Overview" onPress={() => navigate('Overview')}/>
+            <Container>
+                <Content>
+                    <Text>{this.getConnectivity()}</Text>
+                    <Text style={styles.status}>
+                        {this.authText()}
+                    </Text>
+                    <View>
+                        <Grid>
+                        {this.loggedIn()
+                            ? (<Row><Col><Button rounded style={styles.button} onPress={() => this.logout()}><Text style={styles.buttonText}>Logout</Text></Button></Col></Row>)
+                            : (<Row><Col><Button rounded style={styles.button} onPress={() => navigate('Login')}><Text style={styles.buttonText}>Login</Text></Button></Col></Row>)
+                        } 
+                        <Row><Col><Button rounded style={styles.button} onPress={() => navigate('Overview')}><Text style={styles.buttonText}>Overview</Text></Button></Col></Row>
+                        </Grid>
                     </View>
-                </View>
-                <TouchableOpacity>
-                    </TouchableOpacity>
-            </View>
+                </Content>
+            </Container>
         )
     }
     componentWillMount() {
@@ -82,23 +85,17 @@ export default class HomeScreen extends Component {
         return this.state.connectivity
     }
 }
+
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#F5FCFF',
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-    },
-    container2: {
-        backgroundColor: '#A5FCFF',
-        flexDirection: 'row',
-        justifyContent: 'center',
+    status: {
+        fontSize: 30,
+        textAlign: 'center'
     },
     button: {
-        padding: 10
+        marginTop: 20,
+        alignSelf: 'center'
     },
-    status: {
+    buttonText: {
         fontSize: 20,
-        textAlign: 'center'
-    }
+    },
 });
