@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
-import {StyleSheet, View, Alert} from 'react-native'
-import {Badge, ListView, List, ListItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button} from 'native-base';
+import { StyleSheet, View, Alert } from 'react-native'
+import { Badge, ListView, List, ListItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
-import {firebaseApp} from '../firebaseconfig'
+import { firebaseApp } from '../firebaseconfig'
 import stateStore from '../store/store'
-import {observer} from 'mobx-react'
+import { observer } from 'mobx-react'
 
 @observer
-export default class EventScreen extends Component{
-    constructor(props){
+export default class EventScreen extends Component {
+    constructor(props) {
         super(props)
         this.state = {
             eventKey: null,
@@ -24,41 +24,48 @@ export default class EventScreen extends Component{
     static navigationOptions = {
         title: 'Event'
     }
-    render(){
+    render() {
         const event = stateStore.getEvent(this.state.eventKey)
 
-        return(
-            <View style={{flex:1}}>
-                    <Card style={{padding:10, maxHeight:200}}>
-                        
-                            <Text style={{fontSize:22, fontWeight:'bold', marginBottom:5}}>{event.name}</Text>
-                            <View>
-                                <Text style={styles.textmargin}>Description:             {event.description  == null ? "/" : event.description}</Text> 
-                                <Text style={styles.textmargin}>Amount:                   {event.amount == null ? "/": event.amount} {event.currency === null ? "/" : event.currency}</Text>
-                                <Text style={styles.textmargin}>Date:                         {event.date == null ? "/" : event.date}</Text>
-                            </View>
-                        
-                    </Card>
-                    <View>
-                        <Text style={{marginTop:40,marginLeft:12, fontWeight: 'bold'}}>Splitters:</Text> 
-                        {event.splitters == null ? (
-                            <Text>No splitters yet</Text>
-                        ) 
+        return (
+            <View style={{ flex: 1, marginTop:12}}>
+                <Card style={{ padding: 16, flex:-1 }}>
+
+                    <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 16 }}>{event.name}</Text>
+                    <View style={styles.splitTextContainer}>
+                        <Text style={{}}>Description:</Text>
+                        <Text style={{ marginRight: 16 }}>{event.description == null ? "/" : event.description}</Text>
+                    </View>
+                    <View style={styles.splitTextContainer}>
+                        <Text style={{}}>Amount:</Text>
+                        <Text style={{ marginRight: 16 }}>{event.amount == null ? "/" : event.amount} {event.currency === null ? "/" : event.currency}</Text>
+                    </View>
+                    <View style={styles.splitTextContainer}>
+                        <Text style={{}}>Date:</Text>
+                        <Text style={{ marginRight: 16 }}>{event.date == null ? "/" : event.date}</Text>
+                    </View>
+
+                </Card>
+                <View>
+                    <Text style={{ marginTop: 16, marginLeft: 16, fontWeight: 'bold', marginBottom:16 }}>Splitters:</Text>
+                    {event.splitters == null ? (
+                        <Text>No splitters yet</Text>
+                    )
                         :
                         (<List style={styles.list} dataArray={event.splitters}
-                        renderRow={(splitter) => 
-                            <ListItem style={styles.listitem}>
-                                <View  style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <Text>{splitter.name}   {splitter.amount} {splitter.currency}</Text>
-                                    <Badge style={{marginRight: 50, backgroundColor:"#5067FF"}}>
-                                           <Text>{splitter.paid === "true" ? 'V' : 'X'}</Text>
-                                    </Badge>
-                                </View>
-                            </ListItem>
-                        }>>
+                            renderRow={(splitter) =>
+                                <ListItem style={styles.listitem}>
+                                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <Text>{splitter.name}   {splitter.amount} {splitter.currency}</Text>
+                                        <Badge style={{ marginRight: 16, backgroundColor: "#5067FF" }}>
+                                            <Text>{splitter.paid === "true" ? 'V' : 'X'}</Text>
+                                        </Badge>
+                                    </View>
+                                </ListItem>
+                            }>>
                         </List>)}
-                    </View>
-                    <Fab
+                </View>
+                <Fab
                     active={true}
                     direction="up"
                     style={{ backgroundColor: '#5067FF' }}
@@ -68,9 +75,9 @@ export default class EventScreen extends Component{
                     <Text>+</Text>
                 </Fab>
                 <ModalWrapper
-                        onRequestClose={() => {this.setAddSplitterDialog(false)} }
-                        style={{ width: 350, height: 'auto', padding: 24 }}
-                        visible={this.state.addSplitterDialog}>
+                    onRequestClose={() => { this.setAddSplitterDialog(false) }}
+                    style={{ width: 350, height: 'auto', padding: 24 }}
+                    visible={this.state.addSplitterDialog}>
                     <Text>Add Splitter</Text>
                     <Item floatingLabel>
                         <Label>Name</Label>
@@ -86,24 +93,24 @@ export default class EventScreen extends Component{
                     <Item floatingLabel>
                         <Label>Currency</Label>
                         <Input
-                        selectionColor="#5067FF"
-                        onChangeText={(currency) => {
-                            this.setState({
-                                newSplitterCurrency: currency
-                            })
-                        }}
-                        autoFocus={false}/>
+                            selectionColor="#5067FF"
+                            onChangeText={(currency) => {
+                                this.setState({
+                                    newSplitterCurrency: currency
+                                })
+                            }}
+                            autoFocus={false} />
                     </Item>
-                   <Item floatingLabel>
-                       <Label>Amount</Label>
-                       <Input
-                       selectionColor="#5067FF"
-                       onChangeText={(amount) => {
-                           this.setState({
-                               newSplitterAmount: amount
-                           })
-                       }}
-                       autoFocus={false}/>
+                    <Item floatingLabel>
+                        <Label>Amount</Label>
+                        <Input
+                            selectionColor="#5067FF"
+                            onChangeText={(amount) => {
+                                this.setState({
+                                    newSplitterAmount: amount
+                                })
+                            }}
+                            autoFocus={false} />
                     </Item>
                     <View style={styles.buttonContainer}>
                         <Button transparent small onPress={() => this.setAddSplitterDialog(false)}>
@@ -124,7 +131,7 @@ export default class EventScreen extends Component{
             uid: uid,
             eventRef: firebaseApp.database().ref(`users/${uid}/events/${eventKey}`),
             eventKey: eventKey
-        })    
+        })
     }
     setAddSplitterDialog(visible) {
         this.setState({
@@ -132,9 +139,9 @@ export default class EventScreen extends Component{
         })
     }
     addSplitter() {
-        const {eventKey, uid, newSplitterName, newSplitterCurrency, newSplitterAmount, newSplitterPaid} = this.state;
-        if(newSplitterName && newSplitterCurrency && newSplitterAmount) {
-            if(newSplitterAmount > 0) {
+        const { eventKey, uid, newSplitterName, newSplitterCurrency, newSplitterAmount, newSplitterPaid } = this.state;
+        if (newSplitterName && newSplitterCurrency && newSplitterAmount) {
+            if (newSplitterAmount > 0) {
                 stateStore.addSplitterToEvent(eventKey, newSplitterName, newSplitterCurrency, newSplitterAmount, newSplitterPaid)
                 this.setAddSplitterDialog(false)
             }
@@ -143,10 +150,10 @@ export default class EventScreen extends Component{
                     'Wrong amount',
                     'Amount must be positive!',
                     [
-                      {text: 'OK', onPress: () => console.log('OK Pressed')},
+                        { text: 'OK', onPress: () => console.log('OK Pressed') },
                     ],
                     { cancelable: false }
-                  )
+                )
             }
         }
         else {
@@ -154,13 +161,13 @@ export default class EventScreen extends Component{
                 'Field missing',
                 'Every field must be filled in!',
                 [
-                  {text: 'OK', onPress: () => console.log('OK Pressed')},
+                    { text: 'OK', onPress: () => console.log('OK Pressed') },
                 ],
                 { cancelable: false }
-              )
+            )
         }
     }
-    
+
 }
 
 
@@ -172,15 +179,16 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch'
     },
     listitem: {
-        marginTop: 20,
         margin: 0,
         marginLeft: 0,
-        paddingLeft: 17,
+        paddingLeft: 16,
         alignSelf: 'stretch',
         backgroundColor: '#F4F4F4'
     },
-    textmargin: {
-        marginTop: 17,
+    splitTextContainer: { 
+        flexDirection: 'row', 
+        justifyContent: 'space-between', 
+        marginBottom: 16 
     },
     buttonContainer: {
         flexDirection: 'row',
