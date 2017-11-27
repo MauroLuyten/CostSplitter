@@ -50,7 +50,7 @@ export default class EditEventDialog extends Component {
                 <Item floatingLabel style={{marginBottom:16}}>
                     <Label>Amount</Label>
                     <Input
-                        value={this.state.newEventAmount.toString()}
+                        value={this.state.newEventAmount&&this.state.newEventAmount.toString()}
                         keyboardType='numeric'
                         selectionColor="#5067FF"
                         onChangeText={(amount) => {
