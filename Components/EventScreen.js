@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { StyleSheet, View, Alert } from 'react-native'
-import { Badge, ListView, List, ListItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button } from 'native-base';
+import { Icon, Badge, ListView, List, ListItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import { firebaseApp } from '../firebaseconfig'
 import stateStore from '../store/store'
 import { observer } from 'mobx-react'
 import AddSplitterDialog from './Dialogs/AddSplitterDialog'
+import EditEventDialog from './Dialogs/EditEventDialog'
 
 @observer
 export default class EventScreen extends Component {
@@ -15,8 +16,7 @@ export default class EventScreen extends Component {
             eventKey: null,
             uid: null,
             eventRef: null,
-            addSplitterDialog: false,
-            
+
         }
     }
     static navigationOptions = {
@@ -26,17 +26,24 @@ export default class EventScreen extends Component {
         const event = stateStore.getEvent(this.state.eventKey)
 
         return (
-            <View style={{ flex: 1, marginTop:12}}>
-                <Card style={{ padding: 16, flex:-1 }}>
+            <View style={{ flex: 1, marginTop: 12 }}>
+                <Card style={{ padding: 16, flex: -1 }}>
 
-                    <Text style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 16 }}>{event.name}</Text>
+                    <View style={styles.splitTextContainer}>
+                        <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{event.name}</Text>
+                        <Icon 
+                        onPress={()=>this.setEditEventDialog(true)}
+                        style={{ marginRight: 16, color:'#757575' }} 
+                        android="md-create" 
+                        ios="ios-create"></Icon>
+                    </View>
                     <View style={styles.splitTextContainer}>
                         <Text style={{}}>Description:</Text>
                         <Text style={{ marginRight: 16 }}>{event.description == null ? "/" : event.description}</Text>
                     </View>
                     <View style={styles.splitTextContainer}>
                         <Text style={{}}>Amount:</Text>
-                        <Text style={{ marginRight: 16 }}>{event.amount == null ? "/" : event.amount} {event.currency === null ? "/" : event.currency}</Text>
+                        <Text style={{ marginRight: 16 }}>{event.amount == null ? "/" : event.amount} {event.currency == null ? "/" : event.currency}</Text>
                     </View>
                     <View style={styles.splitTextContainer}>
                         <Text style={{}}>Date:</Text>
@@ -45,7 +52,7 @@ export default class EventScreen extends Component {
 
                 </Card>
                 <View>
-                    <Text style={{ marginTop: 16, marginLeft: 16, fontWeight: 'bold', marginBottom:16 }}>Splitters:</Text>
+                    <Text style={{ marginTop: 16, marginLeft: 16, fontWeight: 'bold', marginBottom: 16 }}>Splitters:</Text>
                     {event.splitters == null ? (
                         <Text>No splitters yet</Text>
                     )
@@ -55,7 +62,7 @@ export default class EventScreen extends Component {
                                 <ListItem style={styles.listitem}>
                                     <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                                         <Text>{splitter.name}   {splitter.amount} {splitter.currency}</Text>
-                                        <Badge style={{ marginRight: 16, backgroundColor: this.paidColor(splitter.paid==="true") }}>
+                                        <Badge style={{ marginRight: 16, backgroundColor: this.paidColor(splitter.paid === "true") }}>
                                             <Text>{splitter.paid === "true" ? 'V' : 'X'}</Text>
                                         </Badge>
                                     </View>
@@ -65,6 +72,9 @@ export default class EventScreen extends Component {
                 </View>
                 <AddSplitterDialog ref="AddSplitterDialog" eventKey={this.state.eventKey} uid={this.state.uid}>
                 </AddSplitterDialog>
+                <EditEventDialog ref="EditEventDialog" eventKey={this.state.eventKey} uid={this.state.uid}>
+
+                </EditEventDialog>
                 <Fab
                     active={true}
                     direction="up"
@@ -74,7 +84,7 @@ export default class EventScreen extends Component {
                 >
                     <Text>+</Text>
                 </Fab>
-                
+
             </View>
         )
     }
@@ -90,9 +100,12 @@ export default class EventScreen extends Component {
     setAddSplitterDialog(visible) {
         this.refs.AddSplitterDialog.setAddSplitterDialog(visible)
     }
-    paidColor(paid){
-        return paid? '#4CAF50':'#F44336'
-        
+    setEditEventDialog(visible) {
+        this.refs.EditEventDialog.setEditEventDialog(visible)
+    }
+    paidColor(paid) {
+        return paid ? '#4CAF50' : '#F44336'
+
     }
 
 }
@@ -112,10 +125,10 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         backgroundColor: '#F4F4F4'
     },
-    splitTextContainer: { 
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
-        marginBottom: 16 
+    splitTextContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16
     },
     buttonContainer: {
         flexDirection: 'row',
