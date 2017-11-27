@@ -4,19 +4,20 @@ import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button,
 var ModalWrapper = require('react-native-modal-wrapper').default
 import { StackNavigator } from 'react-navigation';
 import stateStore from '../store/store'
-import {observer} from 'mobx-react'
+import { observer } from 'mobx-react'
 import AddEventDialog from './Dialogs/AddEventDialog'
+import RemoveEventDialog from './Dialogs/RemoveEventDialog'
 
 @observer
 export default class OverviewScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedEvent: null,
+            selectedEvent: '',
             removeEventDialog: false,
             newEventName: ''
         }
-        
+
     }
     static navigationOptions = {
         title: 'Overview'
@@ -27,7 +28,7 @@ export default class OverviewScreen extends Component {
                 <Separator bordered style={styles.seperator}>
                     <Text>EVENTS</Text>
                 </Separator>
-                {stateStore.events.length===0 ?
+                {stateStore.events.length === 0 ?
                     (
                         <Text>
                             No events added yet
@@ -44,7 +45,7 @@ export default class OverviewScreen extends Component {
                                     <View>
                                         <Badge
                                             style={{ marginRight: 5, backgroundColor: '#5067FF' }}>
-                                            <Text onPress={() => {  {this.removeEventDialog(event.key)} }}>
+                                            <Text onPress={() => { { this.setRemoveEventDialog(event.key) } }}>
                                                 X
                                             </Text>
                                         </Badge>
@@ -57,6 +58,12 @@ export default class OverviewScreen extends Component {
                 <AddEventDialog ref="AddEventDialog" uid={this.state.uid}>
 
                 </AddEventDialog>
+
+                <RemoveEventDialog
+                    ref="RemoveEventDialog"
+                    uid={this.state.uid}>
+                </RemoveEventDialog>
+
                 <Fab
                     active={true}
                     direction="up"
@@ -66,21 +73,7 @@ export default class OverviewScreen extends Component {
                 >
                     <Text>+</Text>
                 </Fab>
-                <ModalWrapper
-                    onRequestClose={() => { this.setRemoveEventDialog(false) }}
-                    style={{ width: 350, height: 'auto', padding: 24 }}
-                    visible={this.state.removeEventDialog}>
-                    <Text>Remove Event</Text>
-                    <Text>Do you want to remove {this.state.selectedEvent && this.state.selectedEvent.name} ?</Text>
-                    <View style={styles.buttonContainer}>
-                        <Button transparent small onPress={() => this.setRemoveEventDialog(false)}>
-                            <Text style={{ color: '#5067FF' }}>Cancel</Text>
-                        </Button>
-                        <Button primary small onPress={() => this.removeEvent(this.state.selectedEvent.key)}>
-                            <Text style={{ color: 'white' }}>Confirm</Text>
-                        </Button>
-                    </View>
-                </ModalWrapper>
+
 
             </View>
         )
@@ -91,18 +84,7 @@ export default class OverviewScreen extends Component {
             uid: stateStore.user.uid
         })
     }
-    removeEventDialog(eventKey) {
-        const event = stateStore.events.find(event => event.key===eventKey)
-        this.setState({
-            selectedEvent: event
-        })
-        this.setRemoveEventDialog(true)
-    }
-    removeEvent(key) {
-        stateStore.removeEvent(key)
-        this.setRemoveEventDialog(false)
 
-    }
     navigate(route, params) {
         const { navigate } = this.props.navigation
         navigate(route, params)
@@ -110,18 +92,13 @@ export default class OverviewScreen extends Component {
     setAddEventDialog(visible) {
         this.refs.AddEventDialog.setAddEventDialog(visible)
     }
-    setRemoveEventDialog(visible) {
-        this.setState({
-            removeEventDialog: visible
+    setRemoveEventDialog(key) {
+        const event = stateStore.getEvent(key)
+        this.refs.RemoveEventDialog.setState({
+            event: event
         })
+        this.refs.RemoveEventDialog.setRemoveEventDialog(true)
     }
-/*     addEvent() {
-        const { newEventName, user } = this.state
-        if(newEventName){
-            stateStore.addEvent({name: newEventName})
-            this.setAddEventDialog(false)
-        }
-    } */
 }
 const styles = StyleSheet.create({
     container: {
