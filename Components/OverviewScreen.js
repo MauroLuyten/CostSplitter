@@ -5,6 +5,7 @@ var ModalWrapper = require('react-native-modal-wrapper').default
 import { StackNavigator } from 'react-navigation';
 import stateStore from '../store/store'
 import {observer} from 'mobx-react'
+import AddEventDialog from './Dialogs/AddEventDialog'
 
 @observer
 export default class OverviewScreen extends Component {
@@ -12,7 +13,6 @@ export default class OverviewScreen extends Component {
         super(props)
         this.state = {
             selectedEvent: null,
-            addEventDialog: false,
             removeEventDialog: false,
             newEventName: ''
         }
@@ -54,6 +54,9 @@ export default class OverviewScreen extends Component {
                         }>
                         ></List>
                     )}
+                <AddEventDialog ref="AddEventDialog" uid={this.state.uid}>
+
+                </AddEventDialog>
                 <Fab
                     active={true}
                     direction="up"
@@ -63,31 +66,6 @@ export default class OverviewScreen extends Component {
                 >
                     <Text>+</Text>
                 </Fab>
-                <ModalWrapper
-                    onRequestClose={() => { this.setAddEventDialog(false) }}
-                    style={{ width: 350, height: 'auto', padding: 24 }}
-                    visible={this.state.addEventDialog}>
-                    <Text>New Event</Text>
-                    <Item floatingLabel>
-                        <Label>Event Name</Label>
-                        <Input
-                            selectionColor="#5067FF"
-                            onChangeText={(text) => {
-                                this.setState({
-                                    newEventName: text
-                                })
-                            }}
-                            autoFocus={true} />
-                    </Item>
-                    <View style={styles.buttonContainer}>
-                        <Button transparent small onPress={() => this.setAddEventDialog(false)}>
-                            <Text style={{ color: '#5067FF' }}>Cancel</Text>
-                        </Button>
-                        <Button primary small onPress={() => this.addEvent()}>
-                            <Text style={{ color: 'white' }}>Confirm</Text>
-                        </Button>
-                    </View>
-                </ModalWrapper>
                 <ModalWrapper
                     onRequestClose={() => { this.setRemoveEventDialog(false) }}
                     style={{ width: 350, height: 'auto', padding: 24 }}
@@ -130,22 +108,20 @@ export default class OverviewScreen extends Component {
         navigate(route, params)
     }
     setAddEventDialog(visible) {
-        this.setState({
-            addEventDialog: visible
-        })
+        this.refs.AddEventDialog.setAddEventDialog(visible)
     }
     setRemoveEventDialog(visible) {
         this.setState({
             removeEventDialog: visible
         })
     }
-    addEvent() {
+/*     addEvent() {
         const { newEventName, user } = this.state
         if(newEventName){
             stateStore.addEvent({name: newEventName})
             this.setAddEventDialog(false)
         }
-    }
+    } */
 }
 const styles = StyleSheet.create({
     container: {

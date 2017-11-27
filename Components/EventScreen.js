@@ -54,7 +54,7 @@ export default class EventScreen extends Component {
                 <View>
                     <Text style={{ marginTop: 16, marginLeft: 16, fontWeight: 'bold', marginBottom: 16 }}>Splitters:</Text>
                     {event.splitters == null ? (
-                        <Text>No splitters yet</Text>
+                        <Text style={{marginLeft:16}}>No splitters yet</Text>
                     )
                         :
                         (<List style={styles.list} dataArray={event.splitters}
@@ -71,6 +71,7 @@ export default class EventScreen extends Component {
                         </List>)}
                 </View>
                 <AddSplitterDialog ref="AddSplitterDialog" eventKey={this.state.eventKey} uid={this.state.uid}>
+
                 </AddSplitterDialog>
                 <EditEventDialog ref="EditEventDialog" eventKey={this.state.eventKey} uid={this.state.uid}>
 
