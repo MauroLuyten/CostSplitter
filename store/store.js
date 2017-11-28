@@ -73,6 +73,13 @@ class StateStore {
             this.error=error
         })
     }
+    editEvent(event, key){
+        firebaseApp.database().ref(`users/${this.user.uid}/events`).child(key).update(event)
+        .then()
+        .catch(error=> {
+            this.error=error
+        })
+    }
     getEvent(eventKey) {
         return this.events.find(event => event.key === eventKey)
     }
