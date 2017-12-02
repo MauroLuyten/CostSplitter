@@ -1,23 +1,62 @@
 import { observable, action, computed } from 'mobx'
 import { firebaseApp } from '../firebaseconfig'
 import { ListView } from "react-native";
+import {AsyncStorage} from 'react-native'
+import {create, persist} from 'mobx-persist'
 
 
+class Splitter {
+    constructor(name,currency,amount){
+        this.name = name
+        this.currency = currency
+        this.amount = amount
+    }
+    @persist @observable  name = ''
+    @persist @observable currency = ''
+    @persist @observable amount = 0
+}
+class Event {
+    constructor(name,description,amount){
+        this.name = name
+        this.description = description
+        this.amount = amount
+    }
+    @persist @observable  name = ''
+    @persist @observable description = ''
+    @persist @observable amount = 0
+    @persist('map', Splitter) @observable splitters = new Map()
+}
+class Trip {
+    constructor(name,description){
+        this.name = name
+        this.description = description
+    }
+    @persist @observable  name = ''
+    @persist @observable description = ''
+    @persist('map', Event) @observable events = new Map()
+}
 class StateStore {
-    @observable user = {}
-    @observable trips = new Map()
-    @observable error = {}
+    @persist('object') @observable user = {}
+    @persist('map', Trip) @observable trips = new Map()
+    @persist('object') @observable error = {}
     @observable online = false
 
 
 
+    /* writeToStorage() {
+        AsyncStorage.setItem('trips', JSON.stringify(this.trips))
+        .then()
+        .catch(error=>{
+            
+        })
+    } */
     generateKey() {
         return firebaseApp.database().ref().push().key
     }
     @action addTrip(trip) {
-        trip.events = observable(new Map())
+        
         let key = this.generateKey()
-        this.trips.set(key, trip)
+        this.trips.set(key, new Trip(trip.name, trip.description))
         if (this.online) {
             firebaseApp.database().ref(`users/${this.user.uid}/trips`).child(key).set(trip)
                 .then()
@@ -33,6 +72,7 @@ class StateStore {
             trip.key = key
             tripsArray.push(trip)
         });
+        console.warn(JSON.stringify(tripsArray))
         return tripsArray
     }
     editTrip(trip) {
@@ -47,7 +87,7 @@ class StateStore {
     addEvent(tripKey, event) {
         event.splitters = observable.map()
         const key = this.generateKey()
-        this.trips.get(tripKey).events.set(key,event)
+        this.trips.get(tripKey).events.set(key,new Event(event.name, event.description, event.amount))
         if (this.online) {
             database().ref(`users/${this.user.uid}/trips`)
                 .child(tripKey)
@@ -83,7 +123,8 @@ class StateStore {
     }
     addSplitter(tripKey, eventKey, splitter){
         const key = this.generateKey()
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(key,splitter)
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(
+            key,new Splitter(splitter.name, splitter.currency, splitter.amount))
         if(this.online){
             firebaseApp.database().ref(`users/${this.user.uid}/trips`)
             .child(tripKey)
@@ -215,4 +256,9 @@ class StateStore {
 
 }
 const stateStore = new StateStore()
+    const hydrate = create({
+        storage: AsyncStorage,
+        jsonify: true
+    })
+    hydrate('state', stateStore)
 export default stateStore;
