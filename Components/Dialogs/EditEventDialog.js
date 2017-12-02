@@ -10,6 +10,7 @@ export default class EditEventDialog extends Component {
         this.state = {
             dialog: false,
             uid: this.props.uid,
+            tripKey: this.props.tripKey,
             eventKey: this.props.eventKey,
             newEventName: '',
             newEventDescription: '',
@@ -72,7 +73,7 @@ export default class EditEventDialog extends Component {
         )
     }
     componentWillMount(){
-        const event = stateStore.getEvent(this.props.eventKey)
+        const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
         this.setState({
             newEventName: event.name,
             newEventDescription: event.description,

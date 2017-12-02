@@ -9,8 +9,8 @@ export default class AddSplitterDialog extends Component {
         super(props)
         this.state = {
             dialog: false,
+            tripKey: this.props.tripKey,
             eventKey:this.props.eventKey,
-            uid: this.props.uid,
             newSplitterName: '',
             newSplitterCurrency: '',
             newSplitterAmount: 0,
@@ -75,22 +75,14 @@ export default class AddSplitterDialog extends Component {
         })
     }
     addSplitter() {
-        const { 
-            eventKey, 
-            uid, 
-            newSplitterName, 
-            newSplitterCurrency, 
-            newSplitterAmount, 
-            newSplitterPaid
-         } = this.state;
-        if (newSplitterName && newSplitterCurrency && newSplitterAmount) {
-            if (newSplitterAmount > 0) {
-                stateStore.addSplitterToEvent(
-                    eventKey, 
-                    newSplitterName, 
-                    newSplitterCurrency, 
-                    newSplitterAmount, 
-                    newSplitterPaid)
+        const splitter ={ 
+            name: this.state.newSplitterName,
+            currency: this.state.newSplitterCurrency,
+            amount: this.state.newSplitterAmount
+         } 
+        if (splitter.name && splitter.currency && splitter.amount) {
+            if (splitter.amount > 0) {
+                stateStore.addSplitter(this.state.tripKey, this.state.eventKey, splitter)
                 this.setAddSplitterDialog(false)
             }
             else {

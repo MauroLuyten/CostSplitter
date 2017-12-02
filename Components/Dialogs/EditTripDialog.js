@@ -4,34 +4,33 @@ import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
 
-export default class AddEventDialog extends Component {
+export default class EditTripDialog extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            tripKey: this.props.tripKey,
             dialog: false,
             uid: this.props.uid,
-            newEventName: '',
-            newEventDescription: '',
-            newEventAmount: 0,
+            tripKey: this.props.tripKey,
+            newTripName: '',
+            newTripDescription: '',
+
         }
     }
     render() {
         return (
-
             <ModalWrapper
-                onRequestClose={() => { this.setAddEventDialog(false) }}
+                onRequestClose={() => { this.setEditTripDialog(false) }}
                 style={{ width: 350, height: 'auto', padding: 16 }}
                 visible={this.state.dialog}>
-                <Text style={{ marginBottom: 16 }}>Add Event</Text>
+                <Text style={{ marginBottom: 16 }}>Edit Trip</Text>
                 <Item floatingLabel style={{ marginBottom: 16 }}>
                     <Label>Name</Label>
                     <Input
-                        value={this.state.newEventName}
+                        value={this.state.newTripName}
                         selectionColor="#5067FF"
                         onChangeText={(name) => {
                             this.setState({
-                                newEventName: name
+                                newTripName: name
                             })
                         }}
                         autoFocus={true} />
@@ -39,19 +38,19 @@ export default class AddEventDialog extends Component {
                 <Item floatingLabel style={{ marginBottom: 16 }}>
                     <Label>Description</Label>
                     <Input
-                        value={this.state.newEventDescription}
+                        value={this.state.newTripDescription}
                         selectionColor="#5067FF"
                         onChangeText={(description) => {
                             this.setState({
-                                newEventDescription: description
+                                newTripDescription: description
                             })
                         }}
                         autoFocus={false} />
                 </Item>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
+                {/* <Item floatingLabel style={{marginBottom:16}}>
                     <Label>Amount</Label>
                     <Input
-                        value={this.state.newEventAmount.toString()}
+                        value={this.state.newEventAmount&&this.state.newEventAmount.toString()}
                         keyboardType='numeric'
                         selectionColor="#5067FF"
                         onChangeText={(amount) => {
@@ -60,51 +59,41 @@ export default class AddEventDialog extends Component {
                             })
                         }}
                         autoFocus={false} />
-                </Item>
+                </Item> */}
                 <View style={styles.buttonContainer}>
-                    <Button transparent small onPress={() => this.setAddEventDialog(false)}>
+                    <Button transparent small onPress={() => this.setEditTripDialog(false)}>
                         <Text style={{ color: '#5067FF' }}>Cancel</Text>
                     </Button>
-                    <Button primary small onPress={() => this.addEvent()}>
+                    <Button primary small onPress={() => this.editTrip()}>
                         <Text style={{ color: 'white' }}>Confirm</Text>
                     </Button>
                 </View>
             </ModalWrapper>
         )
     }
-    setAddEventDialog(visible) {
+    componentWillMount() {
+        const trip = stateStore.getEvent(this.props.tripKey)
+        this.setState({
+            newTripName: trip.name,
+            newTripDescription: trip.description,
+
+        })
+    }
+    setEditTripDialog(visible) {
         this.setState({
             dialog: visible
         })
     }
-    addEvent() {
-        const event = {
-            name: this.state.newEventName,
-            description: this.state.newEventDescription,
-            amount: this.state.newEventAmount
-
+    editTrip() {
+        const trip = {
+            name: this.state.newTripName,
+            description: this.state.newTripDescription,
         }
-        if (event.name && event.description && event.amount) {
-            if (event.amount
-                > 0) {
-                stateStore.addEvent(this.state.tripKey, event)
-                this.setAddEventDialog(false)
-                this.setState({
-                    newEventName: '',
-                    newEventDescription: '',
-                    newEventAmount: 0,
-                })
-            }
-            else {
-                Alert.alert(
-                    'Wrong amount',
-                    'Amount must be positive!',
-                    [
-                        { text: 'OK', onPress: () => console.log('OK Pressed') },
-                    ],
-                    { cancelable: false }
-                )
-            }
+        if (trip.name && trip.description) {
+
+            stateStore.editTrip(trip, this.props.tripKey)
+            this.setEditTripDialog(false)
+
         }
         else {
             Alert.alert(

@@ -4,47 +4,47 @@ import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button,
 import { StackNavigator } from 'react-navigation';
 import stateStore from '../store/store'
 import { observer } from 'mobx-react'
-import AddTripDialog from './Dialogs/AddTripDialog'
-import RemoveTripDialog from './Dialogs/RemoveTripDialog'
+import AddEventDialog from './Dialogs/AddEventDialog'
+import RemoveEventDialog from './Dialogs/RemoveEventDialog'
 
 @observer
-export default class OverviewScreen extends Component {
+export default class TripScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            tripKey: this.props.navigation.state.params.tripKey,
             selectedEvent: '',
-            RemoveTripDialog: false,
-            newEventName: ''
+            removeEventDialog: false,
         }
 
     }
     static navigationOptions = {
-        title: 'Overview'
+        title: 'Trip'
     }
     render() {
         return (
             <View style={styles.container}>
                 <Separator bordered style={styles.seperator}>
-                    <Text style={{fontWeight: 'bold'}}>TRIPS</Text>
+                    <Text>EVENTS</Text>
                 </Separator>
-                {stateStore.trips.keys().length === 0 ?
+                {stateStore.getEvents(this.state.tripKey).keys().length === 0 ?
                     (
-                        <Text style={{marginLeft:16, marginTop: 16}}>
-                            No trips added yet
+                        <Text>
+                            No events added yet
                         </Text>
                     )
                     :
                     (<List
                         style={styles.list}
-                        dataArray={stateStore.getTrips}
-                        renderRow={(trip) =>
-                            <ListItem button style={styles.listitem} onPress={() => { this.openTrip(trip.key) }}>
+                        dataArray={stateStore.getEvents(this.state.tripKey)}
+                        renderRow={(event) =>
+                            <ListItem button style={styles.listitem} onPress={() => { this.openEvent(event.key) }}>
                                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text>{trip.name}</Text>
+                                    <Text>{event.name}</Text>
                                     <View>
                                         <Badge
                                             style={{ marginRight: 5, backgroundColor: '#5067FF' }}>
-                                            <Text onPress={() => { { this.setRemoveTripDialog(trip.key) } }}>
+                                            <Text onPress={() => { { this.setRemoveEventDialog(event.key) } }}>
                                                 X
                                             </Text>
                                         </Badge>
@@ -54,22 +54,24 @@ export default class OverviewScreen extends Component {
                         }>
                         ></List>
                     )}
-                <AddTripDialog ref="AddTripDialog" uid={this.state.uid}>
+                <AddEventDialog 
+                    ref="AddEventDialog" 
+                    uid={this.state.uid} 
+                    tripKey={this.state.tripKey}>
+                </AddEventDialog>
 
-                </AddTripDialog>
-
-                <RemoveTripDialog
-                    ref="RemoveTripDialog"
-                    uid={this.state.uid}>
-                </RemoveTripDialog>
+                <RemoveEventDialog
+                    ref="RemoveEventDialog"
+                    uid={this.state.uid}
+                    tripKey={this.state.tripKey}>
+                </RemoveEventDialog>
 
                 <Fab
                     active={true}
                     direction="up"
                     style={{ backgroundColor: '#5067FF' }}
                     position="bottomRight"
-                    onPress={() => this.setAddTripDialog(true)}
-                >
+                    onPress={() => this.setAddEventDialog(true)}>
                     <Text>+</Text>
                 </Fab>
 
@@ -77,9 +79,10 @@ export default class OverviewScreen extends Component {
             </View>
         )
     }
-    openTrip(key) {
-        this.navigate('Trip', {
-            tripKey: key,
+    openEvent(key) {
+        this.navigate('Event', {
+            tripKey: this.state.tripKey,
+            eventKey: key,
             //uid: stateStore.user.uid
         })
     }
@@ -88,15 +91,15 @@ export default class OverviewScreen extends Component {
         const { navigate } = this.props.navigation
         navigate(route, params)
     }
-    setAddTripDialog(visible) {
-        this.refs.AddTripDialog.setAddTripDialog(visible)
+    setAddEventDialog(visible) {
+        this.refs.AddEventDialog.setAddEventDialog(visible)
     }
-    setRemoveTripDialog(key) {
-        const trip = stateStore.getTrip(key)
-        this.refs.RemoveTripDialog.setState({
-            trip: trip
+    setRemoveEventDialog(key) {
+        this.refs.RemoveEventDialog.setState({
+            eventKey: key,
+            event: stateStore.getEvent(this.state.tripKey, key)
         })
-        this.refs.RemoveTripDialog.setRemoveTripDialog(true)
+        this.refs.RemoveEventDialog.setRemoveEventDialog(true)
     }
 }
 const styles = StyleSheet.create({

@@ -18,11 +18,11 @@ import {StackNavigator} from 'react-navigation'
 import HomeScreen from './Components/HomeScreen'
 import LoginScreen from './Components/LoginScreen'
 import OverviewScreen from './Components/OverviewScreen'
+import TripScreen from './Components/TripScreen'
 import EventScreen from './Components/EventScreen'
 import {firebaseApp} from './firebaseconfig.js'
 import stateStore from './store/store'
 import {observer} from 'mobx-react'
-//import {withMappedNavigationProps} from 'react-navigation-props-mapper'
 
 const Application = StackNavigator({
     Home: {
@@ -33,6 +33,9 @@ const Application = StackNavigator({
     },
     Overview: {
         screen: OverviewScreen
+    },
+    Trip: {
+        screen: TripScreen
     },
     Event: {
         screen: EventScreen

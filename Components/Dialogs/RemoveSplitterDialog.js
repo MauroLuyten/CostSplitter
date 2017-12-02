@@ -4,43 +4,44 @@ import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
 
-export default class RemoveEventDialog extends Component {
+export default class RemoveSplitterDialog extends Component {
     constructor(props){
         super(props)
         this.state = {
             dialog: false,
             tripKey: this.props.tripKey,
-            eventKey: null,
-            event: null,
+            eventKey: this.props.eventKey,
+            splitterKey: null,
+            splitter: null,
         }
     }
     render() {
         return (
             <ModalWrapper
-            onRequestClose={() => { this.setRemoveEventDialog(false) }}
+            onRequestClose={() => { this.setRemoveSplitterDialog(false) }}
             style={{ width: 350, height: 'auto', padding: 16 }}
             visible={this.state.dialog}>
-            <Text style={{ marginBottom: 16 }}>Remove Event</Text>
-            <Text>Do you want to remove {this.state.event&&this.state.event.name} ?</Text>
+            <Text style={{ marginBottom: 16 }}>Remove splitter</Text>
+            <Text>Do you want to remove {this.state.splitter&&this.state.splitter.name} ?</Text>
             <View style={styles.buttonContainer}>
-                <Button transparent small onPress={() => this.setRemoveEventDialog(false)}>
+                <Button transparent small onPress={() => this.setRemoveSplitterDialog(false)}>
                     <Text style={{ color: '#5067FF' }}>Cancel</Text>
                 </Button>
-                <Button primary small onPress={() => this.removeEvent()}>
+                <Button primary small onPress={() => this.removesplitter()}>
                     <Text style={{ color: 'white' }}>Confirm</Text>
                 </Button>
             </View>
         </ModalWrapper>
         )
     }
-    setRemoveEventDialog(visible) {
+    setRemoveSplitterDialog(visible) {
         this.setState({
             dialog: visible
         })
     }
-    removeEvent() {
-        stateStore.removeEvent(this.state.tripKey, this.state.eventKey)
-        this.setRemoveEventDialog(false)
+    removesplitter() {
+        stateStore.removeSplitter(this.state.tripKey, this.state.eventKey, this.state.splitterKey)
+        this.setRemoveSplitterDialog(false)
     }
 }
 const styles = StyleSheet.create({
