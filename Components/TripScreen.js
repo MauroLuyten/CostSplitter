@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, StyleSheet, ListView, FlatList, Modal, TextInput } from 'react-native'
-import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge } from 'native-base';
+import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge, Card } from 'native-base';
 import { StackNavigator } from 'react-navigation';
 import stateStore from '../store/store'
 import { observer } from 'mobx-react'
@@ -22,8 +22,24 @@ export default class TripScreen extends Component {
         title: 'Trip'
     }
     render() {
+        const trip = stateStore.getTrip(this.state.tripKey)
+
         return (
             <View style={styles.container}>
+            <Card style={{ padding: 16, flex: -1 }}>
+                <View style={styles.splitTextContainer}>
+                        <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{trip.name}</Text>
+                        <Icon 
+                        onPress={()=>this.setEditEventDialog(true)}
+                        style={{ marginRight: 16, color:'#757575' }} 
+                        android="md-create" 
+                        ios="ios-create"></Icon>
+                </View>
+                <View style={styles.splitTextContainer}>
+                    <Text style={{}}>Description:</Text>
+                    <Text style={{ marginRight: 16 }}>{trip.description == null ? "/" : trip.description}</Text>
+                </View>
+                </Card>
                 <Separator bordered style={styles.seperator}>
                     <Text>EVENTS</Text>
                 </Separator>
@@ -131,5 +147,10 @@ const styles = StyleSheet.create({
     },
     button: {
         margin: 5
+    },
+    splitTextContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16
     }
 });

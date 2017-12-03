@@ -16,14 +16,18 @@ class Splitter {
     @persist @observable amount = 0
 }
 class Event {
-    constructor(name,description,amount){
+    constructor(name,description,amount, currency, date){
         this.name = name
         this.description = description
         this.amount = amount
+        this.currency = currency
+        this.date = date
     }
     @persist @observable  name = ''
     @persist @observable description = ''
     @persist @observable amount = 0
+    @persist @observable date = ''
+    @persist @observable currency = 'euro'
     @persist('map', Splitter) @observable splitters = new Map()
 }
 class Trip {
@@ -87,7 +91,7 @@ class StateStore {
     addEvent(tripKey, event) {
         event.splitters = observable.map()
         const key = this.generateKey()
-        this.trips.get(tripKey).events.set(key,new Event(event.name, event.description, event.amount))
+        this.trips.get(tripKey).events.set(key,new Event(event.name, event.description, event.amount, event.currency, event.date))
         if (this.online) {
             database().ref(`users/${this.user.uid}/trips`)
                 .child(tripKey)

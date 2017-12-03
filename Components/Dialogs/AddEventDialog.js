@@ -14,6 +14,8 @@ export default class AddEventDialog extends Component {
             newEventName: '',
             newEventDescription: '',
             newEventAmount: 0,
+            newEventCurrency: '',
+            newEventDate: ''
         }
     }
     render() {
@@ -61,6 +63,30 @@ export default class AddEventDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
+                <Item floatingLabel style={{ marginBottom: 16 }}>
+                    <Label>Currency</Label>
+                    <Input
+                        value={this.state.newEventCurrency.toString()}
+                        selectionColor="#5067FF"
+                        onChangeText={(currency) => {
+                            this.setState({
+                                newEventCurrency: currency
+                            })
+                        }}
+                        autoFocus={false} />
+                </Item>
+                <Item floatingLabel style={{ marginBottom: 16 }}>
+                    <Label>Date</Label>
+                    <Input
+                        value={this.state.newEventDate.toString()}
+                        selectionColor="#5067FF"
+                        onChangeText={(date) => {
+                            this.setState({
+                                newEventDate: date
+                            })
+                        }}
+                        autoFocus={false} />
+                </Item>
                 <View style={styles.buttonContainer}>
                     <Button transparent small onPress={() => this.setAddEventDialog(false)}>
                         <Text style={{ color: '#5067FF' }}>Cancel</Text>
@@ -81,10 +107,11 @@ export default class AddEventDialog extends Component {
         const event = {
             name: this.state.newEventName,
             description: this.state.newEventDescription,
-            amount: this.state.newEventAmount
-
+            amount: this.state.newEventAmount,
+            currency: this.state.newEventCurrency,
+            date: this.state.newEventDate
         }
-        if (event.name && event.description && event.amount) {
+        if (event.name && event.description && event.amount && event.currency) {
             if (event.amount
                 > 0) {
                 stateStore.addEvent(this.state.tripKey, event)
