@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert } from 'react-native'
+import { StyleSheet, View, Alert, ScrollView } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
@@ -21,10 +21,11 @@ export default class AddEventDialog extends Component {
     render() {
         return (
 
-            <ModalWrapper
+            <ModalWrapper screenHeight="300"
                 onRequestClose={() => { this.setAddEventDialog(false) }}
                 style={{ width: 350, height: 'auto', padding: 16 }}
                 visible={this.state.dialog}>
+                <ScrollView>
                 <Text style={{ marginBottom: 16 }}>Add Event</Text>
                 <Item floatingLabel style={{ marginBottom: 16 }}>
                     <Label>Name</Label>
@@ -50,6 +51,7 @@ export default class AddEventDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
+                <View>
                 <Item floatingLabel style={{ marginBottom: 16 }}>
                     <Label>Amount</Label>
                     <Input
@@ -75,6 +77,7 @@ export default class AddEventDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
+                </View>
                 <Item floatingLabel style={{ marginBottom: 16 }}>
                     <Label>Date</Label>
                     <Input
@@ -95,6 +98,7 @@ export default class AddEventDialog extends Component {
                         <Text style={{ color: 'white' }}>Confirm</Text>
                     </Button>
                 </View>
+                </ScrollView>
             </ModalWrapper>
         )
     }

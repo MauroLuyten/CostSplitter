@@ -6,13 +6,11 @@ import {create, persist} from 'mobx-persist'
 
 
 class Splitter {
-    constructor(name,currency,amount){
+    constructor(name,amount){
         this.name = name
-        this.currency = currency
         this.amount = amount
     }
     @persist @observable  name = ''
-    @persist @observable currency = ''
     @persist @observable amount = 0
 }
 class Event {
@@ -128,7 +126,7 @@ class StateStore {
     addSplitter(tripKey, eventKey, splitter){
         const key = this.generateKey()
         this.trips.get(tripKey).events.get(eventKey).splitters.set(
-            key,new Splitter(splitter.name, splitter.currency, splitter.amount))
+            key,new Splitter(splitter.name, splitter.amount))
         if(this.online){
             firebaseApp.database().ref(`users/${this.user.uid}/trips`)
             .child(tripKey)
@@ -153,6 +151,7 @@ class StateStore {
     }
     editSplitter(tripKey, eventKey, splitterKey){
         //TODO
+        //this.trips.get(tripkey).events.get(eventKey).sp
     }
     removeSplitter(tripKey, eventKey, splitterKey){
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)

@@ -12,7 +12,6 @@ export default class AddSplitterDialog extends Component {
             tripKey: this.props.tripKey,
             eventKey:this.props.eventKey,
             newSplitterName: '',
-            newSplitterCurrency: '',
             newSplitterAmount: 0,
             newSplitterPaid: 'false'
         }
@@ -35,17 +34,6 @@ export default class AddSplitterDialog extends Component {
                             })
                         }}
                         autoFocus={true} />
-                </Item>
-                <Item floatingLabel>
-                    <Label>Currency</Label>
-                    <Input
-                        selectionColor="#5067FF"
-                        onChangeText={(currency) => {
-                            this.setState({
-                                newSplitterCurrency: currency
-                            })
-                        }}
-                        autoFocus={false} />
                 </Item>
                 <Item floatingLabel>
                     <Label>Amount</Label>
@@ -77,10 +65,9 @@ export default class AddSplitterDialog extends Component {
     addSplitter() {
         const splitter ={ 
             name: this.state.newSplitterName,
-            currency: this.state.newSplitterCurrency,
             amount: this.state.newSplitterAmount
          } 
-        if (splitter.name && splitter.currency && splitter.amount) {
+        if (splitter.name && splitter.amount) {
             if (splitter.amount > 0) {
                 stateStore.addSplitter(this.state.tripKey, this.state.eventKey, splitter)
                 this.setAddSplitterDialog(false)
