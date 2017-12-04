@@ -4,15 +4,16 @@ import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
 
-export default class AddSplitterDialog extends Component {
+export default class EditSplitterDialog extends Component {
     constructor(props){
         super(props)
         this.state = {
             dialog: false,
             tripKey: this.props.tripKey,
-            eventKey:this.props.eventKey,
-            splitterKey: this.props.splitterKey,
-            newSplitterName: '',
+            eventKey: this.props.eventKey,
+            splitterKey: null,
+            splitter: null,
+            newSplitterName: null,
             newSplitterAmount: 0,
             newSplitterPaid: 'false'
         }

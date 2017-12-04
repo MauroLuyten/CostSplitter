@@ -74,7 +74,7 @@ class StateStore {
             trip.key = key
             tripsArray.push(trip)
         });
-        console.warn(JSON.stringify(tripsArray))
+        //console.warn(JSON.stringify(tripsArray))
         return tripsArray
     }
     editTrip(trip) {
@@ -110,8 +110,16 @@ class StateStore {
         });
         return eventsArray
     }
-    editEvent(tripKey, eventKey){
+    editEvent(tripKey, event){
         //TODO
+        const eventKey = event.key
+        const oldEvent = this.getEvent(tripKey,eventKey)
+        oldEvent.name = event.name
+        oldEvent.description = event.description
+        oldEvent.amount = event.amount
+        oldEvent.currency = event.currency
+        oldEvent.date = event.date
+        this.trips.get(tripKey).events.set(eventKey, oldEvent)
     }
     removeEvent(tripKey, eventKey){
         this.trips.get(tripKey).events.delete(eventKey)

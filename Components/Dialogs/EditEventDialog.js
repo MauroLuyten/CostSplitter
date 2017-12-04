@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert } from 'react-native'
+import { StyleSheet, View, Alert, ScrollView } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
@@ -14,7 +14,9 @@ export default class EditEventDialog extends Component {
             eventKey: this.props.eventKey,
             newEventName: '',
             newEventDescription: '',
-            newEventAmount: ''
+            newEventAmount: '',
+            newEventCurrency: '',
+            newEventDate: ''
         }
     }
     render() {
@@ -23,6 +25,7 @@ export default class EditEventDialog extends Component {
                 onRequestClose={() => { this.setEditEventDialog(false) }}
                 style={{ width: 350, height: 'auto', padding: 16 }}
                 visible={this.state.dialog}>
+                <ScrollView>
                 <Text style={{marginBottom:16}}>Edit Event</Text>
                 <Item floatingLabel style={{marginBottom:16}}>
                     <Label>Name</Label>
@@ -61,6 +64,30 @@ export default class EditEventDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
+                <Item floatingLabel style={{ marginBottom: 16 }}>
+                    <Label>Currency</Label>
+                    <Input
+                        value={this.state.newEventCurrency&&this.state.newEventCurrency.toString()}
+                        selectionColor="#5067FF"
+                        onChangeText={(currency) => {
+                            this.setState({
+                                newEventCurrency: currency
+                            })
+                        }}
+                        autoFocus={false} />
+                </Item>
+                <Item floatingLabel style={{ marginBottom: 16 }}>
+                    <Label>Date</Label>
+                    <Input
+                        value={this.state.newEventDate&&this.state.newEventDate.toString()}
+                        selectionColor="#5067FF"
+                        onChangeText={(date) => {
+                            this.setState({
+                                newEventDate: date
+                            })
+                        }}
+                        autoFocus={false} />
+                </Item>
                 <View style={styles.buttonContainer}>
                     <Button transparent small onPress={() => this.setEditEventDialog(false)}>
                         <Text style={{ color: '#5067FF' }}>Cancel</Text>
@@ -69,6 +96,7 @@ export default class EditEventDialog extends Component {
                         <Text style={{ color: 'white' }}>Confirm</Text>
                     </Button>
                 </View>
+                </ScrollView>
             </ModalWrapper>
         )
     }
@@ -77,7 +105,9 @@ export default class EditEventDialog extends Component {
         this.setState({
             newEventName: event.name,
             newEventDescription: event.description,
-            newEventAmount: event.amount
+            newEventAmount: event.amount,
+            newEventCurrency: event.currency,
+            newEventDate: event.date
         })
     }
     setEditEventDialog(visible) {
@@ -87,13 +117,16 @@ export default class EditEventDialog extends Component {
     }
     editEvent() {
         const event = { 
+            key: this.props.eventKey,
             name: this.state.newEventName,
             description: this.state.newEventDescription,
-            amount: this.state.newEventAmount
+            amount: this.state.newEventAmount,
+            currency: this.state.newEventCurrency,
+            date: this.state.newEventDate
          }
         if (event.name && event.description && event.amount) {
             if (event.amount > 0) {
-                stateStore.editEvent(event, this.props.eventKey)
+                stateStore.editEvent(this.state.tripKey, event)
                 this.setEditEventDialog(false)
             }
             else {
