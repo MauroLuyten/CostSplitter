@@ -72,7 +72,7 @@ export default class EditTripDialog extends Component {
         )
     }
     componentWillMount() {
-        const trip = stateStore.getEvent(this.props.tripKey)
+        const trip = stateStore.getTrip(this.props.tripKey)
         this.setState({
             newTripName: trip.name,
             newTripDescription: trip.description,
@@ -91,7 +91,7 @@ export default class EditTripDialog extends Component {
         }
         if (trip.name && trip.description) {
 
-            stateStore.editTrip(trip, this.props.tripKey)
+            stateStore.editTrip(this.props.tripKey, trip)
             this.setEditTripDialog(false)
 
         }

@@ -6,6 +6,7 @@ import stateStore from '../store/store'
 import { observer } from 'mobx-react'
 import AddEventDialog from './Dialogs/AddEventDialog'
 import RemoveEventDialog from './Dialogs/RemoveEventDialog'
+import EditTripDialog from './Dialogs/EditTripDialog'
 
 @observer
 export default class TripScreen extends Component {
@@ -30,7 +31,7 @@ export default class TripScreen extends Component {
                 <View style={styles.splitTextContainer}>
                         <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{trip.name}</Text>
                         <Icon 
-                        onPress={()=>this.setEditEventDialog(true)}
+                        onPress={()=>this.setEditTripDialog(true)}
                         style={{ marginRight: 16, color:'#757575' }} 
                         android="md-create" 
                         ios="ios-create"></Icon>
@@ -81,6 +82,12 @@ export default class TripScreen extends Component {
                     uid={this.state.uid}
                     tripKey={this.state.tripKey}>
                 </RemoveEventDialog>
+                
+                <EditTripDialog
+                    ref="EditTripDialog"
+                    uid={this.state.uid}
+                    tripKey={this.state.tripKey}>
+                </EditTripDialog>
 
                 <Fab
                     active={true}
@@ -110,6 +117,14 @@ export default class TripScreen extends Component {
     setAddEventDialog(visible) {
         this.refs.AddEventDialog.setAddEventDialog(visible)
     }
+    setEditTripDialog(key) {
+        this.refs.EditTripDialog.setState({
+            tripKey: key,
+            trip: stateStore.getTrip(this.state.tripKey)
+        })
+        this.refs.EditTripDialog.setEditTripDialog(true)
+    }
+
     setRemoveEventDialog(key) {
         this.refs.RemoveEventDialog.setState({
             eventKey: key,

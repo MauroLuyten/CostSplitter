@@ -77,8 +77,12 @@ class StateStore {
         //console.warn(JSON.stringify(tripsArray))
         return tripsArray
     }
-    editTrip(trip) {
+    editTrip(tripKey, trip) {
         //TODO
+        const oldTrip = this.getTrip(tripKey)
+        oldTrip.name = trip.name
+        oldTrip.description = trip.description
+        this.trips.set(tripKey, oldTrip)
     }
     removeTrip(tripKey) {
         this.trips.delete(tripKey)
