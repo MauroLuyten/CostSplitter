@@ -149,9 +149,11 @@ class StateStore {
         });
         return splittersArray
     }
-    editSplitter(tripKey, eventKey, splitterKey){
+    editSplitter(tripKey, eventKey, splitter){
         //TODO
-        //this.trips.get(tripkey).events.get(eventKey).sp
+        const splitterKey = splitter.key
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, splitter.amount))
+        //console.warn(JSON.stringify(this.getSplitters(tripKey,eventKey)))
     }
     removeSplitter(tripKey, eventKey, splitterKey){
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
