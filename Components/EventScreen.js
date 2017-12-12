@@ -8,6 +8,7 @@ import { observer } from 'mobx-react'
 import AddSplitterDialog from './Dialogs/AddSplitterDialog'
 import EditEventDialog from './Dialogs/EditEventDialog'
 import RemoveSplitterDialog from './Dialogs/RemoveSplitterDialog'
+import EditSplitterDialog from './Dialogs/EditSplitterDialog'
 
 @observer
 export default class EventScreen extends Component {
@@ -64,6 +65,9 @@ export default class EventScreen extends Component {
                                 <ListItem style={styles.listitem}>
                                     <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                                         <Text>{splitter.name}   {splitter.amount} {splitter.currency}</Text>
+                                        <Badge >
+                                            <Text onPress={() => this.setEditSplitterDialog(splitter.key)}>Edit</Text>
+                                        </Badge>
                                         <Badge style={{ marginRight: 16, backgroundColor: this.paidColor(splitter.paid === "true") }}>
                                             <Text onPress={() => this.setRemoveSplitterDialog(splitter.key)}>{splitter.paid === "true" ? 'V' : 'X'}</Text>
                                         </Badge>
@@ -75,6 +79,11 @@ export default class EventScreen extends Component {
                 <AddSplitterDialog ref="AddSplitterDialog" tripKey={this.state.tripKey} eventKey={this.state.eventKey}>
 
                 </AddSplitterDialog>
+                <EditSplitterDialog
+                    ref="EditSplitterDialog"
+                    tripKey={this.state.tripKey}
+                    eventKey={this.state.eventKey}>
+                </EditSplitterDialog>
                 <EditEventDialog ref="EditEventDialog" tripKey={this.state.tripKey} eventKey={this.state.eventKey}>
 
                 </EditEventDialog>
@@ -107,6 +116,13 @@ export default class EventScreen extends Component {
     }
     setAddSplitterDialog(visible) {
         this.refs.AddSplitterDialog.setAddSplitterDialog(visible)
+    }
+    setEditSplitterDialog(key) {
+        this.refs.EditSplitterDialog.setState({
+            splitterKey: key,
+            splitter: stateStore.getSplitter(this.state.tripKey, this.state.eventKey, key)
+        })
+        this.refs.EditSplitterDialog.setEditSplitterDialog(true)
     }
     setEditEventDialog(visible) {
         this.refs.EditEventDialog.setEditEventDialog(visible)

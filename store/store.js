@@ -74,11 +74,15 @@ class StateStore {
             trip.key = key
             tripsArray.push(trip)
         });
-        console.warn(JSON.stringify(tripsArray))
+        //console.warn(JSON.stringify(tripsArray))
         return tripsArray
     }
-    editTrip(trip) {
+    editTrip(tripKey, trip) {
         //TODO
+        const oldTrip = this.getTrip(tripKey)
+        oldTrip.name = trip.name
+        oldTrip.description = trip.description
+        this.trips.set(tripKey, oldTrip)
     }
     removeTrip(tripKey) {
         this.trips.delete(tripKey)
@@ -110,8 +114,16 @@ class StateStore {
         });
         return eventsArray
     }
-    editEvent(tripKey, eventKey){
+    editEvent(tripKey, event){
         //TODO
+        const eventKey = event.key
+        const oldEvent = this.getEvent(tripKey,eventKey)
+        oldEvent.name = event.name
+        oldEvent.description = event.description
+        oldEvent.amount = event.amount
+        oldEvent.currency = event.currency
+        oldEvent.date = event.date
+        this.trips.get(tripKey).events.set(eventKey, oldEvent)
     }
     removeEvent(tripKey, eventKey){
         this.trips.get(tripKey).events.delete(eventKey)
@@ -149,9 +161,11 @@ class StateStore {
         });
         return splittersArray
     }
-    editSplitter(tripKey, eventKey, splitterKey){
+    editSplitter(tripKey, eventKey, splitter){
         //TODO
-        //this.trips.get(tripkey).events.get(eventKey).sp
+        const splitterKey = splitter.key
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, splitter.amount))
+        //console.warn(JSON.stringify(this.getSplitters(tripKey,eventKey)))
     }
     removeSplitter(tripKey, eventKey, splitterKey){
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
