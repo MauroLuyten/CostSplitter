@@ -118,7 +118,7 @@ class StateStore {
         if(this.online){
             firebaseApp.database().ref(`users/${this.user.uid}/trips`)
             .child(tripKey)
-            .child('event')
+            .child('events')
             .child(eventKey)
             .remove()
         }
@@ -130,7 +130,7 @@ class StateStore {
         if(this.online){
             firebaseApp.database().ref(`users/${this.user.uid}/trips`)
             .child(tripKey)
-            .child('event')
+            .child('events')
             .child(eventKey)
             .child('splitters')
             .child(key)
@@ -156,14 +156,7 @@ class StateStore {
     removeSplitter(tripKey, eventKey, splitterKey){
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
     }
-
-
-
-
-
-
-
-     login(username, password) {
+    login(username, password) {
         firebaseApp.auth().signInWithEmailAndPassword(`${username}@costsplitter.com`, password)
             .then(user => {
                 this.setUser(user)
