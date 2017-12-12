@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, ScrollView } from 'react-native'
+import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
@@ -14,6 +14,7 @@ export default class EditEventDialog extends Component {
             eventKey: this.props.eventKey,
             newEventName: '',
             newEventDescription: '',
+            newEventCategory: 'Overnight stay',
             newEventAmount: '',
             newEventCurrency: '',
             newEventDate: ''
@@ -51,6 +52,17 @@ export default class EditEventDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
+
+                <Label>Category</Label>
+                <Picker onValueChange={(itemvalue, itemIndex) => this.setState({newEventCategory: itemvalue})} style={{marginBottom: 16}}
+                        selectedValue={this.state.newEventCategory}>
+                    <Picker.Item label="Overnight stay" value="Overnight stay"/>
+                    <Picker.Item label="Transport" value="Transport"/>
+                    <Picker.Item label="Activity" value="Activity"/>
+                    <Picker.Item label="Food" value="Food"/>
+                    <Picker.Item label="Misc." value="Misc."/>
+                </Picker>
+
                 <Item floatingLabel style={{marginBottom:16}}>
                     <Label>Amount</Label>
                     <Input
@@ -105,6 +117,7 @@ export default class EditEventDialog extends Component {
         this.setState({
             newEventName: event.name,
             newEventDescription: event.description,
+            newEventCategory: event.category,
             newEventAmount: event.amount,
             newEventCurrency: event.currency,
             newEventDate: event.date
@@ -120,11 +133,12 @@ export default class EditEventDialog extends Component {
             key: this.props.eventKey,
             name: this.state.newEventName,
             description: this.state.newEventDescription,
+            category: this.state.newEventCategory,
             amount: this.state.newEventAmount,
             currency: this.state.newEventCurrency,
             date: this.state.newEventDate
          }
-        if (event.name && event.description && event.amount) {
+        if (event.name && event.description && event.category && event.amount) {
             if (event.amount > 0) {
                 stateStore.editEvent(this.state.tripKey, event)
                 this.setEditEventDialog(false)

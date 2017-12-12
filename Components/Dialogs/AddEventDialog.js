@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, ScrollView } from 'react-native'
+import { StyleSheet, View, Alert, ScrollView, Picker} from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
@@ -13,6 +13,7 @@ export default class AddEventDialog extends Component {
             uid: this.props.uid,
             newEventName: '',
             newEventDescription: '',
+            newEventCategory: '',
             newEventAmount: 0,
             newEventCurrency: '',
             newEventDate: ''
@@ -21,7 +22,7 @@ export default class AddEventDialog extends Component {
     render() {
         return (
 
-            <ModalWrapper screenHeight="300"
+            <ModalWrapper
                 onRequestClose={() => { this.setAddEventDialog(false) }}
                 style={{ width: 350, height: 'auto', padding: 16 }}
                 visible={this.state.dialog}>
@@ -51,6 +52,16 @@ export default class AddEventDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
+
+                <Label>Category</Label>
+                <Picker onValueChange={(itemvalue, itemIndex) => this.setState({newEventCategory: itemvalue})} style={{marginBottom: 16}}
+                        selectedValue={this.state.newEventCategory}>
+                    <Picker.Item label="Overnight stay" value="Overnight stay"/>
+                    <Picker.Item label="Transport" value="Transport"/>
+                    <Picker.Item label="Activity" value="Activity"/>
+                    <Picker.Item label="Food" value="Food"/>
+                    <Picker.Item label="Misc." value="Misc."/>
+                </Picker>
                 <View>
                 <Item floatingLabel style={{ marginBottom: 16 }}>
                     <Label>Amount</Label>
@@ -111,11 +122,12 @@ export default class AddEventDialog extends Component {
         const event = {
             name: this.state.newEventName,
             description: this.state.newEventDescription,
+            category: this.state.newEventCategory,
             amount: this.state.newEventAmount,
             currency: this.state.newEventCurrency,
             date: this.state.newEventDate
         }
-        if (event.name && event.description && event.amount && event.currency) {
+        if (event.name && event.description && event.category && event.amount && event.currency) {
             if (event.amount
                 > 0) {
                 stateStore.addEvent(this.state.tripKey, event)
@@ -123,6 +135,7 @@ export default class AddEventDialog extends Component {
                 this.setState({
                     newEventName: '',
                     newEventDescription: '',
+                    newEventCategory: '',
                     newEventAmount: 0,
                 })
             }
