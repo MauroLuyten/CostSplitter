@@ -45,6 +45,10 @@ export default class EventScreen extends Component {
                         <Text style={{ marginRight: 16 }}>{event.description == null ? "/" : event.description}</Text>
                     </View>
                     <View style={styles.splitTextContainer}>
+                        <Text style={{}}>Category:</Text>
+                        <Text style={{ marginRight: 16}}>{event.category == null ? "/" : event.category}</Text>
+                    </View>
+                    <View style={styles.splitTextContainer}>
                         <Text style={{}}>Amount:</Text>
                         <Text style={{ marginRight: 16 }}>{event.amount == null ? "/" : event.amount} {event.currency == null ? "/" : event.currency}</Text>
                     </View>
