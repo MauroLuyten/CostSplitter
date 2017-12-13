@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, ScrollView } from 'react-native'
+import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
@@ -21,83 +21,83 @@ export default class AddEventDialog extends Component {
     render() {
         return (
 
-            <ModalWrapper screenHeight="300"
+            <ModalWrapper
                 onRequestClose={() => { this.setAddEventDialog(false) }}
                 style={{ width: 350, height: 'auto', padding: 16 }}
                 visible={this.state.dialog}>
                 <ScrollView>
-                <Text style={{ marginBottom: 16 }}>Add Event</Text>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Name</Label>
-                    <Input
-                        value={this.state.newEventName}
-                        selectionColor="#5067FF"
-                        onChangeText={(name) => {
-                            this.setState({
-                                newEventName: name
-                            })
-                        }}
-                        autoFocus={true} />
-                </Item>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Description</Label>
-                    <Input
-                        value={this.state.newEventDescription}
-                        selectionColor="#5067FF"
-                        onChangeText={(description) => {
-                            this.setState({
-                                newEventDescription: description
-                            })
-                        }}
-                        autoFocus={false} />
-                </Item>
-                <View>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Amount</Label>
-                    <Input
-                        value={this.state.newEventAmount.toString()}
-                        keyboardType='numeric'
-                        selectionColor="#5067FF"
-                        onChangeText={(amount) => {
-                            this.setState({
-                                newEventAmount: amount
-                            })
-                        }}
-                        autoFocus={false} />
-                </Item>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Currency</Label>
-                    <Input
-                        value={this.state.newEventCurrency.toString()}
-                        selectionColor="#5067FF"
-                        onChangeText={(currency) => {
-                            this.setState({
-                                newEventCurrency: currency
-                            })
-                        }}
-                        autoFocus={false} />
-                </Item>
-                </View>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Date</Label>
-                    <Input
-                        value={this.state.newEventDate.toString()}
-                        selectionColor="#5067FF"
-                        onChangeText={(date) => {
-                            this.setState({
-                                newEventDate: date
-                            })
-                        }}
-                        autoFocus={false} />
-                </Item>
-                <View style={styles.buttonContainer}>
-                    <Button transparent small onPress={() => this.setAddEventDialog(false)}>
-                        <Text style={{ color: '#5067FF' }}>Cancel</Text>
-                    </Button>
-                    <Button primary small onPress={() => this.addEvent()}>
-                        <Text style={{ color: 'white' }}>Confirm</Text>
-                    </Button>
-                </View>
+                    <Text style={{ marginBottom: 16 }}>Add Event</Text>
+                    <Item floatingLabel style={{ marginBottom: 16 }}>
+                        <Label>Name</Label>
+                        <Input
+                            value={this.state.newEventName}
+                            selectionColor="#5067FF"
+                            onChangeText={(name) => {
+                                this.setState({
+                                    newEventName: name
+                                })
+                            }}
+                            autoFocus={true} />
+                    </Item>
+                    <Item floatingLabel style={{ marginBottom: 16 }}>
+                        <Label>Description</Label>
+                        <Input
+                            value={this.state.newEventDescription}
+                            selectionColor="#5067FF"
+                            onChangeText={(description) => {
+                                this.setState({
+                                    newEventDescription: description
+                                })
+                            }}
+                            autoFocus={false} />
+                    </Item>
+                    <View>
+                        <Item floatingLabel style={{ marginBottom: 16 }}>
+                            <Label>Amount</Label>
+                            <Input
+                                value={this.state.newEventAmount.toString()}
+                                keyboardType='numeric'
+                                selectionColor="#5067FF"
+                                onChangeText={(amount) => {
+                                    this.setState({
+                                        newEventAmount: amount
+                                    })
+                                }}
+                                autoFocus={false} />
+                        </Item>
+                        <Item floatingLabel style={{ marginBottom: 16 }}>
+                            <Label>Currency</Label>
+                            <Input
+                                value={this.state.newEventCurrency.toString()}
+                                selectionColor="#5067FF"
+                                onChangeText={(currency) => {
+                                    this.setState({
+                                        newEventCurrency: currency
+                                    })
+                                }}
+                                autoFocus={false} />
+                        </Item>
+                    </View>
+                    <Item floatingLabel style={{ marginBottom: 16 }}>
+                        <Label>Date</Label>
+                        <Input
+                            value={this.state.newEventDate.toString()}
+                            selectionColor="#5067FF"
+                            onChangeText={(date) => {
+                                this.setState({
+                                    newEventDate: date
+                                })
+                            }}
+                            autoFocus={false} />
+                    </Item>
+                    <View style={styles.buttonContainer}>
+                        <Button transparent small onPress={() => this.setAddEventDialog(false)}>
+                            <Text style={{ color: '#5067FF' }}>Cancel</Text>
+                        </Button>
+                        <Button primary small onPress={() => this.addEvent()}>
+                            <Text style={{ color: 'white' }}>Confirm</Text>
+                        </Button>
+                    </View>
                 </ScrollView>
             </ModalWrapper>
         )
