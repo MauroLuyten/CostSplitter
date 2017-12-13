@@ -32,29 +32,31 @@ export default class EventScreen extends Component {
             <View style={{ flex: 1, marginTop: 12 }}>
                 <Card style={{ padding: 16, flex: -1 }}>
 
-                    <View style={styles.splitTextContainer}>
-                        <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{event.name}</Text>
-                        <Icon 
-                        onPress={()=>this.setEditEventDialog(true)}
-                        style={{ marginRight: 16, color:'#757575' }} 
-                        android="md-create" 
-                        ios="ios-create"></Icon>
-                    </View>
-                    <View style={styles.splitTextContainer}>
-                        <Text style={{}}>Description:</Text>
-                        <Text style={{ marginRight: 16 }}>{event.description == null ? "/" : event.description}</Text>
-                    </View>
-                    <View style={styles.splitTextContainer}>
-                        <Text style={{}}>Category:</Text>
-                        <Text style={{ marginRight: 16}}>{event.category == null ? "/" : event.category}</Text>
-                    </View>
-                    <View style={styles.splitTextContainer}>
-                        <Text style={{}}>Amount:</Text>
-                        <Text style={{ marginRight: 16 }}>{event.amount == null ? "/" : event.amount} {event.currency == null ? "/" : event.currency}</Text>
-                    </View>
-                    <View style={styles.splitTextContainer}>
-                        <Text style={{}}>Date:</Text>
-                        <Text style={{ marginRight: 16 }}>{event.date == null ? "/" : event.date}</Text>
+                    <View style={{width:'100%'}}>
+                        <View style={styles.splitTextContainer}>
+                            <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{event.name}</Text>
+                            <Icon 
+                            onPress={()=>this.setEditEventDialog(true)}
+                            style={{ marginRight: 16, color:'#757575' }} 
+                            android="md-create" 
+                            ios="ios-create"></Icon>
+                        </View>
+                        <View style={styles.splitTextContainer}>
+                            <Text style={{}}>Description:</Text>
+                            <Text style={{ marginRight: 16 }}>{event.description == null ? "/" : event.description}</Text>
+                        </View>
+                        <View style={styles.splitTextContainer}>
+                            <Text style={{}}>Category:</Text>
+                            <Text style={{ marginRight: 16}}>{event.category == null ? "/" : event.category}</Text>
+                        </View>
+                        <View style={styles.splitTextContainer}>
+                            <Text style={{}}>Amount:</Text>
+                            <Text style={{ marginRight: 16 }}>{event.amount == null ? "/" : event.amount} {event.currency == null ? "/" : event.currency}</Text>
+                        </View>
+                        <View style={styles.splitTextContainer}>
+                            <Text style={{}}>Date:</Text>
+                            <Text style={{ marginRight: 16 }}>{event.date == null ? "/" : event.date}</Text>
+                        </View>
                     </View>
 
                 </Card>

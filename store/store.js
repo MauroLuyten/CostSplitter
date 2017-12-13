@@ -31,12 +31,14 @@ class Event {
     @persist('map', Splitter) @observable splitters = new Map()
 }
 class Trip {
-    constructor(name,description){
+    constructor(name,description, budget){
         this.name = name
         this.description = description
+        this.budget = budget
     }
     @persist @observable  name = ''
     @persist @observable description = ''
+    @persist @observable budget = ''
     @persist('map', Event) @observable events = new Map()
 }
 class StateStore {
@@ -60,10 +62,11 @@ class StateStore {
     @action addTrip(trip) {
         
         let key = this.generateKey()
-        this.trips.set(key, new Trip(trip.name, trip.description))
+        this.trips.set(key, new Trip(trip.name, trip.description, trip.budget))
         if (this.online) {
             firebaseApp.database().ref(`users/${this.user.uid}/trips`).child(key).set(trip)
                 .then()
+                
         }
     }
     getTrip(tripKey) {

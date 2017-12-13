@@ -28,6 +28,7 @@ export default class TripScreen extends Component {
         return (
             <View style={styles.container}>
             <Card style={{ padding: 16, flex: -1 }}>
+            <View style={{width:'100%'}}>
                 <View style={styles.splitTextContainer}>
                         <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{trip.name}</Text>
                         <Icon 
@@ -39,6 +40,11 @@ export default class TripScreen extends Component {
                 <View style={styles.splitTextContainer}>
                     <Text style={{}}>Description:</Text>
                     <Text style={{ marginRight: 16 }}>{trip.description == null ? "/" : trip.description}</Text>
+                </View>
+                <View style={styles.splitTextContainer}>
+                    <Text style={{}}>Budget:</Text>
+                    <Text style={{ marginRight: 16 }}>{trip.budget == null ? "/" : trip.budget}</Text>
+                </View>
                 </View>
                 </Card>
                 <Separator bordered style={styles.seperator}>

@@ -12,6 +12,7 @@ export default class AddTripDialog extends Component {
             uid: this.props.uid,
             newTripName: '',
             newTripDescription: '',
+            newTripBudget: ''
         }
     }
     render() {
@@ -46,19 +47,19 @@ export default class AddTripDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
-                {/* <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Amount</Label>
+                <Item floatingLabel style={{ marginBottom: 16 }}>
+                    <Label>Budget</Label>
                     <Input
-                        value={this.state.newEventAmount.toString()}
+                        value={this.state.newTripBudget.toString()}
                         keyboardType='numeric'
                         selectionColor="#5067FF"
-                        onChangeText={(amount) => {
+                        onChangeText={(budget) => {
                             this.setState({
-                                newEventAmount: amount
+                                newTripBudget: budget
                             })
                         }}
                         autoFocus={false} />
-                </Item> */}
+                </Item>
                 <View style={styles.buttonContainer}>
                     <Button transparent small onPress={() => this.setAddTripDialog(false)}>
                         <Text style={{ color: '#5067FF' }}>Cancel</Text>
@@ -79,15 +80,17 @@ export default class AddTripDialog extends Component {
         const trip = {
             name: this.state.newTripName,
             description: this.state.newTripDescription,
+            budget: this.state.newTripBudget
 
         }
-        if (trip.name && trip.description) {
+        if (trip.name && trip.description && trip.budget) {
 
             stateStore.addTrip(trip)
             this.setAddTripDialog(false)
             this.setState({
                 newTripName: '',
                 newTripDescription: '',
+                newTripBudget: ''
             })
         }
         else {
