@@ -15,6 +15,7 @@ import {
     StatusBar
 } from 'react-native';
 import {StackNavigator} from 'react-navigation'
+import CurrencyScreen from './Components/CurrencyScreen'
 import HomeScreen from './Components/HomeScreen'
 import LoginScreen from './Components/LoginScreen'
 import OverviewScreen from './Components/OverviewScreen'
@@ -27,6 +28,9 @@ import {observer} from 'mobx-react'
 const Application = StackNavigator({
     Home: {
         screen: HomeScreen
+    },
+    Currency: {
+        screen: CurrencyScreen
     },
     Login: {
         screen: LoginScreen

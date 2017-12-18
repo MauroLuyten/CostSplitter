@@ -44,10 +44,9 @@ class Trip {
 class StateStore {
     @persist('object') @observable user = {}
     @persist('map', Trip) @observable trips = new Map()
+    currencies = ["EUR", "USD", "GBP"]
     @persist('object') @observable error = {}
     @observable online = false
-
-
 
     /* writeToStorage() {
         AsyncStorage.setItem('trips', JSON.stringify(this.trips))
