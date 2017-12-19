@@ -101,6 +101,7 @@ class StateStore {
         const oldTrip = this.getTrip(tripKey)
         oldTrip.name = trip.name
         oldTrip.description = trip.description
+        oldTrip.budget = trip.budget
         this.trips.set(tripKey, oldTrip)
     }
     removeTrip(tripKey) {
