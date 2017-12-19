@@ -3608,6 +3608,10 @@ react-native-keyboard-spacer@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/react-native-keyboard-spacer/-/react-native-keyboard-spacer-0.4.1.tgz#46f18a320432098a25ea9fa89f5143dd254d332d"
 
+react-native-modal-dropdown@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-modal-dropdown/-/react-native-modal-dropdown-0.5.0.tgz#f6c4cd4d077792e56902b43b14d83959f5f40f46"
+
 react-native-modal-wrapper@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-native-modal-wrapper/-/react-native-modal-wrapper-3.0.0.tgz#0d58b5a355d83af5428ed250f300e1088018f22a"
@@ -3619,6 +3623,10 @@ react-native-tab-view@^0.0.69:
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-0.0.69.tgz#f52d4354a98a382f10eb5fcf61db5216c91dc7e7"
   dependencies:
     prop-types "^15.5.8"
+
+react-native-table-component@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-table-component/-/react-native-table-component-1.1.2.tgz#209414dc5a799714a56cc806995c76d2ca61b63b"
 
 react-native-vector-icons@~4.4.2:
   version "4.4.2"

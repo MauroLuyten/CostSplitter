@@ -21,6 +21,7 @@ import LoginScreen from './Components/LoginScreen'
 import OverviewScreen from './Components/OverviewScreen'
 import TripScreen from './Components/TripScreen'
 import EventScreen from './Components/EventScreen'
+import SummariesScreen from './Components/SummariesScreen'
 import {firebaseApp} from './firebaseconfig.js'
 import stateStore from './store/store'
 import {observer} from 'mobx-react'
@@ -43,6 +44,9 @@ const Application = StackNavigator({
     },
     Event: {
         screen: EventScreen
+    },
+    Summaries: {
+        screen: SummariesScreen
     }
 })
 @observer
