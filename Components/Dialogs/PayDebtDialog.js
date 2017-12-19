@@ -13,7 +13,7 @@ export default class RemoveSplitterDialog extends Component {
             eventKey: this.props.eventKey,
             splitterKey: null,
             splitter: null,
-            removeAmount: 0
+            paidAmount: 0
         }
     }
     render() {
@@ -24,14 +24,17 @@ export default class RemoveSplitterDialog extends Component {
             style={{ width: 350, height: 'auto', padding: 16 }}
             visible={this.state.dialog}>
             <Text style={{ marginBottom: 16 }}>Pay debt: {event.name}</Text>
-            <Text> Amount to pay: {this.state.splitter.amount}</Text>
+            <Text style={{ marginBottom: 16 }}> Total amount: {this.state.splitter.amount}</Text>
+            <Text style={{ marginBottom: 16 }}> Already paid: {this.state.splitter.paid}</Text>
+            <Text style={{ marginBottom: 16 }}> Remaining: {(this.state.splitter.amount - this.state.splitter.paid).toFixed(2)}</Text>
             <Item floatingLabel>
                     <Label>Amount</Label>
                     <Input
                         selectionColor="#5067FF"
+                        keyboardType='numeric'
                         onChangeText={(amount) => {
                             this.setState({
-                                removeAmount: amount
+                                paidAmount: amount
                             })
                         }}
                         autoFocus={false} />
@@ -60,11 +63,11 @@ export default class RemoveSplitterDialog extends Component {
         })
     }
     paydebt() {
-        if(this.state.removeAmount > stateStore.getSplitter(this.state.tripKey, this.state.eventKey, this.state.splitterKey).amount) {
+        if(this.state.paidAmount > this.state.splitter.amount - this.state.splitter.paid) {
             Alert.alert('Wrong amount',
                         'Amount to pay may not exceed amount of splitter to pay')
         }
-        else if(this.state.removeAmount < 0) {
+        else if(this.state.paidAmount < 0) {
             Alert.alert(
                 'Wrong amount',
                 'Amount to pay must be positive!',
@@ -75,7 +78,7 @@ export default class RemoveSplitterDialog extends Component {
             )
         }
         else {
-            stateStore.payDebtSplitter(this.state.tripKey, this.state.eventKey, this.state.splitterKey, this.state.removeAmount)
+            stateStore.payDebtSplitter(this.state.tripKey, this.state.eventKey, this.state.splitterKey, this.state.paidAmount)
             this.setPayDebtDialog(false)
         }
     }

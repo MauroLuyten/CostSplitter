@@ -64,9 +64,9 @@ export default class App extends Component {
         )
     }
     componentDidMount() {
-        firebaseApp.auth().onAuthStateChanged(user => {
+        /* firebaseApp.auth().onAuthStateChanged(user => {
             stateStore.setUser(user)
-        })
+        }) */
     }
 
     

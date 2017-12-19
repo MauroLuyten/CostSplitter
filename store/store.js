@@ -6,12 +6,14 @@ import {create, persist} from 'mobx-persist'
 
 
 class Splitter {
-    constructor(name,amount){
+    constructor(name,amount,paid){
         this.name = name
         this.amount = amount
+        this.paid = paid
     }
     @persist @observable  name = ''
     @persist @observable amount = 0
+    @persist @observable paid = 0
 }
 class Event {
     constructor(name, description, category, amount, currency, date){
@@ -58,29 +60,21 @@ class Transaction {
 class StateStore {
     @persist('object') @observable user = {}
     @persist('map', Trip) @observable trips = new Map()
-    currencies = ["EUR", "USD", "GBP"]
-    @persist('object') @observable error = {}
-    @observable online = false
     @persist('map', Transaction) @observable transactions = new Map()
+    @persist('object') @observable error = {}
+    currencies = ["EUR", "USD", "GBP"]
+    @observable online = false
 
-    /* writeToStorage() {
-        AsyncStorage.setItem('trips', JSON.stringify(this.trips))
-        .then()
-        .catch(error=>{
-            
-        })
-    } */
     generateKey() {
         return firebaseApp.database().ref().push().key
     }
     @action addTrip(trip) {
-        
         let key = this.generateKey()
-        this.trips.set(key, new Trip(trip.name, trip.description, trip.budget))
+        this.trips.set(key, new Trip(trip.name, trip.description, parseFloat(trip.budget).toFixed(2)))
         if (this.online) {
             firebaseApp.database().ref(`users/${this.user.uid}/trips`).child(key).set(trip)
                 .then()
-                
+
         }
     }
     getTrip(tripKey) {
@@ -93,7 +87,6 @@ class StateStore {
             trip.key = key
             tripsArray.push(trip)
         });
-        //console.warn(JSON.stringify(tripsArray))
         return tripsArray
     }
     editTrip(tripKey, trip) {
@@ -101,7 +94,7 @@ class StateStore {
         const oldTrip = this.getTrip(tripKey)
         oldTrip.name = trip.name
         oldTrip.description = trip.description
-        oldTrip.budget = trip.budget
+        oldTrip.budget = parseFloat(trip.budget).toFixed(2)
         this.trips.set(tripKey, oldTrip)
     }
     removeTrip(tripKey) {
@@ -113,7 +106,7 @@ class StateStore {
     addEvent(tripKey, event) {
         event.splitters = observable.map()
         const key = this.generateKey()
-        this.trips.get(tripKey).events.set(key,new Event(event.name, event.description, event.category, event.amount, event.currency, event.date))
+        this.trips.get(tripKey).events.set(key,new Event(event.name, event.description, event.category, parseFloat(event.amount).toFixed(2), event.currency, event.date))
         if (this.online) {
             database().ref(`users/${this.user.uid}/trips`)
                 .child(tripKey)
@@ -135,13 +128,12 @@ class StateStore {
         return eventsArray
     }
     editEvent(tripKey, event){
-        //TODO
         const eventKey = event.key
         const oldEvent = this.getEvent(tripKey,eventKey)
         oldEvent.name = event.name
         oldEvent.description = event.description
         oldEvent.category = event.category
-        oldEvent.amount = event.amount
+        oldEvent.amount = parseFloat(event.amount).toFixed(2)
         oldEvent.currency = event.currency
         oldEvent.date = event.date
         this.trips.get(tripKey).events.set(eventKey, oldEvent)
@@ -159,7 +151,7 @@ class StateStore {
     addSplitter(tripKey, eventKey, splitter){
         const key = this.generateKey()
         this.trips.get(tripKey).events.get(eventKey).splitters.set(
-            key,new Splitter(splitter.name, splitter.amount))
+            key,new Splitter(splitter.name, parseFloat(splitter.amount).toFixed(2), parseFloat(splitter.paid).toFixed(2)))
         if(this.online){
             firebaseApp.database().ref(`users/${this.user.uid}/trips`)
             .child(tripKey)
@@ -173,7 +165,7 @@ class StateStore {
 
     addTransaction(splitterName, tripName, eventName, amount) {
         const key = this.generateKey()
-        this.transactions.set(key, new Transaction(splitterName, tripName, eventName, amount))
+        this.transactions.set(key, new Transaction(splitterName, tripName, eventName, parseFloat(amount).toFixed(2)))
     }
 
     removeTransaction(transactionKey) {
@@ -203,10 +195,8 @@ class StateStore {
         return splittersArray
     }
     editSplitter(tripKey, eventKey, splitter){
-        //TODO
         const splitterKey = splitter.key
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, splitter.amount))
-        //console.warn(JSON.stringify(this.getSplitters(tripKey,eventKey)))
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, splitter.amount, splitter.paid))
     }
     removeSplitter(tripKey, eventKey, splitterKey){
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
@@ -216,13 +206,12 @@ class StateStore {
         const splitter = this.getSplitter(tripKey, eventKey, splitterKey)
         const trip = this.getTrip(tripKey)
         const event = this.getEvent(tripKey, eventKey)
-        newAmount = splitter.amount - amount
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, newAmount.toFixed(2)))
-
+        let newPaid = parseFloat(splitter.paid) + parseFloat(amount)
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name,splitter.amount, newPaid.toFixed(2)))
         this.addTransaction(splitter.name, trip.name, event.name, amount)
     }
 
-    login(username, password) {
+    /* login(username, password) {
         firebaseApp.auth().signInWithEmailAndPassword(`${username}@costsplitter.com`, password)
             .then(user => {
                 this.setUser(user)
@@ -258,8 +247,7 @@ class StateStore {
         if(user){
             //this.loadTrips()
         }
-    }
-
+    } */
     /*
     loadTrips() {
         if (this.user) {

@@ -82,16 +82,20 @@ export default class EventScreen extends Component {
                             }>>
                         </List>)}
                 </View>
-                <AddSplitterDialog ref="AddSplitterDialog" tripKey={this.state.tripKey} eventKey={this.state.eventKey}>
-
+                <AddSplitterDialog 
+                    ref="AddSplitterDialog" 
+                    tripKey={this.state.tripKey}
+                    eventKey={this.state.eventKey}>
                 </AddSplitterDialog>
                 <EditSplitterDialog
                     ref="EditSplitterDialog"
                     tripKey={this.state.tripKey}
                     eventKey={this.state.eventKey}>
                 </EditSplitterDialog>
-                <EditEventDialog ref="EditEventDialog" tripKey={this.state.tripKey} eventKey={this.state.eventKey}>
-
+                <EditEventDialog 
+                    ref="EditEventDialog" 
+                    tripKey={this.state.tripKey} 
+                    eventKey={this.state.eventKey}>
                 </EditEventDialog>
                 <RemoveSplitterDialog
                     ref="RemoveSplitterDialog"
@@ -109,8 +113,7 @@ export default class EventScreen extends Component {
                     direction="up"
                     style={{ backgroundColor: '#5067FF' }}
                     position="bottomRight"
-                    onPress={() => this.setAddSplitterDialog(true)}
-                >
+                    onPress={() => this.setAddSplitterDialog(true)}>
                     <Text>+</Text>
                 </Fab>
 
@@ -118,13 +121,6 @@ export default class EventScreen extends Component {
         )
     }
     componentWillMount() {
-        /* const uid = this.props.navigation.state.params.uid
-        const eventKey = this.props.navigation.state.params.key
-        this.setState({
-            uid: uid,
-            eventRef: firebaseApp.database().ref(`users/${uid}/events/${eventKey}`),
-            eventKey: eventKey
-        }) */
     }
     setEditEventDialog(visible) {
         this.refs.EditEventDialog.setEditEventDialog(visible)
@@ -136,8 +132,9 @@ export default class EventScreen extends Component {
         this.refs.EditSplitterDialog.setState({
             splitterKey: key,
             splitter: stateStore.getSplitter(this.state.tripKey, this.state.eventKey, key)
-        })
-        this.refs.EditSplitterDialog.setEditSplitterDialog(true)
+        }, 
+        () => this.refs.EditSplitterDialog.setEditSplitterDialog(true))
+        
     }
     setRemoveSplitterDialog(key) {
         this.refs.RemoveSplitterDialog.setState({
@@ -155,7 +152,6 @@ export default class EventScreen extends Component {
     }
     paidColor(paid) {
         return paid ? '#4CAF50' : '#F44336'
-
     }
 
 }

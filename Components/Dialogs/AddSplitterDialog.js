@@ -13,7 +13,7 @@ export default class AddSplitterDialog extends Component {
             eventKey:this.props.eventKey,
             newSplitterName: '',
             newSplitterAmount: 0,
-            newSplitterPaid: 'false'
+            newSplitterPaid: 0
         }
     }
     render() {
@@ -39,9 +39,22 @@ export default class AddSplitterDialog extends Component {
                     <Label>Amount</Label>
                     <Input
                         selectionColor="#5067FF"
+                        keyboardType='numeric'
                         onChangeText={(amount) => {
                             this.setState({
                                 newSplitterAmount: amount
+                            })
+                        }}
+                        autoFocus={false} />
+                </Item>
+                <Item floatingLabel>
+                    <Label>Paid</Label>
+                    <Input
+                        selectionColor="#5067FF"
+                        keyboardType='numeric'
+                        onChangeText={(paid) => {
+                            this.setState({
+                                newSplitterPaid: paid
                             })
                         }}
                         autoFocus={false} />
@@ -65,22 +78,24 @@ export default class AddSplitterDialog extends Component {
     addSplitter() {
         const splitter ={ 
             name: this.state.newSplitterName,
-            amount: this.state.newSplitterAmount
+            amount: this.state.newSplitterAmount,
+            paid: this.state.newSplitterPaid
          } 
-        if (splitter.name && splitter.amount) {
-            if(parseInt(splitter.amount) > parseInt(stateStore.getEvent(this.state.tripKey, this.state.eventKey).amount)) {
+         const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
+        if (splitter.name && splitter.amount && splitter.paid) {
+            if((parseInt(splitter.amount) > parseInt(event.amount)) && (parseInt(splitter.paid) > parseInt(event.amount))) {
                 Alert.alert('Wrong amount',
-                            'Amount may not exceed amount of event!',
+                            'Amount/Paid may not exceed amount of event!',
                             [
                                 { text: 'OK', onPress: () => console.log('OK Pressed')}
                             ],
                             { cancelable: false}
                         )
             }
-            else if (splitter.amount < 0) {
+            else if (splitter.amount < 0 && splitter.paid < 0) {
                 Alert.alert(
                     'Wrong amount',
-                    'Amount must be positive!',
+                    'Amount/Paid must be positive!',
                     [
                         { text: 'OK', onPress: () => console.log('OK Pressed') },
                     ],
@@ -89,6 +104,11 @@ export default class AddSplitterDialog extends Component {
             }
             else {
                 stateStore.addSplitter(this.state.tripKey, this.state.eventKey, splitter)
+                this.setState({
+                    newSplitterName: '',
+                    newSplitterAmount: 0,
+                    newSplitterPaid: 0
+                })
                 this.setAddSplitterDialog(false)
             }
         }

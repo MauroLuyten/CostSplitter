@@ -15,7 +15,7 @@ export default class EditSplitterDialog extends Component {
             splitter: null,
             newSplitterName: null,
             newSplitterAmount: 0,
-            newSplitterPaid: 'false'
+            newSplitterPaid: 0
         }
     }
     render() {
@@ -29,6 +29,7 @@ export default class EditSplitterDialog extends Component {
                 <Item floatingLabel>
                     <Label>Name</Label>
                     <Input
+                        value={this.state.newSplitterName}
                         selectionColor="#5067FF"
                         onChangeText={(name) => {
                             this.setState({
@@ -40,10 +41,25 @@ export default class EditSplitterDialog extends Component {
                 <Item floatingLabel>
                     <Label>Amount</Label>
                     <Input
+                        value={this.state.newSplitterAmount.toString()}
                         selectionColor="#5067FF"
+                        keyboardType='numeric'
                         onChangeText={(amount) => {
                             this.setState({
                                 newSplitterAmount: amount
+                            })
+                        }}
+                        autoFocus={false} />
+                </Item>
+                <Item floatingLabel>
+                    <Label>Paid</Label>
+                    <Input
+                        value={this.state.newSplitterPaid.toString()}
+                        selectionColor="#5067FF"
+                        keyboardType='numeric'
+                        onChangeText={(paid) => {
+                            this.setState({
+                                newSplitterPaid: paid
                             })
                         }}
                         autoFocus={false} />
@@ -59,7 +75,18 @@ export default class EditSplitterDialog extends Component {
             </ModalWrapper>
         )
     }
+    setInitState(){
+        const splitter = this.state.splitter
+        this.setState({
+            newSplitterName: splitter.name,
+            newSplitterAmount: splitter.amount,
+            newSplitterPaid: splitter.paid
+        })
+    }
     setEditSplitterDialog(visible) {
+        if(visible){
+            this.setInitState()
+        }
         this.setState({
             dialog: visible
         })
@@ -68,9 +95,10 @@ export default class EditSplitterDialog extends Component {
         const splitter ={ 
             key: this.state.splitterKey,
             name: this.state.newSplitterName,
-            amount: this.state.newSplitterAmount
+            amount: this.state.newSplitterAmount,
+            paid: this.state.newSplitterPaid
          } 
-        if (splitter.name && splitter.amount) {
+        if (splitter.name && splitter.amount && splitter.paid) {
             if (splitter.amount > 0) {
                 stateStore.editSplitter(this.state.tripKey, this.state.eventKey, splitter)
                 this.setEditSplitterDialog(false)
