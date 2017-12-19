@@ -13,7 +13,7 @@ export default class AddEventDialog extends Component {
             uid: this.props.uid,
             newEventName: '',
             newEventDescription: '',
-            newEventCategory: '',
+            newEventCategory: 'Overnight stay',
             newEventAmount: 0,
             newEventCurrency: '',
             newEventDate: ''

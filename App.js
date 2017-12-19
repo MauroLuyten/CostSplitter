@@ -20,6 +20,7 @@ import HomeScreen from './Components/HomeScreen'
 import LoginScreen from './Components/LoginScreen'
 import OverviewScreen from './Components/OverviewScreen'
 import TripScreen from './Components/TripScreen'
+import TransactionScreen from './Components/TransactionsScreen'
 import EventScreen from './Components/EventScreen'
 import {firebaseApp} from './firebaseconfig.js'
 import stateStore from './store/store'
@@ -43,6 +44,9 @@ const Application = StackNavigator({
     },
     Event: {
         screen: EventScreen
+    },
+    Transaction: {
+        screen: TransactionScreen
     }
 })
 @observer

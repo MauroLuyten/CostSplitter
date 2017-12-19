@@ -41,12 +41,27 @@ class Trip {
     @persist @observable budget = ''
     @persist('map', Event) @observable events = new Map()
 }
+
+class Transaction {
+    constructor(splitterName, tripName, eventName, amount) {
+        this.splitterName = splitterName,
+        this.tripName = tripName,
+        this.eventName = eventName,
+        this.amount = amount
+    }
+    @persist @observable splitterName = ''
+    @persist @observable tripName = ''
+    @persist @observable eventName = ''
+    @persist @observable amount = 0
+}
+
 class StateStore {
     @persist('object') @observable user = {}
     @persist('map', Trip) @observable trips = new Map()
     currencies = ["EUR", "USD", "GBP"]
     @persist('object') @observable error = {}
     @observable online = false
+    @persist('map', Transaction) @observable transactions = new Map()
 
     /* writeToStorage() {
         AsyncStorage.setItem('trips', JSON.stringify(this.trips))
@@ -154,6 +169,26 @@ class StateStore {
             .set(splitter)
         }
     }
+
+    addTransaction(splitterName, tripName, eventName, amount) {
+        const key = this.generateKey()
+        this.transactions.set(key, new Transaction(splitterName, tripName, eventName, amount))
+    }
+
+    removeTransaction(transactionKey) {
+        this.transactions.delete(transactionKey)
+    }
+
+    getTransactions() {
+        let transactionsArray = []
+        this.transactions.keys().forEach(key => {
+            let transaction = this.transactions.get(key)
+            transaction.key = key
+            transactionsArray.push(transaction)
+        });
+        return transactionsArray;
+    }
+
     getSplitter(tripKey, eventKey, splitterKey){
         return this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
     }
@@ -175,6 +210,17 @@ class StateStore {
     removeSplitter(tripKey, eventKey, splitterKey){
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
     }
+
+    payDebtSplitter(tripKey, eventKey, splitterKey, amount) {
+        const splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+        const trip = this.getTrip(tripKey)
+        const event = this.getEvent(tripKey, eventKey)
+        newAmount = splitter.amount - amount
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, newAmount.toFixed(2)))
+
+        this.addTransaction(splitter.name, trip.name, event.name, amount)
+    }
+
     login(username, password) {
         firebaseApp.auth().signInWithEmailAndPassword(`${username}@costsplitter.com`, password)
             .then(user => {
@@ -211,12 +257,6 @@ class StateStore {
         if(user){
             //this.loadTrips()
         }
-    }
-
-    payDebtSplitter(tripKey, eventKey, splitterKey, amount) {
-        const splitter = this.getSplitter(tripKey, eventKey, splitterKey)
-        newAmount = splitter.amount - amount
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, newAmount))
     }
 
     /*

@@ -68,7 +68,7 @@ export default class AddSplitterDialog extends Component {
             amount: this.state.newSplitterAmount
          } 
         if (splitter.name && splitter.amount) {
-            if(splitter.amount > stateStore.getEvent(this.state.tripKey, this.state.eventKey).amount) {
+            if(parseInt(splitter.amount) > parseInt(stateStore.getEvent(this.state.tripKey, this.state.eventKey).amount)) {
                 Alert.alert('Wrong amount',
                             'Amount may not exceed amount of event!',
                             [
