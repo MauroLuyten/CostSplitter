@@ -212,6 +212,13 @@ class StateStore {
             //this.loadTrips()
         }
     }
+
+    payDebtSplitter(tripKey, eventKey, splitterKey, amount) {
+        const splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+        newAmount = splitter.amount - amount
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, newAmount))
+    }
+
     /*
     loadTrips() {
         if (this.user) {

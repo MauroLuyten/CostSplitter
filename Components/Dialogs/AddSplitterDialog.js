@@ -68,11 +68,16 @@ export default class AddSplitterDialog extends Component {
             amount: this.state.newSplitterAmount
          } 
         if (splitter.name && splitter.amount) {
-            if (splitter.amount > 0) {
-                stateStore.addSplitter(this.state.tripKey, this.state.eventKey, splitter)
-                this.setAddSplitterDialog(false)
+            if(splitter.amount > stateStore.getEvent(this.state.tripKey, this.state.eventKey).amount) {
+                Alert.alert('Wrong amount',
+                            'Amount may not exceed amount of event!',
+                            [
+                                { text: 'OK', onPress: () => console.log('OK Pressed')}
+                            ],
+                            { cancelable: false}
+                        )
             }
-            else {
+            else if (splitter.amount < 0) {
                 Alert.alert(
                     'Wrong amount',
                     'Amount must be positive!',
@@ -81,6 +86,10 @@ export default class AddSplitterDialog extends Component {
                     ],
                     { cancelable: false }
                 )
+            }
+            else {
+                stateStore.addSplitter(this.state.tripKey, this.state.eventKey, splitter)
+                this.setAddSplitterDialog(false)
             }
         }
         else {

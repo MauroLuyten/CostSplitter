@@ -9,6 +9,7 @@ import AddSplitterDialog from './Dialogs/AddSplitterDialog'
 import EditEventDialog from './Dialogs/EditEventDialog'
 import RemoveSplitterDialog from './Dialogs/RemoveSplitterDialog'
 import EditSplitterDialog from './Dialogs/EditSplitterDialog'
+import PayDebtDialog from './Dialogs/PayDebtDialog'
 
 @observer
 export default class EventScreen extends Component {
@@ -19,7 +20,6 @@ export default class EventScreen extends Component {
             eventKey: this.props.navigation.state.params.eventKey,
             uid: null,
             eventRef: null,
-
         }
     }
     static navigationOptions = {
@@ -70,9 +70,9 @@ export default class EventScreen extends Component {
                             renderRow={(splitter) =>
                                 <ListItem style={styles.listitem}>
                                     <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                                        <Text>{splitter.name}   {splitter.amount} {splitter.currency}</Text>
+                                        <Text>{splitter.name}: {splitter.amount} {event.currency}</Text>
                                         <Badge >
-                                            <Text onPress={() => this.setEditSplitterDialog(splitter.key)}>Edit</Text>
+                                            <Text onPress={() => this.setEditSplitterDialog(splitter.key)} onLongPress={() => this.setPayDebtDialog(splitter.key)}>Edit</Text>
                                         </Badge>
                                         <Badge style={{ marginRight: 16, backgroundColor: this.paidColor(splitter.paid === "true") }}>
                                             <Text onPress={() => this.setRemoveSplitterDialog(splitter.key)}>{splitter.paid === "true" ? 'V' : 'X'}</Text>
@@ -98,6 +98,12 @@ export default class EventScreen extends Component {
                     tripKey={this.state.tripKey} 
                     eventKey={this.state.eventKey}>
                 </RemoveSplitterDialog>
+                <PayDebtDialog
+                   ref="PayDebtDialog"
+                   tripKey={this.state.tripKey}
+                   eventKey={this.state.eventKey}>
+                </PayDebtDialog>
+
                 <Fab
                     active={true}
                     direction="up"
@@ -120,6 +126,9 @@ export default class EventScreen extends Component {
             eventKey: eventKey
         }) */
     }
+    setEditEventDialog(visible) {
+        this.refs.EditEventDialog.setEditEventDialog(visible)
+    }
     setAddSplitterDialog(visible) {
         this.refs.AddSplitterDialog.setAddSplitterDialog(visible)
     }
@@ -130,15 +139,19 @@ export default class EventScreen extends Component {
         })
         this.refs.EditSplitterDialog.setEditSplitterDialog(true)
     }
-    setEditEventDialog(visible) {
-        this.refs.EditEventDialog.setEditEventDialog(visible)
-    }
     setRemoveSplitterDialog(key) {
         this.refs.RemoveSplitterDialog.setState({
             splitterKey: key,
             splitter: stateStore.getSplitter(this.state.tripKey, this.state.eventKey, key)
         })
         this.refs.RemoveSplitterDialog.setRemoveSplitterDialog(true)
+    }
+    setPayDebtDialog(key) {
+        this.refs.PayDebtDialog.setState({
+            splitterKey: key,
+            splitter: stateStore.getSplitter(this.state.tripKey, this.state.eventKey, key)
+        })
+        this.refs.PayDebtDialog.setPayDebtDialog(true)
     }
     paidColor(paid) {
         return paid ? '#4CAF50' : '#F44336'
