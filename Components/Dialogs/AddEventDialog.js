@@ -137,6 +137,8 @@ export default class AddEventDialog extends Component {
                     newEventDescription: '',
                     newEventCategory: '',
                     newEventAmount: 0,
+                    newEventCurrency: '',
+                    newEventDate: ''
                 })
             }
             else {
