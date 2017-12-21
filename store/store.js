@@ -194,6 +194,50 @@ class StateStore {
         });
         return splittersArray
     }
+
+    getAllSplitters() {
+        let splittersArray = []
+        this.trips.keys().forEach(tripKey => {
+            this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                    let splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
+                    splitter.key = splitterKey
+                    splittersArray.push(splitter)
+                })
+            })
+        })
+        return splittersArray;
+    }
+
+    getSplitterGeneral(splitterKey) {
+        let splitter = null;
+        this.trips.keys().forEach(tripKey => {
+            this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKeyCheck => {
+                    if(splitterKeyCheck === splitterKey) {
+                        splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
+                    }
+                })
+            })
+        })
+        return splitter
+    }
+
+    getTransactionsSplitter(splitterKey) {
+        let transactionArray = []
+        let splitter = this.getSplitterGeneral(splitterKey)
+        //console.warn(JSON.stringify(splitter))
+        if(typeof splitter !== "undefined" && splitter) {
+        this.transactions.keys().forEach(transactionKey => {
+            let transaction = this.transactions.get(transactionKey)
+            if(transaction.splitterName === splitter.name) {
+                transactionArray.push(transaction)
+            }
+        })
+    }
+        return transactionArray;
+    }
+
     editSplitter(tripKey, eventKey, splitter){
         const splitterKey = splitter.key
         this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, splitter.amount, splitter.paid))

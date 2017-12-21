@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {View, StyleSheet} from 'react-native'
-import { List, ListItem, Content, Container, Text, Separator} from 'native-base'
+import { List, ListItem, Content, Container, Text, Separator, Button} from 'native-base'
 import { Col, Row, Grid } from 'react-native-easy-grid'
 import {StackNavigator} from 'react-navigation'
 import {observer} from 'mobx-react'
@@ -21,14 +21,24 @@ export default class SummariesScreen extends Component {
     render() {
         const {navigate} = this.props.navigation
         return (
-            <View>
-                
-            </View>
+            <Container>
+                <Content>
+                    <View>
+        <Grid>
+                <Row><Col><Button rounded style={styles.button} onPress={() => navigate('AllTransactions')}><Text style={styles.buttonText}>All Transactions</Text></Button></Col></Row>
+                <Row><Col><Button rounded style={styles.button} onPress={() => navigate('TransactionsPP')}><Text style={styles.buttonText}>Transactions P.P</Text></Button></Col></Row>
+        </Grid>
+    </View>
+                </Content>
+            </Container>
         )
     }
     navigate(route) {
         const {navigate} = this.props.navigation
         navigate(route)
+    }
+    loggedIn() {
+        return stateStore.user
     }
 }
 

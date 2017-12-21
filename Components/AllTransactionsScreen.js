@@ -7,7 +7,7 @@ import { observer } from 'mobx-react'
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 
 @observer
-export default class TransactionScreen extends Component {
+export default class AllTransactionsScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {

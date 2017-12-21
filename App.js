@@ -20,7 +20,8 @@ import HomeScreen from './Components/HomeScreen'
 import LoginScreen from './Components/LoginScreen'
 import OverviewScreen from './Components/OverviewScreen'
 import TripScreen from './Components/TripScreen'
-import TransactionScreen from './Components/TransactionsScreen'
+import AllTransactionsScreen from './Components/AllTransactionsScreen'
+import PersonTransactionsScreen from './Components/PersonTransactionsScreen'
 import EventScreen from './Components/EventScreen'
 import SummariesScreen from './Components/SummariesScreen'
 import {firebaseApp} from './firebaseconfig.js'
@@ -49,8 +50,11 @@ const Application = StackNavigator({
     Summaries: {
         screen: SummariesScreen
     },
-    Transaction: {
-        screen: TransactionScreen
+    AllTransactions: {
+        screen: AllTransactionsScreen
+    },
+    TransactionsPP: {
+        screen: PersonTransactionsScreen
     }
 })
 @observer
