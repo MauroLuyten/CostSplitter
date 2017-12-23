@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert } from 'react-native'
-import { Icon, Badge, ListView, List, ListItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button } from 'native-base';
+import { StyleSheet, View, Alert, ScrollView } from 'react-native'
+import { Icon, Badge, ListView, List, splitterItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import { firebaseApp } from '../firebaseconfig'
 import stateStore from '../store/store'
@@ -28,8 +28,10 @@ export default class EventScreen extends Component {
     render() {
         const event = stateStore.getEvent(this.state.tripKey,this.state.eventKey)
         const splitters = stateStore.getSplitters(this.state.tripKey,this.state.eventKey)
+        const paidTotal = stateStore.getTotalPaidEvent(this.state.tripKey, this.state.eventKey)
         return (
-            <View style={{ flex: 1, marginTop: 12 }}>
+            <Container style={{ flex: 1}}>
+                <ScrollView>
                 <Card style={{ padding: 16, flex: -1 }}>
 
                     <View style={{width:'100%'}}>
@@ -37,51 +39,84 @@ export default class EventScreen extends Component {
                             <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{event.name}</Text>
                             <Icon 
                             onPress={()=>this.setEditEventDialog(true)}
-                            style={{ marginRight: 16, color:'#757575' }} 
+                            style={{color:'#5067FF' }} 
                             android="md-create" 
                             ios="ios-create"></Icon>
                         </View>
                         <View style={styles.splitTextContainer}>
                             <Text style={{}}>Description:</Text>
-                            <Text style={{ marginRight: 16 }}>{event.description == null ? "/" : event.description}</Text>
+                            <Text>{event.description == null ? "/" : event.description}</Text>
                         </View>
                         <View style={styles.splitTextContainer}>
                             <Text style={{}}>Category:</Text>
-                            <Text style={{ marginRight: 16}}>{event.category == null ? "/" : event.category}</Text>
+                            <Text >{event.category == null ? "/" : event.category}</Text>
                         </View>
                         <View style={styles.splitTextContainer}>
                             <Text style={{}}>Amount:</Text>
-                            <Text style={{ marginRight: 16 }}>{event.amount == null ? "/" : event.amount} {event.currency == null ? "/" : event.currency}</Text>
+                            <View style={{textAlign: 'right'}}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red' }}>{event.amount} {event.currency}</Text>
+                                <Text style={{textAlign: 'right', color: 'green'}} >+ {paidTotal} {event.currency}</Text>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>{(event.amount - paidTotal).toFixed(2)} {event.currency}</Text>
+                            </View>
                         </View>
                         <View style={styles.splitTextContainer}>
                             <Text style={{}}>Date:</Text>
-                            <Text style={{ marginRight: 16 }}>{event.date == null ? "/" : event.date}</Text>
+                            <Text >{event.date == null ? "/" : event.date}</Text>
                         </View>
                     </View>
 
                 </Card>
-                <View>
+                <View style={{paddingBottom: 32}}>
                     <Text style={{ marginTop: 16, marginLeft: 16, fontWeight: 'bold', marginBottom: 16 }}>Splitters:</Text>
+                    <Fab
+                        active={true}
+                        direction="up"
+                        position="topRight"
+                        containerStyle = {{top: -32}}
+                        style={{ backgroundColor: '#5067FF'}}
+                        onPress={() => this.setAddSplitterDialog(true)}>
+                        <Text>+</Text>
+                    </Fab>
                     {splitters.length===0 ? (
                         <Text style={{marginLeft:16}}>No splitters yet</Text>
                     )
                         :
                         (<List style={styles.list} dataArray={splitters}
                             renderRow={(splitter) =>
-                                <ListItem style={styles.listitem}>
-                                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                                        <Text>{splitter.name}: {splitter.amount} {event.currency}</Text>
-                                        <Badge >
-                                            <Text onPress={() => this.setEditSplitterDialog(splitter.key)} onLongPress={() => this.setPayDebtDialog(splitter.key)}>Edit</Text>
-                                        </Badge>
-                                        <Badge style={{ marginRight: 16, backgroundColor: this.paidColor(splitter.paid === "true") }}>
-                                            <Text onPress={() => this.setRemoveSplitterDialog(splitter.key)}>{splitter.paid === "true" ? 'V' : 'X'}</Text>
-                                        </Badge>
+                                <Card style={styles.splitterItem}>
+                                    <View style={[styles.splitTextContainer,{ marginRight: 18}]}>
+                                        <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{splitter.name}</Text>
+                                        <View style={{textAlign: 'right'}}>
+                                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red' }}>{splitter.amount} {event.currency}</Text>
+                                            <Text style={{textAlign: 'right', color: 'green'}} >+ {splitter.paid} {event.currency}</Text>
+                                            <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>  {(splitter.amount - splitter.paid).toFixed(2)} {event.currency}</Text>
+                                        </View>
                                     </View>
-                                </ListItem>
+                                    <View style = {[styles.splitTextContainer, {marginBottom: 8}]}>
+                                        <Badge style={{ backgroundColor: '#5067FF' }}>
+                                            <Text 
+                                                onPress={() => this.setEditSplitterDialog(splitter.key)} >
+                                                Edit
+                                            </Text>
+                                        </Badge>
+                                        <Badge style={{ backgroundColor: '#5067FF' }}>
+                                            <Text 
+                                                onPress={() => this.setPayDebtDialog(splitter.key)}>
+                                                Pay
+                                            </Text>
+                                        </Badge>
+                                        <Icon 
+                                            onPress={()=>this.setRemoveSplitterDialog(splitter.key)}
+                                            style={{ marginRight: 16, color:'#5067FF' }} 
+                                            android="md-trash" 
+                                            ios="ios-trash">
+                                        </Icon>
+                                    </View>
+                                </Card>
                             }>>
                         </List>)}
                 </View>
+                </ScrollView>
                 <AddSplitterDialog 
                     ref="AddSplitterDialog" 
                     tripKey={this.state.tripKey}
@@ -108,16 +143,9 @@ export default class EventScreen extends Component {
                    eventKey={this.state.eventKey}>
                 </PayDebtDialog>
 
-                <Fab
-                    active={true}
-                    direction="up"
-                    style={{ backgroundColor: '#5067FF' }}
-                    position="bottomRight"
-                    onPress={() => this.setAddSplitterDialog(true)}>
-                    <Text>+</Text>
-                </Fab>
+                
 
-            </View>
+            </Container>
         )
     }
     componentWillMount() {
@@ -154,6 +182,7 @@ export default class EventScreen extends Component {
         return paid ? '#4CAF50' : '#F44336'
     }
 
+
 }
 
 
@@ -164,17 +193,19 @@ const styles = StyleSheet.create({
     list: {
         alignSelf: 'stretch'
     },
-    listitem: {
-        margin: 0,
-        marginLeft: 0,
+    splitterItem: {
+        flex: -1,
+        paddingTop: 16,
         paddingLeft: 16,
-        alignSelf: 'stretch',
-        backgroundColor: '#F4F4F4'
+        paddingRight: 16,
+        backgroundColor: '#F4F4F4',
+        flexDirection: 'column'
     },
     splitTextContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 16
+        marginBottom: 16,
+        width: '100%'
     },
     buttonContainer: {
         flexDirection: 'row',

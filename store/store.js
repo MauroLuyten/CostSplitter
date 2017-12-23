@@ -89,6 +89,20 @@ class StateStore {
         });
         return tripsArray
     }
+    getTotalPaidTrip(tripKey){
+        let total = 0
+        this.getEvents(tripKey).forEach(event =>{
+            total += this.getTotalPaidEvent(tripKey, event.key)
+        })
+        return total.toFixed(2)
+    }
+    getTotalAmountTrip(tripKey){
+        let total = 0
+        this.getEvents(tripKey).forEach(event =>{
+            total += parseFloat(event.amount)
+        })
+        return total.toFixed(2)
+    }
     editTrip(tripKey, trip) {
         //TODO
         const oldTrip = this.getTrip(tripKey)
@@ -127,6 +141,24 @@ class StateStore {
         });
         return eventsArray
     }
+    getTotalPaidEvent(tripKey,eventKey){
+        let total = 0
+        this.getSplitters(tripKey,eventKey).forEach(splitter => {
+
+            total += parseFloat(splitter.paid)
+
+        });
+        return total.toFixed(2)
+    }
+    getTotalAmountEvent(tripKey, eventKey){
+        let total = 0
+        this.getSplitters(tripKey,eventKey).forEach(splitter => {
+
+            total += parseFloat(splitter.amount)
+
+        });
+        return total.toFixed(2)
+    }
     editEvent(tripKey, event){
         const eventKey = event.key
         const oldEvent = this.getEvent(tripKey,eventKey)
@@ -151,7 +183,10 @@ class StateStore {
     addSplitter(tripKey, eventKey, splitter){
         const key = this.generateKey()
         this.trips.get(tripKey).events.get(eventKey).splitters.set(
-            key,new Splitter(splitter.name, parseFloat(splitter.amount).toFixed(2), parseFloat(splitter.paid).toFixed(2)))
+            key,new Splitter(splitter.name, parseFloat(splitter.amount).toFixed(2), parseFloat(0).toFixed(2)))
+        if(splitter.paid>0){
+            this.payDebtSplitter(tripKey, eventKey, key, splitter.paid)
+        }
         if(this.online){
             firebaseApp.database().ref(`users/${this.user.uid}/trips`)
             .child(tripKey)

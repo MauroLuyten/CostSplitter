@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, ListView, FlatList, Modal, TextInput } from 'react-native'
+import { View, StyleSheet, ListView, FlatList, Modal, TextInput, ScrollView } from 'react-native'
 import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge, Card } from 'native-base';
 import { StackNavigator } from 'react-navigation';
 import stateStore from '../store/store'
@@ -24,32 +24,48 @@ export default class TripScreen extends Component {
     }
     render() {
         const trip = stateStore.getTrip(this.state.tripKey)
-
+        const amountTotal = stateStore.getTotalAmountTrip(this.state.tripKey)
         return (
-            <View style={styles.container}>
-            <Card style={{ padding: 16, flex: -1 }}>
-            <View style={{width:'100%'}}>
-                <View style={styles.splitTextContainer}>
-                        <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{trip.name}</Text>
-                        <Icon 
-                        onPress={()=>this.setEditTripDialog(true)}
-                        style={{ marginRight: 16, color:'#757575' }} 
-                        android="md-create" 
-                        ios="ios-create"></Icon>
-                </View>
-                <View style={styles.splitTextContainer}>
-                    <Text style={{}}>Description:</Text>
-                    <Text style={{ marginRight: 16 }}>{trip.description == null ? "/" : trip.description}</Text>
-                </View>
-                <View style={styles.splitTextContainer}>
-                    <Text style={{}}>Budget:</Text>
-                    <Text style={{ marginRight: 16 }}>{trip.budget == null ? "/" : trip.budget}</Text>
-                </View>
-                </View>
+            <Container style={{flex:1}}>
+                <ScrollView>
+                <Card style={{ padding: 16, flex: -1 }}>
+                    <View style={{ width: '100%' }}>
+                        <View style={styles.splitTextContainer}>
+                            <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{trip.name}</Text>
+                            <Icon
+                                onPress={() => this.setEditTripDialog(true)}
+                                style={{ color: '#5067FF' }}
+                                android="md-create"
+                                ios="ios-create"></Icon>
+                        </View>
+                        <View style={styles.splitTextContainer}>
+                            <Text>Description:</Text>
+                            <Text>{trip.description == null ? "/" : trip.description}</Text>
+                        </View>
+                        <View style={styles.splitTextContainer}>
+                            <Text>Budget:</Text>
+                            <View>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>{trip.budget}</Text>
+                                <Text style={{ textAlign: 'right', color: 'red' }} >- {amountTotal} </Text>
+                                {(trip.budget - amountTotal).toFixed(2) < 0
+                                    ? <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right', color: 'red' }}>{(trip.budget - amountTotal).toFixed(2)}</Text>
+                                    : <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right', color: 'green' }}>{(trip.budget - amountTotal).toFixed(2)}</Text>}
+
+                            </View>
+                        </View>
+                    </View>
                 </Card>
-                <Separator bordered style={styles.seperator}>
-                    <Text>EVENTS</Text>
-                </Separator>
+                <View style={{paddingBottom: 32}}>
+                    <Text style={{ marginTop: 16, marginLeft: 16, fontWeight: 'bold', marginBottom: 16 }}>Events:</Text>
+                    <Fab
+                        active={true}
+                        direction="up"
+                        position="topRight"
+                        containerStyle = {{top: -32}}
+                        style={{ backgroundColor: '#5067FF'}}
+                        onPress={() => this.setAddEventDialog(true)}>
+                        <Text>+</Text>
+                    </Fab>
                 {stateStore.getEvents(this.state.tripKey).keys().length === 0 ?
                     (
                         <Text>
@@ -65,21 +81,23 @@ export default class TripScreen extends Component {
                                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Text>{event.name}</Text>
                                     <View>
-                                        <Badge
-                                            style={{ marginRight: 5, backgroundColor: '#5067FF' }}>
-                                            <Text onPress={() => { { this.setRemoveEventDialog(event.key) } }}>
-                                                X
-                                            </Text>
-                                        </Badge>
+                                        <Icon 
+                                            onPress={()=>this.setRemoveEventDialog(event.key)}
+                                            style={{ marginRight: 16, color:'#5067FF' }} 
+                                            android="md-trash" 
+                                            ios="ios-trash">
+                                        </Icon>
                                     </View>
                                 </View>
                             </ListItem>
                         }>
                         ></List>
                     )}
-                <AddEventDialog 
-                    ref="AddEventDialog" 
-                    uid={this.state.uid} 
+                </View>
+                </ScrollView>
+                <AddEventDialog
+                    ref="AddEventDialog"
+                    uid={this.state.uid}
                     tripKey={this.state.tripKey}>
                 </AddEventDialog>
 
@@ -88,24 +106,14 @@ export default class TripScreen extends Component {
                     uid={this.state.uid}
                     tripKey={this.state.tripKey}>
                 </RemoveEventDialog>
-                
+
                 <EditTripDialog
                     ref="EditTripDialog"
                     uid={this.state.uid}
                     tripKey={this.state.tripKey}>
                 </EditTripDialog>
 
-                <Fab
-                    active={true}
-                    direction="up"
-                    style={{ backgroundColor: '#5067FF' }}
-                    position="bottomRight"
-                    onPress={() => this.setAddEventDialog(true)}>
-                    <Text>+</Text>
-                </Fab>
-
-
-            </View>
+            </Container>
         )
     }
     openEvent(key) {
