@@ -120,7 +120,13 @@ class StateStore {
     addEvent(tripKey, event) {
         event.splitters = observable.map()
         const key = this.generateKey()
-        this.trips.get(tripKey).events.set(key,new Event(event.name, event.description, event.category, parseFloat(event.amount).toFixed(2), event.currency, event.date))
+        this.trips.get(tripKey).events.set(key,new Event(
+            event.name, 
+            event.description, 
+            event.category, 
+            parseFloat(event.amount).toFixed(2), 
+            event.currency, 
+            event.date))
         if (this.online) {
             database().ref(`users/${this.user.uid}/trips`)
                 .child(tripKey)
@@ -275,7 +281,14 @@ class StateStore {
 
     editSplitter(tripKey, eventKey, splitter){
         const splitterKey = splitter.key
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name, splitter.amount, splitter.paid))
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(
+            splitterKey, 
+            new Splitter(
+                splitter.name, 
+                splitter.amount, 
+                splitter.paid
+            )
+        )
     }
     removeSplitter(tripKey, eventKey, splitterKey){
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
@@ -286,7 +299,14 @@ class StateStore {
         const trip = this.getTrip(tripKey)
         const event = this.getEvent(tripKey, eventKey)
         let newPaid = parseFloat(splitter.paid) + parseFloat(amount)
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(splitterKey, new Splitter(splitter.name,splitter.amount, newPaid.toFixed(2)))
+        this.trips.get(tripKey).events.get(eventKey).splitters.set(
+            splitterKey, 
+            new Splitter(
+                splitter.name,
+                splitter.amount, 
+                newPaid.toFixed(2)
+            )
+        )
         this.addTransaction(splitter.name, trip.name, event.name, amount)
     }
 
