@@ -258,6 +258,21 @@ class StateStore {
         return splitter
     }
 
+    getSplittersExpensesTrip(tripKey) {
+        let splittersArray = []
+        if(typeof this.trips.get(tripKey) !== "undefined" && this.trips.get(tripKey)) {
+        this.trips.get(tripKey).events.keys().forEach(eventKey => {
+            this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                let splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
+                splitter.key = splitterKey
+                splitter.eventName = this.trips.get(tripKey).events.get(eventKey).name
+                splittersArray.push(splitter)
+            })
+        })
+    }
+        return splittersArray
+    }
+
     getTransactionsSplitter(splitterKey) {
         let transactionArray = []
         let splitter = this.getSplitterGeneral(splitterKey)

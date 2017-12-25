@@ -22,6 +22,7 @@ import OverviewScreen from './Components/OverviewScreen'
 import TripScreen from './Components/TripScreen'
 import AllTransactionsScreen from './Components/AllTransactionsScreen'
 import PersonTransactionsScreen from './Components/PersonTransactionsScreen'
+import TripTableScreen from './Components/TripTableScreen'
 import EventScreen from './Components/EventScreen'
 import SummariesScreen from './Components/SummariesScreen'
 import {firebaseApp} from './firebaseconfig.js'
@@ -55,6 +56,9 @@ const Application = StackNavigator({
     },
     TransactionsPP: {
         screen: PersonTransactionsScreen
+    },
+    TripTable: {
+        screen: TripTableScreen
     }
 })
 @observer

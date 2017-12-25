@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
+import DatePicker from 'react-native-datepicker'
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
 
@@ -16,7 +17,7 @@ export default class AddEventDialog extends Component {
             newEventCategory: 'Overnight stay',
             newEventAmount: 0,
             newEventCurrency: '',
-            newEventDate: ''
+            newEventDate: '01-01-2018'
         }
     }
     render() {
@@ -89,18 +90,18 @@ export default class AddEventDialog extends Component {
                         autoFocus={false} />
                 </Item>
                 </View>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Date</Label>
-                    <Input
-                        value={this.state.newEventDate.toString()}
-                        selectionColor="#5067FF"
-                        onChangeText={(date) => {
-                            this.setState({
-                                newEventDate: date
-                            })
-                        }}
-                        autoFocus={false} />
-                </Item>
+                
+                <Label>Date</Label>
+                <DatePicker floatingLabel style={{ marginBottom: 16 }}
+                  date={this.state.newEventDate}
+                  mode="date"
+                  placeholder="select date"
+                  format="DD-MM-YYYY"
+                  minDate="01-01-2000"
+                  maxDate="01-02-2018"
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
+                  onDateChange={(date) => {this.setState({newEventDate: date})}} />
                 <View style={styles.buttonContainer}>
                     <Button transparent small onPress={() => this.setAddEventDialog(false)}>
                         <Text style={{ color: '#5067FF' }}>Cancel</Text>

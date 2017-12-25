@@ -12,37 +12,38 @@ export default class PersonTransactionsScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedSplitter: null,
-            selectedSplitterName: '',
-            splitters: null,
-            transactions: null
+            selectedTrip: null,
+            selectedTripName: '',
+            trips: null,
+            expenses: null
         }
 
     }
     static navigationOptions = {
-        title: 'Person Transactions'
+        title: 'Trip Table'
     }
     render() {
-        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];
-        const transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        const tableHead = ['Splitter', 'Event', 'Amount', 'Paid', 'Due'];
+        const trips = stateStore.getTrips;
+        const expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip);
         return (
             <View style={styles.container}>
                 <Picker
-                    selectedValue={this.state.selectedSplitterName}
+                    selectedValue={this.state.selectedTripName}
                     onValueChange={(itemValue, itemIndex) => this.handleChangedOption(itemIndex)}>
                     <Picker.Item label="None" key="None" value="None"></Picker.Item>
-                        {splitters.map((splitter) => <Picker.Item label={splitter.name} key={splitter.key} value={splitter.name}/>)} 
+                        {trips.map((trip) => <Picker.Item label={trip.name} key={trip.key} value={trip.name}/>)} 
                 </Picker>
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
-                    {transactions.length===0 ? (
-                        <Text style={{marginLeft:16}}>No transactions yet</Text>
+                    {expenses.length===0 ? (
+                        <Text style={{marginLeft:16}}>No expenses yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={transactions}
-                            renderRow={(transaction) =>
-                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, transaction.amount]} style={styles.row} textStyle={styles.text}/>
+                        (<List style={styles.list} dataArray={expenses}
+                            renderRow={(expense) =>
+                               <Row data={[expense.name, expense.eventName, expense.amount, expense.paid, parseFloat(expense.amount - expense.paid).toFixed(2)]} style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
@@ -51,8 +52,8 @@ export default class PersonTransactionsScreen extends Component {
         )
     }
     componentWillMount() {
-        splitters = stateStore.getAllSplitters();
-        transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        trips = stateStore.getTrips;
+        expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip);
     }
 
     navigate(route) {
@@ -62,9 +63,9 @@ export default class PersonTransactionsScreen extends Component {
 
     handleChangedOption(val) {
         if(val != 0) {
-            this.setState({selectedSplitter: splitters[val-1].key, selectedSplitterName: splitters[val-1].name})
+            this.setState({selectedTrip: trips[val-1].key, selectedTripName: trips[val-1].name})
         } else {
-            this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
+            this.setState({selectedTrip: null, selectedTripName: 'none'})
         }
     }
 }
