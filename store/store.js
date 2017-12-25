@@ -347,7 +347,9 @@ class StateStore {
                 daysArray.push(day)
             })
         })
-        return daysArray
+
+        let uniqueArray = Array.from(new Set(daysArray))
+        return uniqueArray
     }
 
     editSplitter(tripKey, eventKey, splitter){
