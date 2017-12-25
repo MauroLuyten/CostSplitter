@@ -292,7 +292,6 @@ class StateStore {
     getTransactionsSplitter(splitterKey) {
         let transactionArray = []
         let splitter = this.getSplitterGeneral(splitterKey)
-        //console.warn(JSON.stringify(splitter))
         if(typeof splitter !== "undefined" && splitter) {
         this.transactions.keys().forEach(transactionKey => {
             let transaction = this.transactions.get(transactionKey)
@@ -302,6 +301,53 @@ class StateStore {
         })
     }
         return transactionArray;
+    }
+
+    getExpensesPerDayPerson(splitterParameter, day) {
+        let splittersArray = []
+        if(day === "All") {
+            if(splitterParameter !== null) {
+                this.trips.keys().forEach(tripKey => {
+                    this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                            this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                                let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                                if(splitter.key === splitterParameter) {
+                                    splitter.tripName = this.getTrip(tripKey).name
+                                    splittersArray.push(splitter)
+                                }
+                        })
+                    })
+                })
+            }
+        } else {
+            if(splitterParameter !== null) {
+                this.trips.keys().forEach(tripKey => {
+                    this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                        if(day === this.getEvent(tripKey,eventKey).date) {
+                            this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                                let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                                if(splitter.key === splitterParameter) {
+                                    splitter.tripName = this.getTrip(tripKey).name
+                                    splittersArray.push(splitter)
+                                }
+                            })
+                        }
+                    })
+                })
+            }
+        }
+        return splittersArray
+    }
+
+    getExpenseDays() {
+        let daysArray = []
+        this.trips.keys().forEach(tripKey => {
+            this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                let day = this.getEvent(tripKey,eventKey).date
+                daysArray.push(day)
+            })
+        })
+        return daysArray
     }
 
     editSplitter(tripKey, eventKey, splitter){
