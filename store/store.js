@@ -165,6 +165,22 @@ class StateStore {
         });
         return total.toFixed(2)
     }
+    getEventDivision(tripKey, eventKey){
+        let equally = true
+        let splitters = this.getSplitters(tripKey, eventKey)
+        if(splitters.length==0){
+            equally = false
+        } else{
+            let firstAmount = splitters[0].amount
+            splitters.forEach(splitter => {
+                if(splitter.amount!==firstAmount){
+                    equally = false
+                }
+            })
+        }
+        return equally ? "Equally" : "Individually"
+
+    }
     editEvent(tripKey, event){
         const eventKey = event.key
         const oldEvent = this.getEvent(tripKey,eventKey)

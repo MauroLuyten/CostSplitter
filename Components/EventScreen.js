@@ -29,6 +29,7 @@ export default class EventScreen extends Component {
         const event = stateStore.getEvent(this.state.tripKey,this.state.eventKey)
         const splitters = stateStore.getSplitters(this.state.tripKey,this.state.eventKey)
         const paidTotal = stateStore.getTotalPaidEvent(this.state.tripKey, this.state.eventKey)
+        const divided = stateStore.getEventDivision(this.state.tripKey, this.state.eventKey)
         return (
             <Container style={{ flex: 1}}>
                 <ScrollView>
@@ -62,6 +63,10 @@ export default class EventScreen extends Component {
                         <View style={styles.splitTextContainer}>
                             <Text style={{}}>Date:</Text>
                             <Text >{event.date == null ? "/" : event.date}</Text>
+                        </View>
+                        <View style={styles.splitTextContainer}>
+                            <Text style={{}}>Divided:</Text>
+                            <Text>{divided}</Text>
                         </View>
                     </View>
 

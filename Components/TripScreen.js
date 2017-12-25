@@ -80,7 +80,6 @@ export default class TripScreen extends Component {
                             <ListItem button style={styles.listitem} onPress={() => { this.openEvent(event.key) }}>
                                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Text style={{width:100}}>{event.name}</Text>
-                                    
                                     <Text style={{fontWeight:'bold'}}>{event.amount}</Text>
                                     <Icon 
                                         onPress={()=>this.setRemoveEventDialog(event.key)}
@@ -88,7 +87,6 @@ export default class TripScreen extends Component {
                                         android="md-trash" 
                                         ios="ios-trash">
                                     </Icon>
-                                    
                                 </View>
                             </ListItem>
                         }>
