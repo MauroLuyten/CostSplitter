@@ -8,14 +8,13 @@ import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-ta
 
 
 @observer
-export default class PersonTransactionsScreen extends Component {
+export default class ExpensesCategoryScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedSplitter: null,
-            selectedSplitterName: '',
-            splitters: null,
-            transactions: null
+            selectedCategory: 'Overnight stay',
+            categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.'],
+            expenses: null
         }
 
     }
@@ -23,26 +22,25 @@ export default class PersonTransactionsScreen extends Component {
         title: 'Person Transactions'
     }
     render() {
-        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];
-        const transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        const tableHead = ['Trip', 'Event', 'Description', 'Amount', 'Currency'];
+        const expenses = stateStore.getExpensesPerCategory(this.state.selectedCategory);
         return (
             <View style={styles.container}>
                 <Picker
-                    selectedValue={this.state.selectedSplitterName}
+                    selectedValue={this.state.selectedCategory}
                     onValueChange={(itemValue, itemIndex) => this.handleChangedOption(itemIndex)}>
-                    <Picker.Item label="None" key="None" value="None"></Picker.Item>
-                        {splitters.map((splitter) => <Picker.Item label={splitter.name} key={splitter.key} value={splitter.name}/>)} 
+                        {this.state.categories.map((category) => <Picker.Item label={category} key={category} value={category}/>)} 
                 </Picker>
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
-                    {transactions.length===0 ? (
-                        <Text style={{marginLeft:16}}>No transactions yet</Text>
+                    {expenses.length===0 ? (
+                        <Text style={{marginLeft:16}}>No expenses yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={transactions}
-                            renderRow={(transaction) =>
-                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, transaction.amount]} style={styles.row} textStyle={styles.text}/>
+                        (<List style={styles.list} dataArray={expenses}
+                            renderRow={(expense) =>
+                               <Row data={[expense.tripName, expense.name, expense.description, expense.amount, expense.currency]} style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
@@ -51,8 +49,7 @@ export default class PersonTransactionsScreen extends Component {
         )
     }
     componentWillMount() {
-        splitters = stateStore.getAllSplitters();
-        transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        expenses = stateStore.getExpensesPerCategory(this.state.selectedCategory);
     }
 
     navigate(route) {
@@ -61,11 +58,7 @@ export default class PersonTransactionsScreen extends Component {
     }
 
     handleChangedOption(val) {
-        if(val != 0) {
-            this.setState({selectedSplitter: splitters[val-1].key, selectedSplitterName: splitters[val-1].name})
-        } else {
-            this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
-        }
+        this.setState({selectedCategory: this.state.categories[val]})
     }
 }
 const styles = StyleSheet.create({

@@ -27,6 +27,8 @@ export default class SummariesScreen extends Component {
         <Grid>
                 <Row><Col><Button rounded style={styles.button} onPress={() => navigate('AllTransactions')}><Text style={styles.buttonText}>All Transactions</Text></Button></Col></Row>
                 <Row><Col><Button rounded style={styles.button} onPress={() => navigate('TransactionsPP')}><Text style={styles.buttonText}>Transactions P.P</Text></Button></Col></Row>
+                <Row><Col><Button rounded style={styles.button} onPress={() => navigate('TripTable')}><Text style={styles.buttonText}>Trip Table</Text></Button></Col></Row>
+                <Row><Col><Button rounded style={styles.button} onPress={() => navigate('ExpensesCategory')}><Text style={styles.buttonText}>Expenses / Category</Text></Button></Col></Row>
         </Grid>
     </View>
                 </Content>
