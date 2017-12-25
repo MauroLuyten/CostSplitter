@@ -79,15 +79,16 @@ export default class TripScreen extends Component {
                         renderRow={(event) =>
                             <ListItem button style={styles.listitem} onPress={() => { this.openEvent(event.key) }}>
                                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <Text>{event.name}</Text>
-                                    <View>
-                                        <Icon 
-                                            onPress={()=>this.setRemoveEventDialog(event.key)}
-                                            style={{ marginRight: 16, color:'#5067FF' }} 
-                                            android="md-trash" 
-                                            ios="ios-trash">
-                                        </Icon>
-                                    </View>
+                                    <Text style={{width:100}}>{event.name}</Text>
+                                    
+                                    <Text style={{fontWeight:'bold'}}>{event.amount}</Text>
+                                    <Icon 
+                                        onPress={()=>this.setRemoveEventDialog(event.key)}
+                                        style={{ marginRight: 16, color:'#5067FF' }} 
+                                        android="md-trash" 
+                                        ios="ios-trash">
+                                    </Icon>
+                                    
                                 </View>
                             </ListItem>
                         }>
