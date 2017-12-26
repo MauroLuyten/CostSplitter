@@ -32,8 +32,14 @@ class Event {
     @persist @observable currency = 'euro'
     @persist('map', Splitter) @observable splitters = new Map()
 }
+class Currency {
+    constructor(name){
+        this.name
+    }
+    @persist @observable  name = ''
+}
 class Trip {
-    constructor(name,description, budget){
+    constructor(name,description, budget, currenciesArray){
         this.name = name
         this.description = description
         this.budget = budget
@@ -41,6 +47,7 @@ class Trip {
     @persist @observable  name = ''
     @persist @observable description = ''
     @persist @observable budget = ''
+    @persist('map', Currency) @observable currencies = new Map()
     @persist('map', Event) @observable events = new Map()
 }
 
@@ -62,7 +69,8 @@ class StateStore {
     @persist('map', Trip) @observable trips = new Map()
     @persist('map', Transaction) @observable transactions = new Map()
     @persist('object') @observable error = {}
-    currencies = ["EUR", "USD", "GBP"]
+    currencies = ['EUR', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK' , 'NZD', 'PHP', 'PLN',
+    'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR']
     @observable online = false
 
     generateKey() {

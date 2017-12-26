@@ -3,6 +3,11 @@ import { StyleSheet, View, Alert } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
+import SelectMultiple from 'react-native-select-multiple'
+import Collapsible from 'react-native-collapsible';
+
+const currenciesArray = ['EUR', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK' , 'NZD', 'PHP', 'PLN',
+'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR']
 
 export default class AddTripDialog extends Component {
     constructor(props) {
@@ -12,13 +17,15 @@ export default class AddTripDialog extends Component {
             uid: this.props.uid,
             newTripName: '',
             newTripDescription: '',
-            newTripBudget: ''
+            newTripBudget: '',
+            selectedCurrencies: ['EUR'], 
+            isCollapsed: true
         }
     }
     render() {
         return (
 
-            <ModalWrapper
+            <ModalWrapper over
                 onRequestClose={() => { this.setAddTripDialog(false) }}
                 style={{ width: 350, height: 'auto', padding: 16 }}
                 visible={this.state.dialog}>
@@ -60,6 +67,14 @@ export default class AddTripDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
+                <Button primary small onPress={() => this.toggleCollapsible()}>
+                    <Text style={{ color: 'white' }}>Toggle Currencies</Text>
+                </Button>
+                <Collapsible collapsed={this.state.isCollapsed}>
+                    <View style={{height: 400}}>
+                        <SelectMultiple items={currenciesArray} selectedItems={this.state.selectedCurrencies} onSelectionsChange={this.onSelectionsChange}/>
+                    </View>
+                </Collapsible>
                 <View style={styles.buttonContainer}>
                     <Button transparent small onPress={() => this.setAddTripDialog(false)}>
                         <Text style={{ color: '#5067FF' }}>Cancel</Text>
@@ -70,6 +85,22 @@ export default class AddTripDialog extends Component {
                 </View>
             </ModalWrapper>
         )
+    }
+
+    //currencies
+    onSelectionsChange = (selectedCurrencies) => {
+        this.setState({ selectedCurrencies })
+      }
+    toggleCollapsible(){
+        if(this.state.isCollapsed){
+            this.setState({
+                isCollapsed: false
+            })
+        } else {
+            this.setState({
+                isCollapsed: true
+            })
+        }
     }
     setAddTripDialog(visible) {
         this.setState({
