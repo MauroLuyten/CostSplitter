@@ -10,6 +10,7 @@ import EditEventDialog from './Dialogs/EditEventDialog'
 import RemoveSplitterDialog from './Dialogs/RemoveSplitterDialog'
 import EditSplitterDialog from './Dialogs/EditSplitterDialog'
 import PayDebtDialog from './Dialogs/PayDebtDialog'
+import DivideEventDialog from './Dialogs/DivideEventDialog'
 
 @observer
 export default class EventScreen extends Component {
@@ -20,6 +21,7 @@ export default class EventScreen extends Component {
             eventKey: this.props.navigation.state.params.eventKey,
             uid: null,
             eventRef: null,
+            fabActive: false
         }
     }
     static navigationOptions = {
@@ -74,13 +76,34 @@ export default class EventScreen extends Component {
                 <View style={{paddingBottom: 32}}>
                     <Text style={{ marginTop: 16, marginLeft: 16, fontWeight: 'bold', marginBottom: 16 }}>Splitters:</Text>
                     <Fab
-                        active={true}
-                        direction="up"
+                        style={{}}
+                        active={this.state.fabActive}
+                        direction="left"
                         position="topRight"
                         containerStyle = {{top: -32}}
                         style={{ backgroundColor: '#5067FF'}}
-                        onPress={() => this.setAddSplitterDialog(true)}>
-                        <Text>+</Text>
+                        onPress={() => this.setState({fabActive: !this.state.fabActive})}>
+                        <Icon
+                            style={{}} 
+                            android="md-more" 
+                            ios="ios-more">
+                        </Icon>
+                        <Button 
+                            style={{elevation:3, backgroundColor:'#5067FF'}}
+                            onPress={()=>this.setAddSplitterDialog(true)}>
+                            <Icon
+                                style={{ }} 
+                                android="md-add" 
+                                ios="ios-add">
+                            </Icon>
+                        </Button>
+                        <Button 
+                            style={{elevation:3 , backgroundColor:'#5067FF'}}
+                            onPress={()=>this.setDivideEventDialog(true)}>
+                            <Icon>
+                                <Text style={{color:'white', fontWeight:'bold'}}>%</Text>
+                            </Icon>
+                        </Button>
                     </Fab>
                     {splitters.length===0 ? (
                         <Text style={{marginLeft:16}}>No splitters yet</Text>
@@ -91,9 +114,9 @@ export default class EventScreen extends Component {
                                 <Card style={styles.splitterItem}>
                                     <View style={[styles.splitTextContainer,{ marginRight: 18}]}>
                                         <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{splitter.name}</Text>
-                                        <View style={{textAlign: 'right'}}>
-                                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red' }}>{splitter.amount} {event.currency}</Text>
-                                            <Text style={{textAlign: 'right', color: 'green'}} >+ {splitter.paid} {event.currency}</Text>
+                                        <View style={{}}>
+                                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red', textAlign: 'right'  }}>{splitter.amount} {event.currency}</Text>
+                                            <Text style={{textAlign: 'right', color: 'green', textAlign: 'right' }} >+ {splitter.paid} {event.currency}</Text>
                                             <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>  {(splitter.amount - splitter.paid).toFixed(2)} {event.currency}</Text>
                                         </View>
                                     </View>
@@ -147,6 +170,11 @@ export default class EventScreen extends Component {
                    tripKey={this.state.tripKey}
                    eventKey={this.state.eventKey}>
                 </PayDebtDialog>
+                <DivideEventDialog
+                    ref="DivideEventDialog" 
+                    tripKey={this.state.tripKey} 
+                    eventKey={this.state.eventKey}>
+                </DivideEventDialog>
 
                 
 
@@ -182,6 +210,9 @@ export default class EventScreen extends Component {
             splitter: stateStore.getSplitter(this.state.tripKey, this.state.eventKey, key)
         })
         this.refs.PayDebtDialog.setPayDebtDialog(true)
+    }
+    setDivideEventDialog(visible){
+        this.refs.DivideEventDialog.setDivideEventDialog(visible)
     }
     paidColor(paid) {
         return paid ? '#4CAF50' : '#F44336'

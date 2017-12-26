@@ -179,7 +179,31 @@ class StateStore {
             })
         }
         return equally ? "Equally" : "Individually"
-
+    }
+    divideEvent(tripKey, eventKey, eventDivision, amountType, amount){
+        const currentDivision = this.getEventDivision(tripKey, eventKey)
+        const event = this.getEvent(tripKey, eventKey)
+        if(eventDivision=="Equally"){
+            if(amountType=="Fixed Amount"){
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(amount).toFixed(2))
+            }
+            if(amountType=="Custom Percentage"){
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount*amount/100).toFixed(2))
+            }
+            if(amountType=="Equal Share"){
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount/amount).toFixed(2))
+            }
+        } else if(eventDivision=="Individually"){
+            if(currentDivision=="Equally"){
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(0).toFixed(2))
+            }
+        }
+    }
+    setSplitterAmounts(tripKey, eventKey, amount){
+        this.getSplitters(tripKey, eventKey).forEach(splitter => {
+            splitter.amount = amount
+            this.editSplitter(tripKey, eventKey, splitter)
+        })
     }
     editEvent(tripKey, event){
         const eventKey = event.key
