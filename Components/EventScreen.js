@@ -56,7 +56,7 @@ export default class EventScreen extends Component {
                         </View>
                         <View style={styles.splitTextContainer}>
                             <Text style={{}}>Amount:</Text>
-                            <View style={{textAlign: 'right'}}>
+                            <View style={{}}>
                                 <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red' }}>{event.amount} {event.currency}</Text>
                                 <Text style={{textAlign: 'right', color: 'green'}} >+ {paidTotal} {event.currency}</Text>
                                 <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>{(event.amount - paidTotal).toFixed(2)} {event.currency}</Text>
