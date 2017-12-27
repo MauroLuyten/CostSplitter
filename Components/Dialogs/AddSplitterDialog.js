@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert } from 'react-native'
+import { StyleSheet, View, Alert, Picker } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
@@ -11,29 +11,57 @@ export default class AddSplitterDialog extends Component {
             dialog: false,
             tripKey: this.props.tripKey,
             eventKey:this.props.eventKey,
+            existingSplitterKey: '',
             newSplitterName: '',
             newSplitterAmount: 0,
             newSplitterPaid: 0
         }
     }
     render() {
+        const persons = stateStore.getPersons()
+        let pickeritems = []
+        pickeritems.push(<Picker.Item label="New splitter" value="new" />)
+        persons.forEach(person => {
+            pickeritems.push(<Picker.Item label={person.name} value={person.key} />)
+        })
         return (
-
             <ModalWrapper
                 onRequestClose={() => { this.setAddSplitterDialog(false) }}
                 style={{ width: 350, height: 'auto', padding: 24 }}
                 visible={this.state.dialog}>
                 <Text>Add Splitter</Text>
+                <Label>Existing</Label>
+                <Picker
+                    onValueChange={( itemValue, itemIndex) => {
+                        if(itemIndex!==0){
+                            this.setState({
+                                newSplitterName: persons[itemIndex-1].name,
+                                existingSplitterKey: persons[itemIndex-1].key
+                            })
+                        } else if(itemValue=="new"){
+                            this.setState({
+                                newSplitterName: '',
+                                existingSplitterKey: ''
+                            })
+                        }
+                    }}
+                    selectedValue= {this.state.newSplitterName=='' ? "new" : this.state.existingSplitterKey}
+                    style={{ marginBottom: 16 }}>
+                   {pickeritems}
+                </Picker>
+                <Label>New</Label>
                 <Item floatingLabel>
                     <Label>Name</Label>
                     <Input
+                        value={this.state.newSplitterName}
                         selectionColor="#5067FF"
                         onChangeText={(name) => {
                             this.setState({
                                 newSplitterName: name
                             })
                         }}
-                        autoFocus={true} />
+                        autoFocus={true}
+                        disabled={this.state.existingSplitterKey!==''} />
                 </Item>
                 <Item floatingLabel>
                     <Label>Amount</Label>
@@ -101,9 +129,19 @@ export default class AddSplitterDialog extends Component {
                     ],
                     { cancelable: false }
                 )
+            } else if(stateStore.getSplitter(this.state.tripKey, this.state.eventKey, this.state.existingSplitterKey)){
+                console.log(stateStore.getSplitter(this.state.tripKey, this.state.eventKey, this.state.existingSplitterKey))
+                Alert.alert(
+                    'Error',
+                    'This person is already a splitter of this event.',
+                    [
+                        { text: 'OK', onPress: () => console.log('OK Pressed') },
+                    ],
+                    { cancelable: false }
+                )
             }
             else {
-                stateStore.addSplitter(this.state.tripKey, this.state.eventKey, splitter)
+                stateStore.addSplitter(this.state.tripKey, this.state.eventKey, splitter, this.state.existingSplitterKey)
                 this.setState({
                     newSplitterName: '',
                     newSplitterAmount: 0,

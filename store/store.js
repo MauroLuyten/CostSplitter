@@ -63,11 +63,20 @@ class Transaction {
     @persist @observable eventName = ''
     @persist @observable amount = 0
 }
+class Person {
+    constructor(key, name) {
+        this.key = key,
+        this.name = name
+    }
+    @persist @observable name = ''
+    @persist @observable key = ''
+}
 
 class StateStore {
     @persist('object') @observable user = {}
     @persist('map', Trip) @observable trips = new Map()
     @persist('map', Transaction) @observable transactions = new Map()
+    @persist('map', Person) @observable persons = new Map()
     @persist('object') @observable error = {}
     currencies = ['EUR', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK' , 'NZD', 'PHP', 'PLN',
     'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR']
@@ -76,7 +85,30 @@ class StateStore {
     generateKey() {
         return firebaseApp.database().ref().push().key
     }
-    @action addTrip(trip) {
+    addPerson(key, name) {
+        if(name!==''){
+            this.persons.set(key, new Person(key, name))
+        }
+    }
+    getPerson(key){
+        if(key!==''){
+            return this.persons.get(key)
+        }
+    }
+    getPersons() {
+        let personsArray = []
+        this.persons.keys().forEach(key => {
+            let person = this.persons.get(key)
+            personsArray.push(person)
+        });
+        return personsArray
+    }
+    removePerson(key) {
+        if(key!==''){
+            this.persons.delete(key)
+        }
+    }
+    addTrip(trip) {
         let key = this.generateKey()
         this.trips.set(key, new Trip(trip.name, trip.description, parseFloat(trip.budget).toFixed(2)))
         if (this.online) {
@@ -234,10 +266,13 @@ class StateStore {
             .remove()
         }
     }
-    addSplitter(tripKey, eventKey, splitter){
-        const key = this.generateKey()
+    addSplitter(tripKey, eventKey, splitter, key){
+        if(key=='' || key==null){
+            key = this.generateKey()
+        }
         this.trips.get(tripKey).events.get(eventKey).splitters.set(
             key,new Splitter(splitter.name, parseFloat(splitter.amount).toFixed(2), parseFloat(0).toFixed(2)))
+            this.addPerson(key, splitter.name)
         if(splitter.paid>0){
             this.payDebtSplitter(tripKey, eventKey, key, splitter.paid)
         }
