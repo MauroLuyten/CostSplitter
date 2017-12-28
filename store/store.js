@@ -322,6 +322,11 @@ class StateStore {
                 })
             })
         })
+/*         let splitters = this.getPersons()
+        splitters.keys().forEach(splitterKey => {
+            splitter.getPerson(splitterKey)
+            splittersArray.push()
+        }) */
         return splittersArray;
     }
 
@@ -391,10 +396,11 @@ class StateStore {
                 this.trips.keys().forEach(tripKey => {
                     this.trips.get(tripKey).events.keys().forEach(eventKey => {
                             this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                                let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                                let splitter = this.getPerson(splitterKey)
                                 if(splitter.key === splitterParameter) {
-                                    splitter.tripName = this.getTrip(tripKey).name
-                                    splittersArray.push(splitter)
+                                    let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
+                                    splitterAdd.tripName = this.getTrip(tripKey).name
+                                    splittersArray.push(splitterAdd)
                                 }
                         })
                     })
@@ -406,10 +412,11 @@ class StateStore {
                     this.trips.get(tripKey).events.keys().forEach(eventKey => {
                         if(day === this.getEvent(tripKey,eventKey).date) {
                             this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                                let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                                let splitter = this.getPerson(splitterKey)
                                 if(splitter.key === splitterParameter) {
-                                    splitter.tripName = this.getTrip(tripKey).name
-                                    splittersArray.push(splitter)
+                                    let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
+                                    splitterAdd.tripName = this.getTrip(tripKey).name
+                                    splittersArray.push(splitterAdd)
                                 }
                             })
                         }
@@ -461,6 +468,42 @@ class StateStore {
         })
     }
         return splittersArray;
+    }
+
+    getTotalExpensesPersonCategory(splitterKeyParameter, category) {
+        let result = []
+        let totalPaid = 0.0
+        let totalDue = 0.0
+        let totalRecPay = 0.0
+        if(typeof splitterKeyParameter !== "undefined" && splitterKeyParameter) {
+            if(typeof category !== "undefined" && category) {
+                let expenses = this.getExpensesPerCategory(category)
+                result.push(this.getPerson(splitterKeyParameter).name)
+                for(var i = 0; i < expenses.length; i++) {
+                    let expense = expenses[i]
+                    if(expense.splitters !== null) {
+                        expense.splitters.keys().forEach(splitterKey => {
+                            if(splitterKey === splitterKeyParameter) {
+                                let splitter = this.getSplitterGeneral(splitterKey)
+                                totalPaid = totalPaid + splitter.paid
+                                if(splitter.amount - splitter.paid > 0) {
+                                    totalDue += splitter.amount - splitter.paid
+                                }
+                                totalRecPay += splitter.amount - splitter.paid
+                            }
+                        })
+                    }
+                }
+            }
+        }
+        else {
+            result.push("/")
+        }
+
+        result.push(parseFloat(totalPaid).toFixed(2))
+        result.push(parseFloat(totalDue).toFixed(2))
+        result.push(parseFloat(totalRecPay).toFixed(2))
+        return result
     }
 
     editSplitter(tripKey, eventKey, splitter){

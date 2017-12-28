@@ -26,6 +26,7 @@ import TripTableScreen from './Components/TripTableScreen'
 import ExpensesCategoryScreen from './Components/ExpensesCategoryScreen'
 import ExpenseDayPersonScreen from './Components/ExpensesDayPersonScreen'
 import ExpenseTableScreen from './Components/ExpenseTableScreen'
+import TotalExpensePersonCatScreen from './Components/TotalExpensesPersonCategoryScreen'
 import EventScreen from './Components/EventScreen'
 import SummariesScreen from './Components/SummariesScreen'
 import {firebaseApp} from './firebaseconfig.js'
@@ -71,6 +72,9 @@ const Application = StackNavigator({
     },
     ExpenseTable: {
         screen: ExpenseTableScreen
+    },
+    TotalExpensePersonCat :{
+        screen: TotalExpensePersonCatScreen
     }
 })
 @observer

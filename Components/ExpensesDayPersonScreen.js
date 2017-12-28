@@ -61,7 +61,7 @@ export default class ExpensesDayPersonScreen extends Component {
         )
     }
     componentWillMount() {
-        splitters = stateStore.getAllSplitters()
+        splitters = stateStore.getPersons()
         days = stateStore.getExpenseDays()
         expenses = stateStore. getExpensesPerDayPerson(this.state.selectedSplitter, this.state.selectedDay)
     }
