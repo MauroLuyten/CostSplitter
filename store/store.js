@@ -433,6 +433,36 @@ class StateStore {
         return uniqueArray
     }
 
+    getAllEvents() {
+        let eventsArray = []
+        this.trips.keys().forEach(tripKey => {
+            this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                let event = this.getEvent(tripKey, eventKey)
+                event.key = eventKey
+                eventsArray.push(event)
+            })
+        })
+        return eventsArray;
+    }
+
+    getSplittersEvent(eventKeyParameter) {
+        let splittersArray = []
+        if(typeof eventKeyParameter !== "undefined" && eventKeyParameter) {
+        this.trips.keys().forEach(tripKey => {
+            this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                if(eventKey == eventKeyParameter) {
+                    this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                        let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                        splitter.tripName = this.getTrip(tripKey).name
+                        splittersArray.push(splitter)
+                    })
+                }
+            })
+        })
+    }
+        return splittersArray;
+    }
+
     editSplitter(tripKey, eventKey, splitter){
         const splitterKey = splitter.key
         this.trips.get(tripKey).events.get(eventKey).splitters.set(

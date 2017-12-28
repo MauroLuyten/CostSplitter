@@ -8,7 +8,7 @@ import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-ta
 
 
 @observer
-export default class PersonTransactionsScreen extends Component {
+export default class TripTableScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -23,7 +23,7 @@ export default class PersonTransactionsScreen extends Component {
         title: 'Trip Table'
     }
     render() {
-        const tableHead = ['Splitter', 'Event', 'Amount', 'Paid', 'Due'];
+        const tableHead = ['Splitter', 'Trip', 'Amount (Due)', 'Paid', 'Receives/Due'];
         const trips = stateStore.getTrips;
         const expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip);
         return (
