@@ -110,6 +110,7 @@ export default class AddSplitterDialog extends Component {
             paid: this.state.newSplitterPaid
          } 
          const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
+         const dividedAmountEvent = stateStore.getTotalAmountEvent(this.state.tripKey, this.state.eventKey)
         if (splitter.name && splitter.amount && splitter.paid) {
             if((parseInt(splitter.amount) > parseInt(event.amount)) && (parseInt(splitter.paid) > parseInt(event.amount))) {
                 Alert.alert('Wrong amount',
@@ -124,6 +125,16 @@ export default class AddSplitterDialog extends Component {
                 Alert.alert(
                     'Wrong amount',
                     'Amount/Paid must be positive!',
+                    [
+                        { text: 'OK', onPress: () => console.log('OK Pressed') },
+                    ],
+                    { cancelable: false }
+                )
+            }
+            else if (splitter.amount > event.amount - dividedAmountEvent) {
+                Alert.alert(
+                    'Wrong amount',
+                    `Amount may not be higher than ${(event.amount - dividedAmountEvent).toFixed(2)}`,
                     [
                         { text: 'OK', onPress: () => console.log('OK Pressed') },
                     ],

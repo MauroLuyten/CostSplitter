@@ -15,7 +15,7 @@ export default class AllTransactionsScreen extends Component {
 
     }
     static navigationOptions = {
-        title: 'Transaction'
+        title: 'All Transactions'
     }
     render() {
         const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];

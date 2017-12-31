@@ -19,7 +19,7 @@ export default class ExpensesCategoryScreen extends Component {
 
     }
     static navigationOptions = {
-        title: 'Person Transactions'
+        title: 'Expenses per category'
     }
     render() {
         const tableHead = ['Trip', 'Event', 'Description', 'Amount', 'Currency'];

@@ -491,10 +491,11 @@ class StateStore {
                 this.trips.keys().forEach(tripKey => {
                     this.trips.get(tripKey).events.keys().forEach(eventKey => {
                             this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                                let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                                let splitter = this.getPerson(splitterKey)
                                 if(splitter.key === splitterParameter) {
-                                    splitter.tripName = this.getTrip(tripKey).name
-                                    splittersArray.push(splitter)
+                                    let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
+                                    splitterAdd.tripName = this.getTrip(tripKey).name
+                                    splittersArray.push(splitterAdd)
                                 }
                         })
                     })
@@ -506,10 +507,11 @@ class StateStore {
                     this.trips.get(tripKey).events.keys().forEach(eventKey => {
                         if(day === this.getEvent(tripKey,eventKey).date) {
                             this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                                let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                                let splitter = this.getPerson(splitterKey)
                                 if(splitter.key === splitterParameter) {
-                                    splitter.tripName = this.getTrip(tripKey).name
-                                    splittersArray.push(splitter)
+                                    let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
+                                    splitterAdd.tripName = this.getTrip(tripKey).name
+                                    splittersArray.push(splitterAdd)
                                 }
                             })
                         }
@@ -531,6 +533,72 @@ class StateStore {
 
         let uniqueArray = Array.from(new Set(daysArray))
         return uniqueArray
+    }
+
+    getAllEvents() {
+        let eventsArray = []
+        this.trips.keys().forEach(tripKey => {
+            this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                let event = this.getEvent(tripKey, eventKey)
+                event.key = eventKey
+                eventsArray.push(event)
+            })
+        })
+        return eventsArray;
+    }
+
+    getSplittersEvent(eventKeyParameter) {
+        let splittersArray = []
+        if(typeof eventKeyParameter !== "undefined" && eventKeyParameter) {
+        this.trips.keys().forEach(tripKey => {
+            this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                if(eventKey == eventKeyParameter) {
+                    this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                        let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                        splitter.tripName = this.getTrip(tripKey).name
+                        splittersArray.push(splitter)
+                    })
+                }
+            })
+        })
+    }
+        return splittersArray;
+    }
+
+    getTotalExpensesPersonCategory(splitterKeyParameter, category) {
+        let result = []
+        let totalPaid = 0
+        let totalDue = 0
+        let totalRecPay = 0
+        if(typeof splitterKeyParameter !== "undefined" && splitterKeyParameter) {
+            if(typeof category !== "undefined" && category) {
+                result.push(this.getPerson(splitterKeyParameter).name)
+                this.trips.keys().forEach(tripKey => {
+                    this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                        let expense = this.getEvent(tripKey, eventKey)
+                        if(expense.category === category) {
+                            this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                                let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                                if(splitterKeyParameter === splitterKey) {
+                                    totalPaid += parseFloat(splitter.paid)
+                                    //console.warn(totalPaid)
+                                    totalDue += parseFloat(splitter.amount)
+                                    totalRecPay += parseFloat(splitter.amount - splitter.paid)
+                                }
+                            })
+                        }
+                    })
+                })
+            }
+        }
+        else {
+            result.push("/")
+        }
+
+        result.push(totalPaid.toFixed(2))
+        result.push(totalDue.toFixed(2))
+        result.push(totalRecPay.toFixed(2))
+        return result
     }
 
     editSplitter(tripKey, eventKey, splitter){

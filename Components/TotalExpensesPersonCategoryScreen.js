@@ -8,23 +8,26 @@ import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-ta
 
 
 @observer
-export default class PersonTransactionsScreen extends Component {
+export default class TotalExpensesPersonCategoryScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            splitters: null,
             selectedSplitter: null,
             selectedSplitterName: '',
-            splitters: null,
-            transactions: null
+            selectedCategory: 'Overnight stay',
+            categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.'],
+            totalExpenses: null,
         }
 
     }
     static navigationOptions = {
-        title: 'Person Transactions'
+        title: 'Tot. expenses per person per cat.'
     }
     render() {
-        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];
-        const transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        const tableHead = ['Splitter', 'Paid', 'Amount (Due)', 'Receives/Due']
+        const splitters = stateStore.getPersons()
+        const totalExpenses = stateStore.getTotalExpensesPersonCategory(this.state.selectedSplitter, this.state.selectedCategory)
         return (
             <View style={styles.container}>
                 <Picker
@@ -33,26 +36,23 @@ export default class PersonTransactionsScreen extends Component {
                     <Picker.Item label="None" key="None" value="None"></Picker.Item>
                         {splitters.map((splitter) => <Picker.Item label={splitter.name} key={splitter.key} value={splitter.name}/>)} 
                 </Picker>
+                <Picker
+                    selectedValue={this.state.selectedCategory}
+                    onValueChange={(itemValue, itemIndex) => this.handleCategoryOption(itemIndex)}>
+                        {this.state.categories.map((category) => <Picker.Item label={category} key={category} value={category}/>)} 
+                </Picker>
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
-                    {transactions.length===0 ? (
-                        <Text style={{marginLeft:16}}>No transactions yet</Text>
-                    )
-                        :
-                        (<List style={styles.list} dataArray={transactions}
-                            renderRow={(transaction) =>
-                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, transaction.amount]} style={styles.row} textStyle={styles.text}/>
-                            }>>
-                        </List>)}
+                    <Row data={totalExpenses} styles={styles.list} textStyle={styles.text}/>
                 </Table>
 
             </View>
         )
     }
     componentWillMount() {
-        splitters = stateStore.getPersons();
-        transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        splitters = stateStore.getPersons()
+        totalExpenses = stateStore. getTotalExpensesPersonCategory(this.state.selectedSplitter, this.state.selectedCategory)
     }
 
     navigate(route) {
@@ -66,6 +66,10 @@ export default class PersonTransactionsScreen extends Component {
         } else {
             this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
         }
+    }
+
+    handleCategoryOption(val) {
+        this.setState({selectedCategory: this.state.categories[val]})
     }
 }
 const styles = StyleSheet.create({

@@ -8,41 +8,42 @@ import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-ta
 
 
 @observer
-export default class PersonTransactionsScreen extends Component {
+export default class ExpenseTableScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedSplitter: null,
-            selectedSplitterName: '',
-            splitters: null,
-            transactions: null
+            selectedExpense: null,
+            selectedExpenseName: '',
+            expenses: null,
+            splitters: null
         }
 
     }
     static navigationOptions = {
-        title: 'Person Transactions'
+        title: 'Expense Table'
     }
     render() {
-        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];
-        const transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        const tableHead = ['Splitter', 'Trip', 'Amount (Due)', 'Paid', 'Receives/Due'];
+        const expenses = stateStore.getAllEvents();
+        const splitters = stateStore.getSplittersEvent(this.state.selectedExpense);
         return (
             <View style={styles.container}>
                 <Picker
-                    selectedValue={this.state.selectedSplitterName}
+                    selectedValue={this.state.selectedExpenseName}
                     onValueChange={(itemValue, itemIndex) => this.handleChangedOption(itemIndex)}>
                     <Picker.Item label="None" key="None" value="None"></Picker.Item>
-                        {splitters.map((splitter) => <Picker.Item label={splitter.name} key={splitter.key} value={splitter.name}/>)} 
+                        {expenses.map((expense) => <Picker.Item label={expense.name} key={expense.key} value={expense.name}/>)} 
                 </Picker>
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
-                    {transactions.length===0 ? (
-                        <Text style={{marginLeft:16}}>No transactions yet</Text>
+                    {splitters.length===0 ? (
+                        <Text style={{marginLeft:16}}>No splitters yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={transactions}
-                            renderRow={(transaction) =>
-                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, transaction.amount]} style={styles.row} textStyle={styles.text}/>
+                        (<List style={styles.list} dataArray={splitters}
+                            renderRow={(splitter) =>
+                               <Row data={[splitter.name, splitter.tripName, splitter.amount, splitter.paid, parseFloat(splitter.amount - splitter.paid).toFixed(2)]} style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
@@ -51,8 +52,8 @@ export default class PersonTransactionsScreen extends Component {
         )
     }
     componentWillMount() {
-        splitters = stateStore.getPersons();
-        transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        expenses = stateStore.getAllEvents()
+        splitters = stateStore.getSplittersEvent(this.state.selectedExpense);
     }
 
     navigate(route) {
@@ -62,9 +63,9 @@ export default class PersonTransactionsScreen extends Component {
 
     handleChangedOption(val) {
         if(val != 0) {
-            this.setState({selectedSplitter: splitters[val-1].key, selectedSplitterName: splitters[val-1].name})
+            this.setState({selectedExpense: expenses[val-1].key, selectedExpenseName: expenses[val-1].name})
         } else {
-            this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
+            this.setState({selectedExpense: null, selectedExpenseName: 'none'})
         }
     }
 }
