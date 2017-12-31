@@ -6,8 +6,6 @@ import stateStore from '../../store/store'
 import SelectMultiple from 'react-native-select-multiple'
 import Collapsible from 'react-native-collapsible';
 
-const currenciesArray = ['EUR', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK' , 'NZD', 'PHP', 'PLN',
-'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR']
 
 export default class AddTripDialog extends Component {
     constructor(props) {
@@ -18,8 +16,9 @@ export default class AddTripDialog extends Component {
             newTripName: '',
             newTripDescription: '',
             newTripBudget: '',
-            selectedCurrencies: ['EUR'], 
-            isCollapsed: true
+            selectedCurrencies: [{label: 'EUR', value: 'EUR' }], 
+            isCollapsed: true,
+            currenciesArray: []
         }
     }
     render() {
@@ -67,12 +66,13 @@ export default class AddTripDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
+                <Label>Currency</Label>
                 <Button primary small onPress={() => this.toggleCollapsible()}>
                     <Text style={{ color: 'white' }}>Toggle Currencies</Text>
                 </Button>
                 <Collapsible collapsed={this.state.isCollapsed}>
                     <View style={{height: 400}}>
-                        <SelectMultiple items={currenciesArray} selectedItems={this.state.selectedCurrencies} onSelectionsChange={this.onSelectionsChange}/>
+                        <SelectMultiple items={this.state.currenciesArray} selectedItems={this.state.selectedCurrencies} onSelectionsChange={this.onSelectionsChange}/>
                     </View>
                 </Collapsible>
                 <View style={styles.buttonContainer}>
@@ -85,6 +85,11 @@ export default class AddTripDialog extends Component {
                 </View>
             </ModalWrapper>
         )
+    }
+    componentWillMount(){
+        this.setState({
+            currenciesArray: stateStore.currencies.keys()
+        })
     }
 
     //currencies
@@ -111,17 +116,19 @@ export default class AddTripDialog extends Component {
         const trip = {
             name: this.state.newTripName,
             description: this.state.newTripDescription,
-            budget: this.state.newTripBudget
+            budget: this.state.newTripBudget,
+            currencies: this.state.selectedCurrencies
 
         }
-        if (trip.name && trip.description && trip.budget) {
+        if (trip.name && trip.description && trip.budget && trip.currencies.length != 0) {
 
             stateStore.addTrip(trip)
             this.setAddTripDialog(false)
             this.setState({
                 newTripName: '',
                 newTripDescription: '',
-                newTripBudget: ''
+                newTripBudget: '',
+                selectedCurrencies: ['EUR']
             })
         }
         else {

@@ -63,6 +63,10 @@ export default class EventScreen extends Component {
                             </View>
                         </View>
                         <View style={styles.splitTextContainer}>
+                            <Text style={{}}>Currency:</Text>
+                            <Text>{event.currency == null ? "/" : event.currency}</Text>
+                        </View>
+                        <View style={styles.splitTextContainer}>
                             <Text style={{}}>Date:</Text>
                             <Text >{event.date == null ? "/" : event.date}</Text>
                         </View>
@@ -217,8 +221,6 @@ export default class EventScreen extends Component {
     paidColor(paid) {
         return paid ? '#4CAF50' : '#F44336'
     }
-
-
 }
 
 

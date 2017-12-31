@@ -38,6 +38,7 @@ export default class HomeScreen extends Component {
                         <Row><Col><Button rounded style={styles.button} onPress={() => navigate('Overview')}><Text style={styles.buttonText}>Overview</Text></Button></Col></Row>
                         <Row><Col><Button rounded style={styles.button} onPress={() => navigate('Currency')}><Text style={styles.buttonText}>Currencies</Text></Button></Col></Row>
                         <Row><Col><Button rounded style={styles.button} onPress={() => navigate('Summaries')}><Text style={styles.buttonText}>Summaries</Text></Button></Col></Row>
+                        <Row><Col><Button rounded style={styles.button} onPress={() => stateStore.clearTrips()}><Text style={styles.buttonText}>Clear</Text></Button></Col></Row>
                         </Grid>
                     </View>
                 </Content>

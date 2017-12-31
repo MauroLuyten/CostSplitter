@@ -83,6 +83,7 @@ export default class App extends Component {
         /* firebaseApp.auth().onAuthStateChanged(user => {
             stateStore.setUser(user)
         }) */
+        stateStore.loadCurrencies()
     }
 
     

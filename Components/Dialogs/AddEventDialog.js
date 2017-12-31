@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
-import { Text, Label, Item, Input, Button } from 'native-base';
+import { StyleSheet, View, Alert, ScrollView} from 'react-native'
+import { Text, Label, Item, Input, Button, Picker} from 'native-base';
 import DatePicker from 'react-native-datepicker'
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
@@ -16,8 +16,9 @@ export default class AddEventDialog extends Component {
             newEventDescription: '',
             newEventCategory: 'Overnight stay',
             newEventAmount: 0,
-            newEventCurrency: '',
-            newEventDate: '01-01-2018'
+            newEventDate: '01-01-2018',
+            currencies: [],
+            selectedCurrency: ''
         }
     }
     render() {
@@ -64,31 +65,25 @@ export default class AddEventDialog extends Component {
                     <Picker.Item label="Misc." value="Misc."/>
                 </Picker>
                 <View>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Amount</Label>
-                    <Input
-                        value={this.state.newEventAmount.toString()}
-                        keyboardType='numeric'
-                        selectionColor="#5067FF"
-                        onChangeText={(amount) => {
-                            this.setState({
-                                newEventAmount: amount
-                            })
-                        }}
-                        autoFocus={false} />
-                </Item>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
+                    <Item floatingLabel style={{ marginBottom: 16 }}>
+                        <Label>Amount</Label>
+                        <Input
+                            value={this.state.newEventAmount.toString()}
+                            keyboardType='numeric'
+                            selectionColor="#5067FF"
+                            onChangeText={(amount) => {
+                                this.setState({
+                                    newEventAmount: amount
+                                })
+                            }}
+                            autoFocus={false} />
+                    </Item>
                     <Label>Currency</Label>
-                    <Input
-                        value={this.state.newEventCurrency.toString()}
-                        selectionColor="#5067FF"
-                        onChangeText={(currency) => {
-                            this.setState({
-                                newEventCurrency: currency
-                            })
-                        }}
-                        autoFocus={false} />
-                </Item>
+                    <Picker selectedValue={this.state.selectedCurrency} onValueChange={(itemvalue, itemIndex) => this.setState({selectedCurrency: itemvalue})}>
+                        {this.state.currencies.map(currency => (
+                            <Picker.Item key={currency.label} label={currency.label} value={currency.value} />
+                        ))}
+                    </Picker>
                 </View>
                 
                 <Label>Date</Label>
@@ -125,7 +120,7 @@ export default class AddEventDialog extends Component {
             description: this.state.newEventDescription,
             category: this.state.newEventCategory,
             amount: this.state.newEventAmount,
-            currency: this.state.newEventCurrency,
+            currency: this.state.selectedCurrency,
             date: this.state.newEventDate
         }
         if (event.name && event.description && event.category && event.amount && event.currency) {
@@ -136,10 +131,10 @@ export default class AddEventDialog extends Component {
                 this.setState({
                     newEventName: '',
                     newEventDescription: '',
-                    newEventCategory: '',
+                    newEventCategory: 'Overnight stay',
                     newEventAmount: 0,
-                    newEventCurrency: '',
-                    newEventDate: ''
+                    selectedCurrency: '',
+                    newEventDate: '01-01-2018'
                 })
             }
             else {
@@ -163,6 +158,13 @@ export default class AddEventDialog extends Component {
                 { cancelable: false }
             )
         }
+    }
+    componentWillMount() {
+        const trip = stateStore.getTrip(this.props.tripKey)
+        this.setState({
+            currencies: trip.currencies,
+            selectedCurrency: trip.currencies[0].value
+        })
     }
 }
 const styles = StyleSheet.create({
