@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, ListView, FlatList, Modal, TextInput, ScrollView } from 'react-native'
+import { View, StyleSheet, ListView, FlatList, Modal, TextInput, ScrollView, Picker, NetInfo} from 'react-native'
 import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge, Card } from 'native-base';
 import { StackNavigator } from 'react-navigation';
 import stateStore from '../store/store'
@@ -16,6 +16,7 @@ export default class TripScreen extends Component {
             tripKey: this.props.navigation.state.params.tripKey,
             selectedEvent: '',
             removeEventDialog: false,
+            selectedCurrency: ''
         }
 
     }
@@ -43,6 +44,12 @@ export default class TripScreen extends Component {
                             <Text>Description:</Text>
                             <Text>{trip.description == null ? "/" : trip.description}</Text>
                         </View>
+                        <View style={styles.currencies}>
+                            <Text>Currencies:</Text>
+                            {currenciesArray = trip.currencies.map(currency => (
+                                <Text key={currency.label}>{currency.value}</Text>
+                            ))}
+                        </View>
                         <View style={styles.splitTextContainer}>
                             <Text>Budget:</Text>
                             <View>
@@ -55,6 +62,11 @@ export default class TripScreen extends Component {
                             </View>
                         </View>
                     </View>
+                    <Picker selectedValue={this.state.selectedCurrency} onValueChange={(itemvalue, itemIndex) =>{this.getNewRateTripBudget(itemvalue)}}>
+                        {trip.currencies.map(currency => (
+                            <Picker.Item key={currency.label} label={currency.label} value={currency.value} />
+                        ))}
+                    </Picker>
                 </Card>
                 <View style={{paddingBottom: 32}}>
                     <Text style={{ marginTop: 16, marginLeft: 16, fontWeight: 'bold', marginBottom: 16 }}>Events:</Text>
@@ -81,7 +93,7 @@ export default class TripScreen extends Component {
                             <ListItem button style={styles.listitem} onPress={() => { this.openEvent(event.key) }}>
                                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Text style={{width:100}}>{event.name}</Text>
-                                    <Text style={{fontWeight:'bold'}}>{event.amount}</Text>
+                                    <Text style={{fontWeight:'bold'}}>{event.amount+ ' '+event.currency}</Text>
                                     <Icon 
                                         onPress={()=>this.setRemoveEventDialog(event.key)}
                                         style={{ marginRight: 16, color:'#5067FF' }} 
@@ -116,6 +128,19 @@ export default class TripScreen extends Component {
             </Container>
         )
     }
+
+    getNewRateTripBudget(itemvalue){
+            stateStore.getNewRateTripBudget(this.state.tripKey, this.state.selectedCurrency, itemvalue)
+            this.setState({selectedCurrency: itemvalue});
+    }
+
+    componentWillMount(){
+        const trip = stateStore.getTrip(this.state.tripKey)
+        this.setState({
+            selectedCurrency: trip.selectedCurrency
+        })
+    }
+
     openEvent(key) {
         this.navigate('Event', {
             tripKey: this.state.tripKey,
@@ -178,6 +203,11 @@ const styles = StyleSheet.create({
         margin: 5
     },
     splitTextContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16
+    }, 
+    currencies: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 16

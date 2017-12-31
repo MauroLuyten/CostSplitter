@@ -1,7 +1,7 @@
 import { observable, action, computed } from 'mobx'
 import { firebaseApp } from '../firebaseconfig'
 import { ListView } from "react-native";
-import {AsyncStorage} from 'react-native'
+import {AsyncStorage, NetInfo} from 'react-native'
 import {create, persist} from 'mobx-persist'
 
 
@@ -32,22 +32,39 @@ class Event {
     @persist @observable description = ''
     @persist @observable category = ''
     @persist @observable amount = 0
+    @persist @observable currency = ''
     @persist @observable date = ''
-    @persist @observable currency = 'euro'
     @persist('map', Splitter) @observable splitters = new Map()
 }
 class Trip {
-    constructor(key, name, description, budget){
+    
+    constructor(key, name, description, budget, currencies, selectedCurrency){
         this.key = key
         this.name = name
         this.description = description
         this.budget = budget
+        this.currencies = currencies
+        this.selectedCurrency = selectedCurrency
     }
     @persist @observable key = ''
     @persist @observable name = ''
     @persist @observable description = ''
     @persist @observable budget = ''
+    //used for consistency in the dropdown menu; see getNewRateTripBudget()
+    @persist @observable selectedCurrency = ''
+    @persist('list') @observable currencies = []
     @persist('map', Event) @observable events = new Map()
+    @persist @observable totalAmount = 0
+}
+
+class Currency {
+    constructor(name, rate){
+        // key naam , value rate
+        this.name = name
+        this.rate = rate
+    }
+    @persist @observable  name = ''
+    @persist @observable rate = 0
 }
 
 class Transaction {
@@ -77,8 +94,58 @@ class StateStore {
     @persist('map', Transaction) @observable transactions = new Map()
     @persist('map', Person) @observable persons = new Map()
     @persist('object') @observable error = {}
-    currencies = ["EUR", "USD", "GBP"]
+    currenciesArray = ['EUR', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK' , 'NZD', 'PHP', 'PLN',
+    'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR']
     @observable online = false
+    @persist('map', Currency) @observable currencies = new Map()
+
+    //Currency
+    getRateAPI = (url) => {
+        return fetch(url).then(response => response.json());
+    }
+    addCurrency(currency){
+        this.currencies.set(currency.name, currency)
+    }
+    getCurrency(key){
+        return this.currencies.get(key)
+    }
+    amountToEuro(currencyName, amount){
+        const currency = this.getCurrency(currencyName)
+        return amount / currency.rate
+    }
+    amountToCurrency(currencyName, amount){
+        const currency = this.getCurrency(currencyName)
+        return amount * currency.rate
+    }
+    convertAmount(baseCurrency, targetCurrency, amount){
+       // console.log(baseCurrency + " - " + targetCurrency)
+        return this.amountToCurrency(targetCurrency, this.amountToEuro(baseCurrency, amount)) 
+    }
+    loadCurrencies(){
+        NetInfo.isConnected.fetch().then(isConnected => {
+            if(isConnected){
+                this.getRateAPI('https://api.fixer.io/latest').then((response) =>{
+                    const keys = Object.keys(response.rates)
+                    for (let currency of keys){
+                        let currencyValue = response.rates[currency]
+                        this.addCurrency(new Currency(currency, currencyValue))
+                    }
+                    this.addCurrency(new Currency('EUR', parseFloat(1.00)))
+                })
+            } else {
+                const response = '{"base":"EUR","date":"2017-12-29","rates":{"AUD":1.5346,"BGN":1.9558,"BRL":3.9729,"CAD":1.5039,"CHF":1.1702,"CNY":7.8044,"CZK":25.535,"DKK":7.4449,"GBP":0.88723,"HKD":9.372,"HRK":7.44,"HUF":310.33,"IDR":16239.0,"ILS":4.1635,"INR":76.606,"JPY":135.01,"KRW":1279.6,"MXN":23.661,"MYR":4.8536,"NOK":9.8403,"NZD":1.685,"PHP":59.795,"PLN":4.177,"RON":4.6585,"RUB":69.392,"SEK":9.8438,"SGD":1.6024,"THB":39.121,"TRY":4.5464,"USD":1.1993,"ZAR":14.805}}'
+                response = JSON.parse(response)
+                const keys = Object.keys(response.rates)
+                for (let currency of keys){
+                    let currencyValue = response.rates[currency]
+                    this.addCurrency(new Currency(currency, currencyValue))
+                }
+                this.addCurrency(new Currency('EUR', parseFloat(1.00)))
+            }
+        })
+    }
+
+
     generateKey() {
         return firebaseApp.database().ref().push().key
     }
@@ -105,12 +172,20 @@ class StateStore {
             this.persons.delete(key)
         }
     }
+
     clearTrips(){
         this.trips.clear()
     }
+
+    getNewRateTripBudget(tripKey, oldCurrency, newCurrency){
+        const trip = this.getTrip(tripKey)
+        trip.budget = parseFloat(this.convertAmount(oldCurrency, newCurrency,trip.budget)).toFixed(2)
+        trip.selectedCurrency = newCurrency
+    }
+
     addTrip(trip) {
         let key = this.generateKey()
-        this.trips.set(key, new Trip(key, trip.name, trip.description, parseFloat(trip.budget).toFixed(2)))
+        this.trips.set(key, new Trip(key, trip.name, trip.description, parseFloat(trip.budget).toFixed(2), trip.currencies, 'EUR'))
         if (this.online) {
             firebaseApp.database().ref(`users/${this.user.uid}/trips`).child(key).set(trip)
                 .then()
@@ -136,8 +211,10 @@ class StateStore {
     }
     getTotalAmountTrip(tripKey){
         let total = 0
+        let trip = this.getTrip(tripKey)
+        console.log(trip)
         this.getEvents(tripKey).forEach(event =>{
-            total += parseFloat(event.amount)
+            total += parseFloat(this.convertAmount(event.currency, trip.selectedCurrency , event.amount))
         })
         return total.toFixed(2)
     }
@@ -146,6 +223,9 @@ class StateStore {
         oldTrip.name = trip.name
         oldTrip.description = trip.description
         oldTrip.budget = parseFloat(trip.budget).toFixed(2)
+        oldTrip.currencies = trip.currencies
+        oldTrip.selectedCurrency = trip.selectedCurrency
+        this.trips.set(tripKey, oldTrip)
     }
     removeTrip(tripKey) {
         this.trips.delete(tripKey)
@@ -249,17 +329,37 @@ class StateStore {
             this.editSplitter(tripKey, eventKey, splitter)
         })
     }
+    
     editEvent(tripKey, event){
-        //const eventKey = event.key
-        const oldEvent = this.getEvent(tripKey,event.key)
+        const eventKey = event.key
+        const oldEvent = this.getEvent(tripKey,eventKey)
+        //!!!! ugly code, otherwise weird error -> _event.currency undefined
+        const eventCurrency = event.currency
+        const oldEventCurrency = oldEvent.currency
+        //!!!!
         oldEvent.name = event.name
         oldEvent.description = event.description
         oldEvent.category = event.category
         oldEvent.amount = parseFloat(event.amount).toFixed(2)
+        //if currency is changed -> change all the amounts to the new currency
+        let newRate = 1
+        if(oldEventCurrency != eventCurrency){
+            oldEvent.selectedCurrency = event.selectedCurrency
+            //change amounts
+            //trip.budget = trip.budget * newRate
+            oldEvent.amount = parseFloat(this.convertAmount(oldEventCurrency, eventCurrency, oldEvent.amount)).toFixed(2)
+            //change splitter amounts
+            let splitters = this.getSplitters(tripKey, eventKey)
+            for (let splitter of splitters){
+                splitter.amount = parseFloat(this.convertAmount(oldEventCurrency, eventCurrency, splitter.amount)).toFixed(2)
+                splitter.paid = parseFloat(this.convertAmount(oldEventCurrency, eventCurrency, splitter.paid)).toFixed(2)
+            }
+        }
         oldEvent.currency = event.currency
         oldEvent.date = event.date
         //this.trips.get(tripKey).events.set(eventKey, oldEvent)
     }
+
     removeEvent(tripKey, eventKey){
         this.trips.get(tripKey).events.delete(eventKey)
         if(this.online){

@@ -12,7 +12,7 @@ export default class CurrencyScreen extends Component {
         super(props)
         this.state = {
             connectivity: false,
-            currencies: stateStore.currencies,
+            currencies: stateStore.currenciesArray,
             selectedCurrency: 'EUR',
             isLoading: false,
             rates: null

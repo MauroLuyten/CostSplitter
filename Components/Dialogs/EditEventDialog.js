@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
+import { StyleSheet, View, Alert, ScrollView, Picker, NetInfo } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base'
 import DatePicker from 'react-native-datepicker'
 var ModalWrapper = require('react-native-modal-wrapper').default
@@ -17,8 +17,9 @@ export default class EditEventDialog extends Component {
             newEventDescription: '',
             newEventCategory: 'Overnight stay',
             newEventAmount: '',
-            newEventCurrency: '',
-            newEventDate: ''
+            newEventDate: '',
+            currencies: [],
+            selectedCurrency: ''
         }
     }
     render() {
@@ -77,18 +78,12 @@ export default class EditEventDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
-                <Item floatingLabel style={{ marginBottom: 16 }}>
-                    <Label>Currency</Label>
-                    <Input
-                        value={this.state.newEventCurrency&&this.state.newEventCurrency.toString()}
-                        selectionColor="#5067FF"
-                        onChangeText={(currency) => {
-                            this.setState({
-                                newEventCurrency: currency
-                            })
-                        }}
-                        autoFocus={false} />
-                </Item>
+                <Label>Currency</Label>
+                <Picker selectedValue={this.state.selectedCurrency} onValueChange={(itemvalue, itemIndex) => this.setState({selectedCurrency: itemvalue})}>
+                    {this.state.currencies.map(currency => (
+                        <Picker.Item key={currency.label} label={currency.label} value={currency.value} />
+                    ))}
+                </Picker>
                 <Label>Date</Label>
                 <DatePicker floatingLabel style={{ marginBottom: 16 }}
                   date={this.state.newEventDate}
@@ -113,28 +108,22 @@ export default class EditEventDialog extends Component {
             </ModalWrapper>
         )
     }
+
     componentWillMount(){
+        const trip = stateStore.getTrip(this.props.tripKey)
         const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
         this.setState({
             newEventName: event.name,
             newEventDescription: event.description,
             newEventCategory: event.category,
             newEventAmount: event.amount,
-            newEventCurrency: event.currency,
-            newEventDate: event.date
+            newEventDate: event.date,
+            currencies: trip.currencies,
+            selectedCurrency: event.currency
         })
     }
-   /*  componentWillUpdate(){
-        const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
-        this.setState({
-            newEventName: event.name,
-            newEventDescription: event.description,
-            newEventCategory: event.category,
-            newEventAmount: event.amount,
-            newEventCurrency: event.currency,
-            newEventDate: event.date
-        })
-    } */
+
+
     setEditEventDialog(visible) {
         this.setState({
             dialog: visible
@@ -147,10 +136,11 @@ export default class EditEventDialog extends Component {
             description: this.state.newEventDescription,
             category: this.state.newEventCategory,
             amount: this.state.newEventAmount,
-            currency: this.state.newEventCurrency,
-            date: this.state.newEventDate
+            currency: this.state.selectedCurrency,
+            date: this.state.newEventDate,
+            selectedCurrency: this.state.selectedCurrency
          }
-        if (event.name && event.description && event.category && event.amount) {
+        if (event.name && event.description && event.category && event.amount && event.currency) {
             if (event.amount > 0) {
                 stateStore.editEvent(this.state.tripKey, event)
                 this.setEditEventDialog(false)
@@ -178,6 +168,7 @@ export default class EditEventDialog extends Component {
         }
     }
 }
+
 const styles = StyleSheet.create({
     
     buttonContainer: {
