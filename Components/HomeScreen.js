@@ -17,27 +17,27 @@ export default class HomeScreen extends Component {
     }
     static navigationOptions = {
         title: 'Home',
-        headerTitleStyle: { alignSelf: 'center'},
-        headerStyle: { backgroundColor: '#bac2ff'},
+
     }
     render() {
         const {navigate} = this.props.navigation
         return (
             <Container>
                 <Content>
-                    <Text>{this.getConnectivity()}</Text>
+                   {/*  <Text>{this.getConnectivity()}</Text>
                     <Text style={styles.status}>
                         {this.authText()}
-                    </Text>
+                    </Text> */}
                     <View>
                         <Grid>
-                        {this.loggedIn()
+                         {/* this.loggedIn()
                             ? (<Row><Col><Button rounded style={styles.button} onPress={() => this.logout()}><Text style={styles.buttonText}>Logout</Text></Button></Col></Row>)
                             : (<Row><Col><Button rounded style={styles.button} onPress={() => navigate('Login')}><Text style={styles.buttonText}>Login</Text></Button></Col></Row>)
-                        } 
+                         */}  
                         <Row><Col><Button rounded style={styles.button} onPress={() => navigate('Overview')}><Text style={styles.buttonText}>Overview</Text></Button></Col></Row>
                         <Row><Col><Button rounded style={styles.button} onPress={() => navigate('Currency')}><Text style={styles.buttonText}>Currencies</Text></Button></Col></Row>
                         <Row><Col><Button rounded style={styles.button} onPress={() => navigate('Summaries')}><Text style={styles.buttonText}>Summaries</Text></Button></Col></Row>
+                        <Row><Col><Button rounded style={styles.button} onPress={() => stateStore.clearTrips()}><Text style={styles.buttonText}>Clear</Text></Button></Col></Row>
                         </Grid>
                     </View>
                 </Content>

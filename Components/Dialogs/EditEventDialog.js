@@ -124,6 +124,17 @@ export default class EditEventDialog extends Component {
             newEventDate: event.date
         })
     }
+   /*  componentWillUpdate(){
+        const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
+        this.setState({
+            newEventName: event.name,
+            newEventDescription: event.description,
+            newEventCategory: event.category,
+            newEventAmount: event.amount,
+            newEventCurrency: event.currency,
+            newEventDate: event.date
+        })
+    } */
     setEditEventDialog(visible) {
         this.setState({
             dialog: visible

@@ -14,7 +14,6 @@ export default class OverviewScreen extends Component {
         this.state = {
             selectedEvent: '',
             RemoveTripDialog: false,
-            newEventName: ''
         }
 
     }
@@ -22,12 +21,13 @@ export default class OverviewScreen extends Component {
         title: 'Overview'
     }
     render() {
+        const trips = stateStore.getTrips()
         return (
             <View style={styles.container}>
                 <Separator bordered style={styles.seperator}>
                     <Text style={{fontWeight: 'bold'}}>TRIPS</Text>
                 </Separator>
-                {stateStore.trips.keys().length === 0 ?
+                {!trips.length ?
                     (
                         <Text style={{marginLeft:16, marginTop: 16}}>
                             No trips added yet
@@ -36,7 +36,7 @@ export default class OverviewScreen extends Component {
                     :
                     (<List
                         style={styles.list}
-                        dataArray={stateStore.getTrips}
+                        dataArray={_.cloneDeep(trips)}
                         renderRow={(trip) =>
                             <ListItem button style={styles.listitem} onPress={() => { this.openTrip(trip.key) }}>
                                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -80,10 +80,12 @@ export default class OverviewScreen extends Component {
     openTrip(key) {
         this.navigate('Trip', {
             tripKey: key,
-            //uid: stateStore.user.uid
+            //OnNavigateBack: this.handleOnNavigateBack
         })
     }
-
+    /* handleOnNavigateBack = () => {
+        this.setState(this.state)
+    } */
     navigate(route, params) {
         const { navigate } = this.props.navigation
         navigate(route, params)

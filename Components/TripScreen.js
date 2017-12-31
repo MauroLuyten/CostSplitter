@@ -24,6 +24,7 @@ export default class TripScreen extends Component {
     }
     render() {
         const trip = stateStore.getTrip(this.state.tripKey)
+        const events = stateStore.getEvents(this.state.tripKey)
         const amountTotal = stateStore.getTotalAmountTrip(this.state.tripKey)
         return (
             <Container style={{flex:1}}>
@@ -66,7 +67,7 @@ export default class TripScreen extends Component {
                         onPress={() => this.setAddEventDialog(true)}>
                         <Text>+</Text>
                     </Fab>
-                {stateStore.getEvents(this.state.tripKey).keys().length === 0 ?
+                {!events.length ?
                     (
                         <Text>
                             No events added yet
@@ -75,7 +76,7 @@ export default class TripScreen extends Component {
                     :
                     (<List
                         style={styles.list}
-                        dataArray={stateStore.getEvents(this.state.tripKey)}
+                        dataArray={_.cloneDeep(events)}
                         renderRow={(event) =>
                             <ListItem button style={styles.listitem} onPress={() => { this.openEvent(event.key) }}>
                                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>

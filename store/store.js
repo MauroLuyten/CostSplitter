@@ -6,17 +6,20 @@ import {create, persist} from 'mobx-persist'
 
 
 class Splitter {
-    constructor(name,amount,paid){
+    constructor(key, name,amount,paid){
+        this.key = key
         this.name = name
         this.amount = amount
         this.paid = paid
     }
-    @persist @observable  name = ''
+    @persist @observable key = ''
+    @persist @observable name = ''
     @persist @observable amount = 0
     @persist @observable paid = 0
 }
 class Event {
-    constructor(name, description, category, amount, currency, date){
+    constructor(key, name, description, category, amount, currency, date){
+        this.key = key
         this.name = name
         this.description = description
         this.currency = currency
@@ -24,7 +27,8 @@ class Event {
         this.category = category
         this.date = date
     }
-    @persist @observable  name = ''
+    @persist @observable key = ''
+    @persist @observable name = ''
     @persist @observable description = ''
     @persist @observable category = ''
     @persist @observable amount = 0
@@ -33,12 +37,14 @@ class Event {
     @persist('map', Splitter) @observable splitters = new Map()
 }
 class Trip {
-    constructor(name,description, budget){
+    constructor(key, name, description, budget){
+        this.key = key
         this.name = name
         this.description = description
         this.budget = budget
     }
-    @persist @observable  name = ''
+    @persist @observable key = ''
+    @persist @observable name = ''
     @persist @observable description = ''
     @persist @observable budget = ''
     @persist('map', Event) @observable events = new Map()
@@ -73,7 +79,6 @@ class StateStore {
     @persist('object') @observable error = {}
     currencies = ["EUR", "USD", "GBP"]
     @observable online = false
-
     generateKey() {
         return firebaseApp.database().ref().push().key
     }
@@ -100,9 +105,12 @@ class StateStore {
             this.persons.delete(key)
         }
     }
+    clearTrips(){
+        this.trips.clear()
+    }
     addTrip(trip) {
         let key = this.generateKey()
-        this.trips.set(key, new Trip(trip.name, trip.description, parseFloat(trip.budget).toFixed(2)))
+        this.trips.set(key, new Trip(key, trip.name, trip.description, parseFloat(trip.budget).toFixed(2)))
         if (this.online) {
             firebaseApp.database().ref(`users/${this.user.uid}/trips`).child(key).set(trip)
                 .then()
@@ -112,13 +120,11 @@ class StateStore {
     getTrip(tripKey) {
         return this.trips.get(tripKey)
     }
-    @computed get getTrips(){
+    getTrips(){
         let tripsArray = []
-        this.trips.keys().forEach(key => {
-            let trip = this.trips.get(key)
-            trip.key = key
-            tripsArray.push(trip)
-        });
+        this.trips.values().slice().forEach(trip=>{
+            tripsArray.push(new Trip(trip.key, trip.name, trip.description, trip.budget))
+        })
         return tripsArray
     }
     getTotalPaidTrip(tripKey){
@@ -136,12 +142,10 @@ class StateStore {
         return total.toFixed(2)
     }
     editTrip(tripKey, trip) {
-        //TODO
-        const oldTrip = this.getTrip(tripKey)
+        const oldTrip = this.trips.get(tripKey)
         oldTrip.name = trip.name
         oldTrip.description = trip.description
         oldTrip.budget = parseFloat(trip.budget).toFixed(2)
-        this.trips.set(tripKey, oldTrip)
     }
     removeTrip(tripKey) {
         this.trips.delete(tripKey)
@@ -153,6 +157,7 @@ class StateStore {
         event.splitters = observable.map()
         const key = this.generateKey()
         this.trips.get(tripKey).events.set(key,new Event(
+            key,
             event.name, 
             event.description, 
             event.category, 
@@ -172,10 +177,17 @@ class StateStore {
     }
     getEvents(tripKey) {
         let eventsArray = []
-        this.trips.get(tripKey).events.keys().forEach(key => {
-            let event = this.trips.get(tripKey).events.get(key)
-            event.key = key
-            eventsArray.push(event)
+        this.trips.get(tripKey).events.values().forEach(event => {
+            let newEvent = new Event(
+                event.key,
+                event.name, 
+                event.description, 
+                event.category, 
+                parseFloat(event.amount).toFixed(2), 
+                event.currency, 
+                event.date)
+                newEvent.splitters = this.getSplitters(tripKey, event.key)
+            eventsArray.push(newEvent)
         });
         return eventsArray
     }
@@ -238,15 +250,15 @@ class StateStore {
         })
     }
     editEvent(tripKey, event){
-        const eventKey = event.key
-        const oldEvent = this.getEvent(tripKey,eventKey)
+        //const eventKey = event.key
+        const oldEvent = this.getEvent(tripKey,event.key)
         oldEvent.name = event.name
         oldEvent.description = event.description
         oldEvent.category = event.category
         oldEvent.amount = parseFloat(event.amount).toFixed(2)
         oldEvent.currency = event.currency
         oldEvent.date = event.date
-        this.trips.get(tripKey).events.set(eventKey, oldEvent)
+        //this.trips.get(tripKey).events.set(eventKey, oldEvent)
     }
     removeEvent(tripKey, eventKey){
         this.trips.get(tripKey).events.delete(eventKey)
@@ -263,7 +275,7 @@ class StateStore {
             key = this.generateKey()
         }
         this.trips.get(tripKey).events.get(eventKey).splitters.set(
-            key,new Splitter(splitter.name, parseFloat(splitter.amount).toFixed(2), parseFloat(0).toFixed(2)))
+            key,new Splitter(key, splitter.name, parseFloat(splitter.amount).toFixed(2), parseFloat(0).toFixed(2)))
             this.addPerson(key, splitter.name)
         if(splitter.paid>0){
             this.payDebtSplitter(tripKey, eventKey, key, splitter.paid)
@@ -302,13 +314,14 @@ class StateStore {
         return this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
     }
     getSplitters(tripKey, eventKey){
-        let splittersArray = []
+        /* let splittersArray = []
         this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(key => {
             let splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(key)
             splitter.key = key
             splittersArray.push(splitter)
         });
-        return splittersArray
+        return splittersArray */
+        return this.trips.get(tripKey).events.get(eventKey).splitters.values()
     }
 
     getAllSplitters() {
@@ -502,15 +515,10 @@ class StateStore {
     }
 
     editSplitter(tripKey, eventKey, splitter){
-        const splitterKey = splitter.key
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(
-            splitterKey, 
-            new Splitter(
-                splitter.name, 
-                splitter.amount, 
-                splitter.paid
-            )
-        )
+        const oldSplitter = this.getSplitter(tripKey, eventKey, splitter.key)
+        oldSplitter.name = splitter.name
+        oldSplitter.amount = splitter.amount
+        oldSplitter.paid = splitter.paid
     }
     removeSplitter(tripKey, eventKey, splitterKey){
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
@@ -524,6 +532,7 @@ class StateStore {
         this.trips.get(tripKey).events.get(eventKey).splitters.set(
             splitterKey, 
             new Splitter(
+                splitter.key,
                 splitter.name,
                 splitter.amount, 
                 newPaid.toFixed(2)

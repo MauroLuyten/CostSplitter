@@ -109,7 +109,8 @@ export default class EventScreen extends Component {
                         <Text style={{marginLeft:16}}>No splitters yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={splitters}
+                        (<List style={styles.list} 
+                            dataArray={_.cloneDeep(splitters)}
                             renderRow={(splitter) =>
                                 <Card style={styles.splitterItem}>
                                     <View style={[styles.splitTextContainer,{ marginRight: 18}]}>
