@@ -49,7 +49,7 @@ export default class DivideEventDialog extends Component {
                             <Item floatingLabel style={{ marginBottom: 16 }}>
                                 <Label>Amount</Label>
                                 <Input
-                                    value={this.state.newEventAmount && this.state.newEventAmount.toString()}
+                                    value={this.state.amount.toString()}
                                     keyboardType='numeric'
                                     selectionColor="#5067FF"
                                     onChangeText={(amount) => {
@@ -89,7 +89,7 @@ export default class DivideEventDialog extends Component {
     }
     divideWarning () {
         Alert.alert(
-            'Waring',
+            'Warning',
             'Redividing the event will change/reset the amounts for each splitter on this event.',
             [
                 { text: 'OK', onPress: () => this.divideEvent() },
@@ -122,12 +122,12 @@ export default class DivideEventDialog extends Component {
                     )
                 }
                 else if(amountType=="Fixed Amount"){
-                    console.log(splitterSize)
-                    if((amount*splitterSize)>event.amount){
+                    //console.log(splitterSize)
+                    if((amount*splitterSize)>stateStore.amountToCurrency(event.currency,event.amount)){
                         Alert.alert(
                             'Wrong amount',
                             `${amount} x ${splitterSize} splitters may not exceed Event amount.
-                             Max amount is ${(event.amount / splitterSize).toFixed(2)}`,
+                             Max amount is ${(stateStore.amountToCurrency(event.currency,event.amount) / splitterSize).toFixed(2)}`,
                             [
                                 { text: 'OK', onPress: () => console.log('OK Pressed') },
                             ],
@@ -139,7 +139,8 @@ export default class DivideEventDialog extends Component {
                             eventKey,
                             eventDivision,
                             amountType,
-                            amount
+                            //amount
+                            stateStore.amountToEuro(event.currency,amount)
                         )
                         this.setDivideEventDialog(false)
                     }

@@ -50,13 +50,11 @@ class Trip {
     @persist @observable name = ''
     @persist @observable description = ''
     @persist @observable budget = ''
-    //used for consistency in the dropdown menu; see getNewRateTripBudget()
     @persist @observable selectedCurrency = ''
     @persist('list') @observable currencies = []
     @persist('map', Event) @observable events = new Map()
-    @persist @observable totalAmount = 0
+    //@persist @observable totalAmount = 0
 }
-
 class Currency {
     constructor(name, rate){
         // key naam , value rate
@@ -66,7 +64,6 @@ class Currency {
     @persist @observable  name = ''
     @persist @observable rate = 0
 }
-
 class Transaction {
     constructor(splitterName, tripName, eventName, amount) {
         this.splitterName = splitterName,
@@ -99,7 +96,7 @@ class StateStore {
     @observable online = false
     @persist('map', Currency) @observable currencies = new Map()
 
-    //Currency
+
     getRateAPI = (url) => {
         return fetch(url).then(response => response.json());
     }
@@ -118,7 +115,6 @@ class StateStore {
         return amount * currency.rate
     }
     convertAmount(baseCurrency, targetCurrency, amount){
-       // console.log(baseCurrency + " - " + targetCurrency)
         return this.amountToCurrency(targetCurrency, this.amountToEuro(baseCurrency, amount)) 
     }
     loadCurrencies(){
@@ -177,15 +173,16 @@ class StateStore {
         this.trips.clear()
     }
 
-    getNewRateTripBudget(tripKey, oldCurrency, newCurrency){
+    /* getNewRateTripBudget(tripKey, oldCurrency, newCurrency){
         const trip = this.getTrip(tripKey)
         trip.budget = parseFloat(this.convertAmount(oldCurrency, newCurrency,trip.budget)).toFixed(2)
         trip.selectedCurrency = newCurrency
-    }
+    } */
 
     addTrip(trip) {
         let key = this.generateKey()
-        this.trips.set(key, new Trip(key, trip.name, trip.description, parseFloat(trip.budget).toFixed(2), trip.currencies, 'EUR'))
+        trip.budget = this.amountToEuro(trip.selectedCurrency, trip.budget)
+        this.trips.set(key, new Trip(key, trip.name, trip.description, parseFloat(trip.budget), trip.currencies, trip.selectedCurrency))
         if (this.online) {
             firebaseApp.database().ref(`users/${this.user.uid}/trips`).child(key).set(trip)
                 .then()
@@ -207,24 +204,30 @@ class StateStore {
         this.getEvents(tripKey).forEach(event =>{
             total += this.getTotalPaidEvent(tripKey, event.key)
         })
-        return total.toFixed(2)
+        return total
     }
     getTotalAmountTrip(tripKey){
         let total = 0
-        let trip = this.getTrip(tripKey)
-        console.log(trip)
+        //let trip = this.getTrip(tripKey)
         this.getEvents(tripKey).forEach(event =>{
-            total += parseFloat(this.convertAmount(event.currency, trip.selectedCurrency , event.amount))
+            //total += parseFloat(this.convertAmount(event.currency, trip.selectedCurrency , event.amount))
+            total += parseFloat(event.amount)
         })
-        return total.toFixed(2)
+        return total
     }
     editTrip(tripKey, trip) {
         const oldTrip = this.trips.get(tripKey)
+        trip.budget = stateStore.amountToEuro(trip.selectedCurrency, trip.budget)
         oldTrip.name = trip.name
         oldTrip.description = trip.description
-        oldTrip.budget = parseFloat(trip.budget).toFixed(2)
+        oldTrip.budget = parseFloat(trip.budget)
         oldTrip.currencies = trip.currencies
         oldTrip.selectedCurrency = trip.selectedCurrency
+        this.trips.set(tripKey, oldTrip)
+    }
+    changeTripCurrency(tripKey,currencyName){
+        const oldTrip = this.trips.get(tripKey)
+        oldTrip.selectedCurrency = currencyName
         this.trips.set(tripKey, oldTrip)
     }
     removeTrip(tripKey) {
@@ -236,12 +239,13 @@ class StateStore {
     addEvent(tripKey, event) {
         event.splitters = observable.map()
         const key = this.generateKey()
+        event.amount = this.amountToEuro(event.currency, event.amount)
         this.trips.get(tripKey).events.set(key,new Event(
             key,
             event.name, 
             event.description, 
             event.category, 
-            parseFloat(event.amount).toFixed(2), 
+            parseFloat(event.amount), 
             event.currency, 
             event.date))
         if (this.online) {
@@ -263,7 +267,7 @@ class StateStore {
                 event.name, 
                 event.description, 
                 event.category, 
-                parseFloat(event.amount).toFixed(2), 
+                parseFloat(event.amount), 
                 event.currency, 
                 event.date)
                 newEvent.splitters = this.getSplitters(tripKey, event.key)
@@ -274,20 +278,16 @@ class StateStore {
     getTotalPaidEvent(tripKey,eventKey){
         let total = 0
         this.getSplitters(tripKey,eventKey).forEach(splitter => {
-
             total += parseFloat(splitter.paid)
-
         });
-        return total.toFixed(2)
+        return total
     }
     getTotalAmountEvent(tripKey, eventKey){
         let total = 0
         this.getSplitters(tripKey,eventKey).forEach(splitter => {
-
             total += parseFloat(splitter.amount)
-
         });
-        return total.toFixed(2)
+        return total
     }
     getEventDivision(tripKey, eventKey){
         let equally = true
@@ -309,57 +309,41 @@ class StateStore {
         const event = this.getEvent(tripKey, eventKey)
         if(eventDivision=="Equally"){
             if(amountType=="Fixed Amount"){
-                this.setSplitterAmounts(tripKey, eventKey, parseFloat(amount).toFixed(2))
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(amount))
             }
             if(amountType=="Custom Percentage"){
-                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount*amount/100).toFixed(2))
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount*amount/100))
             }
             if(amountType=="Equal Share"){
-                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount/amount).toFixed(2))
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount/amount))
             }
         } else if(eventDivision=="Individually"){
             if(currentDivision=="Equally"){
-                this.setSplitterAmounts(tripKey, eventKey, parseFloat(0).toFixed(2))
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(0))
             }
         }
     }
     setSplitterAmounts(tripKey, eventKey, amount){
         this.getSplitters(tripKey, eventKey).forEach(splitter => {
-            splitter.amount = amount
-            this.editSplitter(tripKey, eventKey, splitter)
+            this.getSplitter(tripKey, eventKey, splitter.key).amount = amount
         })
     }
     
     editEvent(tripKey, event){
         const eventKey = event.key
         const oldEvent = this.getEvent(tripKey,eventKey)
-        //!!!! ugly code, otherwise weird error -> _event.currency undefined
-        const eventCurrency = event.currency
-        const oldEventCurrency = oldEvent.currency
-        //!!!!
+        event.amount = this.amountToEuro(event.currency, event.amount)
         oldEvent.name = event.name
         oldEvent.description = event.description
         oldEvent.category = event.category
-        oldEvent.amount = parseFloat(event.amount).toFixed(2)
-        //if currency is changed -> change all the amounts to the new currency
-        let newRate = 1
-        if(oldEventCurrency != eventCurrency){
-            oldEvent.selectedCurrency = event.selectedCurrency
-            //change amounts
-            //trip.budget = trip.budget * newRate
-            oldEvent.amount = parseFloat(this.convertAmount(oldEventCurrency, eventCurrency, oldEvent.amount)).toFixed(2)
-            //change splitter amounts
-            let splitters = this.getSplitters(tripKey, eventKey)
-            for (let splitter of splitters){
-                splitter.amount = parseFloat(this.convertAmount(oldEventCurrency, eventCurrency, splitter.amount)).toFixed(2)
-                splitter.paid = parseFloat(this.convertAmount(oldEventCurrency, eventCurrency, splitter.paid)).toFixed(2)
-            }
-        }
+        oldEvent.amount = parseFloat(event.amount)
         oldEvent.currency = event.currency
         oldEvent.date = event.date
-        //this.trips.get(tripKey).events.set(eventKey, oldEvent)
     }
-
+    changeEventCurrency(tripKey, eventKey, currencyName){
+        const oldEvent = this.getEvent(tripKey, eventKey)
+        oldEvent.currency = currencyName
+    }
     removeEvent(tripKey, eventKey){
         this.trips.get(tripKey).events.delete(eventKey)
         if(this.online){
@@ -374,8 +358,10 @@ class StateStore {
         if(key=='' || key==null){
             key = this.generateKey()
         }
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(
-            key,new Splitter(key, splitter.name, parseFloat(splitter.amount).toFixed(2), parseFloat(0).toFixed(2)))
+        const event = this.trips.get(tripKey).events.get(eventKey)
+        splitter.amount = this.amountToEuro(event.currency, splitter.amount)
+        event.splitters.set(
+            key,new Splitter(key, splitter.name, parseFloat(splitter.amount), parseFloat(0)))
             this.addPerson(key, splitter.name)
         if(splitter.paid>0){
             this.payDebtSplitter(tripKey, eventKey, key, splitter.paid)
@@ -414,13 +400,6 @@ class StateStore {
         return this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
     }
     getSplitters(tripKey, eventKey){
-        /* let splittersArray = []
-        this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(key => {
-            let splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(key)
-            splitter.key = key
-            splittersArray.push(splitter)
-        });
-        return splittersArray */
         return this.trips.get(tripKey).events.get(eventKey).splitters.values()
     }
 
@@ -615,7 +594,10 @@ class StateStore {
     }
 
     editSplitter(tripKey, eventKey, splitter){
-        const oldSplitter = this.getSplitter(tripKey, eventKey, splitter.key)
+        const event = this.trips.get(tripKey).events.get(eventKey)
+        const oldSplitter = event.splitters.get(splitter.key)
+        splitter.amount = this.amountToEuro(event.currency, splitter.amount)
+        splitter.paid = this.amountToEuro(event.currency, splitter.paid)
         oldSplitter.name = splitter.name
         oldSplitter.amount = splitter.amount
         oldSplitter.paid = splitter.paid
@@ -624,21 +606,13 @@ class StateStore {
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
     }
 
-    payDebtSplitter(tripKey, eventKey, splitterKey, amount) {
-        const splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+    payDebtSplitter(tripKey, eventKey, splitterKey, paid) {
         const trip = this.getTrip(tripKey)
-        const event = this.getEvent(tripKey, eventKey)
-        let newPaid = parseFloat(splitter.paid) + parseFloat(amount)
-        this.trips.get(tripKey).events.get(eventKey).splitters.set(
-            splitterKey, 
-            new Splitter(
-                splitter.key,
-                splitter.name,
-                splitter.amount, 
-                newPaid.toFixed(2)
-            )
-        )
-        this.addTransaction(splitter.name, trip.name, event.name, amount)
+        const event = trip.events.get(eventKey)
+        const splitter = event.splitters.get(splitterKey)
+        paid = this.amountToEuro(event.currency, paid)
+        splitter.paid = parseFloat(splitter.paid) + paid
+        this.addTransaction(splitter.name, trip.name, event.name, this.amountToCurrency(event.currency,paid))
     }
 
     /* login(username, password) {

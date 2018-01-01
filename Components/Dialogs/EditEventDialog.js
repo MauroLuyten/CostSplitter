@@ -16,7 +16,7 @@ export default class EditEventDialog extends Component {
             newEventName: '',
             newEventDescription: '',
             newEventCategory: 'Overnight stay',
-            newEventAmount: '',
+            newEventAmount: 0,
             newEventDate: '',
             currencies: [],
             selectedCurrency: ''
@@ -64,11 +64,23 @@ export default class EditEventDialog extends Component {
                     <Picker.Item label="Food" value="Food"/>
                     <Picker.Item label="Misc." value="Misc."/>
                 </Picker>
+                <Label>Currency</Label>
+                <Picker 
+                    selectedValue={this.state.selectedCurrency} 
+                    onValueChange={(itemvalue, itemIndex) => 
+                        this.setState(
+                            {   newEventAmount: stateStore.convertAmount(this.state.selectedCurrency, itemvalue, this.state.newEventAmount),
+                                selectedCurrency: itemvalue}
+                        )}>
+                    {this.state.currencies.map(currency => (
+                        <Picker.Item key={currency.label} label={currency.label} value={currency.value} />
+                    ))}
+                </Picker>
 
                 <Item floatingLabel style={{marginBottom:16}}>
                     <Label>Amount</Label>
                     <Input
-                        value={this.state.newEventAmount&&this.state.newEventAmount.toString()}
+                        value={this.state.newEventAmount.toString()}
                         keyboardType='numeric'
                         selectionColor="#5067FF"
                         onChangeText={(amount) => {
@@ -78,12 +90,8 @@ export default class EditEventDialog extends Component {
                         }}
                         autoFocus={false} />
                 </Item>
-                <Label>Currency</Label>
-                <Picker selectedValue={this.state.selectedCurrency} onValueChange={(itemvalue, itemIndex) => this.setState({selectedCurrency: itemvalue})}>
-                    {this.state.currencies.map(currency => (
-                        <Picker.Item key={currency.label} label={currency.label} value={currency.value} />
-                    ))}
-                </Picker>
+
+                
                 <Label>Date</Label>
                 <DatePicker floatingLabel style={{ marginBottom: 16 }}
                   date={this.state.newEventDate}
@@ -112,11 +120,12 @@ export default class EditEventDialog extends Component {
     componentWillMount(){
         const trip = stateStore.getTrip(this.props.tripKey)
         const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
+        const amount = stateStore.amountToCurrency(event.currency, event.amount)
         this.setState({
             newEventName: event.name,
             newEventDescription: event.description,
             newEventCategory: event.category,
-            newEventAmount: event.amount,
+            newEventAmount: amount,
             newEventDate: event.date,
             currencies: trip.currencies,
             selectedCurrency: event.currency
@@ -138,7 +147,6 @@ export default class EditEventDialog extends Component {
             amount: this.state.newEventAmount,
             currency: this.state.selectedCurrency,
             date: this.state.newEventDate,
-            selectedCurrency: this.state.selectedCurrency
          }
         if (event.name && event.description && event.category && event.amount && event.currency) {
             if (event.amount > 0) {

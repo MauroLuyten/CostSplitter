@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, Picker } from 'react-native'
+import { StyleSheet, View, Alert, Picker, ScrollView } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
@@ -22,13 +22,14 @@ export default class AddSplitterDialog extends Component {
         let pickeritems = []
         pickeritems.push(<Picker.Item label="New splitter" value="new" />)
         persons.forEach(person => {
-            pickeritems.push(<Picker.Item label={person.name} value={person.key} />)
+            pickeritems.push(<Picker.Item label={person.name} key={person.key} value={person.key} />)
         })
         return (
             <ModalWrapper
                 onRequestClose={() => { this.setAddSplitterDialog(false) }}
                 style={{ width: 350, height: 'auto', padding: 24 }}
                 visible={this.state.dialog}>
+                <ScrollView>
                 <Text>Add Splitter</Text>
                 <Label>Existing</Label>
                 <Picker
@@ -95,6 +96,7 @@ export default class AddSplitterDialog extends Component {
                         <Text style={{ color: 'white' }}>Confirm</Text>
                     </Button>
                 </View>
+                </ScrollView>
             </ModalWrapper>
         )
     }
@@ -111,8 +113,10 @@ export default class AddSplitterDialog extends Component {
          } 
          const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
          const dividedAmountEvent = stateStore.getTotalAmountEvent(this.state.tripKey, this.state.eventKey)
+         const normAmount = stateStore.amountToEuro(event.currency, splitter.amount)
+         const normPaid = stateStore.amountToEuro(event.currency, splitter.paid)
         if (splitter.name && splitter.amount && splitter.paid) {
-            if((parseInt(splitter.amount) > parseInt(event.amount)) && (parseInt(splitter.paid) > parseInt(event.amount))) {
+            if((parseFloat(normAmount) > parseFloat(event.amount)) || (parseFloat(normPaid) > parseFloat(event.amount))) {
                 Alert.alert('Wrong amount',
                             'Amount/Paid may not exceed amount of event!',
                             [
@@ -131,17 +135,16 @@ export default class AddSplitterDialog extends Component {
                     { cancelable: false }
                 )
             }
-            else if (splitter.amount > event.amount - dividedAmountEvent) {
+            else if (normAmount > event.amount - dividedAmountEvent) {
                 Alert.alert(
                     'Wrong amount',
-                    `Amount may not be higher than ${(event.amount - dividedAmountEvent).toFixed(2)}`,
+                    `Amount may not be higher than ${stateStore.amountToCurrency(event.currency,(event.amount - dividedAmountEvent)).toFixed(2)}`,
                     [
                         { text: 'OK', onPress: () => console.log('OK Pressed') },
                     ],
                     { cancelable: false }
                 )
             } else if(stateStore.getSplitter(this.state.tripKey, this.state.eventKey, this.state.existingSplitterKey)){
-                console.log(stateStore.getSplitter(this.state.tripKey, this.state.eventKey, this.state.existingSplitterKey))
                 Alert.alert(
                     'Error',
                     'This person is already a splitter of this event.',

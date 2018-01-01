@@ -64,28 +64,25 @@ export default class AddEventDialog extends Component {
                     <Picker.Item label="Food" value="Food"/>
                     <Picker.Item label="Misc." value="Misc."/>
                 </Picker>
-                <View>
-                    <Item floatingLabel style={{ marginBottom: 16 }}>
-                        <Label>Amount</Label>
-                        <Input
-                            value={this.state.newEventAmount.toString()}
-                            keyboardType='numeric'
-                            selectionColor="#5067FF"
-                            onChangeText={(amount) => {
-                                this.setState({
-                                    newEventAmount: amount
-                                })
-                            }}
-                            autoFocus={false} />
-                    </Item>
-                    <Label>Currency</Label>
-                    <Picker selectedValue={this.state.selectedCurrency} onValueChange={(itemvalue, itemIndex) => this.setState({selectedCurrency: itemvalue})}>
-                        {this.state.currencies.map(currency => (
-                            <Picker.Item key={currency.label} label={currency.label} value={currency.value} />
-                        ))}
-                    </Picker>
-                </View>
-                
+                <Label>Currency</Label>
+                <Picker selectedValue={this.state.selectedCurrency} onValueChange={(itemvalue, itemIndex) => this.setState({selectedCurrency: itemvalue})}>
+                    {this.state.currencies.map(currency => (
+                        <Picker.Item key={currency.label} label={currency.label} value={currency.value} />
+                    ))}
+                </Picker>
+                <Item floatingLabel style={{ marginBottom: 16 }}>
+                    <Label>Amount</Label>
+                    <Input
+                        value={this.state.newEventAmount.toString()}
+                        keyboardType='numeric'
+                        selectionColor="#5067FF"
+                        onChangeText={(amount) => {
+                            this.setState({
+                                newEventAmount: amount
+                            })
+                        }}
+                        autoFocus={false} />
+                </Item>
                 <Label>Date</Label>
                 <DatePicker floatingLabel style={{ marginBottom: 16 }}
                   date={this.state.newEventDate}
@@ -108,6 +105,13 @@ export default class AddEventDialog extends Component {
                 </ScrollView>
             </ModalWrapper>
         )
+    }
+    componentWillMount() {
+        const trip = stateStore.getTrip(this.props.tripKey)
+        this.setState({
+            currencies: trip.currencies,
+            selectedCurrency: trip.currencies[0].value
+        })
     }
     setAddEventDialog(visible) {
         this.setState({
@@ -158,13 +162,6 @@ export default class AddEventDialog extends Component {
                 { cancelable: false }
             )
         }
-    }
-    componentWillMount() {
-        const trip = stateStore.getTrip(this.props.tripKey)
-        this.setState({
-            currencies: trip.currencies,
-            selectedCurrency: trip.currencies[0].value
-        })
     }
 }
 const styles = StyleSheet.create({

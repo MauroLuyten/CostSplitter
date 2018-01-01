@@ -18,15 +18,18 @@ export default class RemoveSplitterDialog extends Component {
     }
     render() {
         const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
+        const amount = stateStore.amountToCurrency(event.currency, this.state.splitter.amount)
+        const paid = stateStore.amountToCurrency(event.currency, this.state.splitter.paid)
+        const remaining = amount - paid
         return (
             <ModalWrapper
             onRequestClose={() => { this.setPayDebtDialog(false) }}
             style={{ width: 350, height: 'auto', padding: 16 }}
             visible={this.state.dialog}>
             <Text style={{ marginBottom: 16 }}>Pay debt: {event.name}</Text>
-            <Text style={{ marginBottom: 16 }}> Total amount: {this.state.splitter.amount}</Text>
-            <Text style={{ marginBottom: 16 }}> Already paid: {this.state.splitter.paid}</Text>
-            <Text style={{ marginBottom: 16 }}> Remaining: {(this.state.splitter.amount - this.state.splitter.paid).toFixed(2)}</Text>
+            <Text style={{ marginBottom: 16 }}> Total debt: {amount.toFixed(2)} {event.currency}</Text>
+            <Text style={{ marginBottom: 16 }}> Already paid: {paid.toFixed(2)} {event.currency}</Text>
+            <Text style={{ marginBottom: 16 }}> Remaining: {remaining.toFixed(2)} {event.currency}</Text>
             <Item floatingLabel>
                     <Label>Amount</Label>
                     <Input
@@ -63,7 +66,8 @@ export default class RemoveSplitterDialog extends Component {
         })
     }
     paydebt() {
-        if(this.state.paidAmount > this.state.splitter.amount - this.state.splitter.paid) {
+        const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
+        if(stateStore.amountToEuro(event.currency,this.state.paidAmount) > this.state.splitter.amount - this.state.splitter.paid) {
             Alert.alert('Wrong amount',
                         'Amount to pay may not exceed amount of splitter to pay')
         }

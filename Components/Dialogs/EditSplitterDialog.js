@@ -36,7 +36,8 @@ export default class EditSplitterDialog extends Component {
                                 newSplitterName: name
                             })
                         }}
-                        autoFocus={true} />
+                        autoFocus={true}
+                        disabled />
                 </Item>
                 <Item floatingLabel>
                     <Label>Amount</Label>
@@ -76,11 +77,14 @@ export default class EditSplitterDialog extends Component {
         )
     }
     setInitState(){
-        const splitter = this.state.splitter
+        let splitter = this.state.splitter
+        const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
+        const amount = stateStore.amountToCurrency(event.currency, splitter.amount)
+        const paid = stateStore.amountToCurrency(event.currency, splitter.paid)
         this.setState({
             newSplitterName: splitter.name,
-            newSplitterAmount: splitter.amount,
-            newSplitterPaid: splitter.paid
+            newSplitterAmount: amount,
+            newSplitterPaid: paid
         })
     }
     setEditSplitterDialog(visible) {
@@ -98,32 +102,57 @@ export default class EditSplitterDialog extends Component {
             amount: this.state.newSplitterAmount,
             paid: this.state.newSplitterPaid
          } 
+         const event = stateStore.getEvent(this.state.tripKey, this.state.eventKey)
+         const oldSplitter = event.splitters.get(splitter.key)
+         const dividedAmountEvent = stateStore.getTotalAmountEvent(this.state.tripKey, this.state.eventKey)
+         const normAmount = stateStore.amountToEuro(event.currency, splitter.amount)
+         const normPaid = stateStore.amountToEuro(event.currency, splitter.paid)
         if (splitter.name && splitter.amount && splitter.paid) {
-            if (splitter.amount > 0) {
-                stateStore.editSplitter(this.state.tripKey, this.state.eventKey, splitter)
-                this.setEditSplitterDialog(false)
+            if((parseFloat(normAmount) > parseFloat(event.amount)) || (parseFloat(normPaid) > parseFloat(event.amount))) {
+                Alert.alert('Wrong amount',
+                            'Amount/Paid may not exceed amount of event!',
+                            [
+                                { text: 'OK', onPress: () => console.log('OK Pressed')}
+                            ],
+                            { cancelable: false}
+                        )
             }
-            else {
+            else if (parseFloat(splitter.amount) < 0 || parseFloat(splitter.paid) < 0) {
                 Alert.alert(
                     'Wrong amount',
-                    'Amount must be positive!',
+                    'Amount/Paid must be positive!',
                     [
                         { text: 'OK', onPress: () => console.log('OK Pressed') },
                     ],
                     { cancelable: false }
                 )
             }
+            else if (normAmount > (event.amount - dividedAmountEvent + oldSplitter.amount)) {
+                Alert.alert(
+                    'Wrong amount',
+                    `Amount may not be higher than ${stateStore.amountToCurrency(event.currency,(event.amount - dividedAmountEvent + oldSplitter.amount)).toFixed(2)}`,
+                    [
+                        { text: 'OK', onPress: () => console.log('OK Pressed') },
+                    ],
+                    { cancelable: false }
+                )
+            } else if(stateStore.getSplitter(this.state.tripKey, this.state.eventKey, this.state.existingSplitterKey)){
+                Alert.alert(
+                    'Error',
+                    'This person is already a splitter of this event.',
+                    [
+                        { text: 'OK', onPress: () => console.log('OK Pressed') },
+                    ],
+                    { cancelable: false }
+                )
+            }else{
+                stateStore.editSplitter(this.state.tripKey, this.state.eventKey, splitter)
+                this.setEditSplitterDialog(false)
+
+            }
+
         }
-        else {
-            Alert.alert(
-                'Field missing',
-                'Every field must be filled in!',
-                [
-                    { text: 'OK', onPress: () => console.log('OK Pressed') },
-                ],
-                { cancelable: false }
-            )
-        }
+
     }
 }
 const styles = StyleSheet.create({

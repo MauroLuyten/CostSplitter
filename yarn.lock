@@ -3490,7 +3490,7 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.5.8:
+prop-types@^15.5.10, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.6.0:
   version "15.6.0"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
   dependencies:
@@ -3575,6 +3575,12 @@ react-devtools-core@^2.5.0:
     shell-quote "^1.6.1"
     ws "^2.0.3"
 
+react-native-collapsible@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/react-native-collapsible/-/react-native-collapsible-0.9.0.tgz#207849faa15493820d19fa6a5e58f7c7b6c1b910"
+  dependencies:
+    prop-types "^15.5.10"
+
 react-native-datepicker@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/react-native-datepicker/-/react-native-datepicker-1.6.0.tgz#3a40dc9b112023c49d60ba2a0789d440b7e3d97c"
@@ -3635,6 +3641,12 @@ react-native-modal-wrapper@^3.0.0:
   resolved "https://registry.yarnpkg.com/react-native-modal-wrapper/-/react-native-modal-wrapper-3.0.0.tgz#0d58b5a355d83af5428ed250f300e1088018f22a"
   dependencies:
     react-native-keyboard-spacer "^0.4.1"
+
+react-native-select-multiple@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-select-multiple/-/react-native-select-multiple-1.2.0.tgz#1f4662c085fc2b76101986d0a45b09e5343359e5"
+  dependencies:
+    prop-types "^15.6.0"
 
 react-native-selectbox@^0.1.2:
   version "0.1.2"

@@ -1,6 +1,6 @@
-import React, {Component} from 'react'
-import {StyleSheet, View, Alert} from 'react-native'
-import {Text, Label, Item, Input, Button} from 'native-base';
+import React, { Component } from 'react'
+import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
+import { Text, Label, Item, Input, Button, Icon } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
 import SelectMultiple from 'react-native-select-multiple'
@@ -15,127 +15,163 @@ export default class EditTripDialog extends Component {
             tripKey: this.props.tripKey,
             newTripName: '',
             newTripDescription: '',
-            newTripBudget: '',
-            selectedCurrencies: [], 
-            isCollapsed: true,
+            newTripBudget: 0,
+            selectedCurrencies: [],
+            selectedCurrency: '',
             currenciesArray: [],
-            selectedCurrency: ''
+            currenciesModal: false,
         }
     }
     render() {
         return (
             <ModalWrapper
                 onRequestClose={() => {
-                this.setEditTripDialog(false)
-            }}
+                    this.setEditTripDialog(false)
+                }}
                 style={{
-                width: 350,
-                height: 'auto',
-                padding: 16
-            }}
+                    width: 350,
+                    height: 'auto',
+                    padding: 16
+                }}
                 visible={this.state.dialog}>
-                <Text style={{
-                    marginBottom: 16
-                }}>Edit Trip</Text>
-                <Item
-                    floatingLabel
-                    style={{
-                    marginBottom: 16
-                }}>
-                    <Label>Name</Label>
-                    <Input
-                        value={this.state.newTripName}
-                        selectionColor="#5067FF"
-                        onChangeText={(name) => {
-                        this.setState({newTripName: name})
-                    }}
-                        autoFocus={true}/>
-                </Item>
-                <Item
-                    floatingLabel
-                    style={{
-                    marginBottom: 16
-                }}>
-                    <Label>Description</Label>
-                    <Input
-                        value={this.state.newTripDescription}
-                        selectionColor="#5067FF"
-                        onChangeText={(description) => {
-                        this.setState({newTripDescription: description})
-                    }}
-                        autoFocus={false}/>
-                </Item>
-                <Item
-                    floatingLabel
-                    style={{
-                    marginBottom: 16
-                }}>
-                    <Label>Budget</Label>
-                    <Input
-                        value={this.state.newTripBudget && this
-                        .state
-                        .newTripBudget
-                        .toString()}
-                        keyboardType='numeric'
-                        selectionColor="#5067FF"
-                        onChangeText={(budget) => {
-                        this.setState({newTripBudget: budget})
-                    }}
-                        autoFocus={false}/>
-                </Item>
-                <Button primary small onPress={() => this.toggleCollapsible()}>
-                    <Text style={{ color: 'white' }}>Toggle Currencies</Text>
-                </Button>
-                <Collapsible collapsed={this.state.isCollapsed}>
-                    <View style={{height: 400}}>
-                        <SelectMultiple items={this.state.currenciesArray} selectedItems={this.state.selectedCurrencies} onSelectionsChange={this.onSelectionsChange}/>
+                <ScrollView>
+                    <Text style={{ marginBottom: 16 }}>Edit trip</Text>
+                    <Item floatingLabel style={{ marginBottom: 16 }}>
+                        <Label>Name</Label>
+                        <Input
+                            value={this.state.newTripName}
+                            selectionColor="#5067FF"
+                            onChangeText={(name) => {
+                                this.setState({
+                                    newTripName: name
+                                })
+                            }}
+                            autoFocus={true} />
+                    </Item>
+                    <Item floatingLabel style={{ marginBottom: 16 }}>
+                        <Label>Description</Label>
+                        <Input
+                            value={this.state.newTripDescription}
+                            selectionColor="#5067FF"
+                            onChangeText={(description) => {
+                                this.setState({
+                                    newTripDescription: description
+                                })
+                            }}
+                            autoFocus={false} />
+                    </Item>
+                    <Label>Currencies</Label>
+                    <View style={styles.splitTextContainer}>
+                        <Text style={{ marginTop: 3, marginLeft: 6, width: '80%' }}>
+                            {this.currenciesString(this.state.selectedCurrencies)}
+                        </Text>
+                        <Icon
+                            onPress={() => this.setCurrenciesModal(true)}
+                            style={{ color: '#5067FF', marginLeft: 12 }}
+                            android="md-create"
+                            ios="ios-create">
+                        </Icon>
                     </View>
-                </Collapsible>
-                <View style={styles.buttonContainer}>
-                    <Button transparent small onPress={() => this.setEditTripDialog(false)}>
-                        <Text
-                            style={{
-                            color: '#5067FF'
-                        }}>Cancel</Text>
-                    </Button>
-                    <Button primary small onPress={() => this.editTrip()}>
-                        <Text
-                            style={{
-                            color: 'white'
-                        }}>Confirm</Text>
-                    </Button>
-                </View>
+                    <Label style={{ width: '100%' }}>Budget</Label>
+                    <View style={styles.splitTextContainer}>
+                        <Picker
+                            style={{ width: 85 }}
+                            selectedValue={this.state.selectedCurrency}
+                            onValueChange={(itemvalue, itemIndex) => {
+                                this.setState({
+                                    newTripBudget: 
+                                    stateStore.amountToCurrency(
+                                        itemvalue,
+                                        stateStore.amountToEuro(this.state.selectedCurrency,this.state.newTripBudget)),
+                                    selectedCurrency: itemvalue
+                                })
+                            }}>
+                            {this.state.selectedCurrencies.map(currency => (
+                                <Picker.Item key={currency.value} label={currency.value} value={currency.value} />
+                            ))}
+                        </Picker>
+                        <Input
+                            style={{ flex: 1, borderBottomWidth: 0.5 }}
+                            value={this.state.newTripBudget.toString()}
+                            keyboardType='numeric'
+                            selectionColor="#5067FF"
+                            onChangeText={(budget) => {
+                                this.setState({
+                                    newTripBudget: budget
+                                })
+                            }}
+                            autoFocus={false} />
+
+                    </View>
+
+                    <ModalWrapper
+                        visible={this.state.currenciesModal}
+                        style={{ width: 350, height: 'auto', padding: 16 }}
+                        onRequestClose={() => this.setCurrenciesModal(false)}>
+                        <View>
+                            <Text>Choose relevant currencies</Text>
+                            <SelectMultiple
+                                items={this.state.currenciesArray.sort()}
+                                selectedItems={this.state.selectedCurrencies.slice()}
+                                onSelectionsChange={this.onSelectionsChange}
+                                style={{ height: 400 }} />
+                            <Text>Selected: {this.state.selectedCurrencies.map(currency => (
+                                " " + currency.value
+                            ))}
+                            </Text>
+                            <View style={styles.buttonContainer}>
+                                <Button transparent small onPress={() => { this.setCurrenciesModal(false) }}>
+                                    <Text style={{ color: '#5067FF' }}>Cancel</Text>
+                                </Button>
+                                <Button primary small onPress={() => { this.setCurrenciesModal(false) }}>
+                                    <Text style={{ color: 'white' }}>Confirm</Text>
+                                </Button>
+                            </View>
+                        </View>
+                    </ModalWrapper>
+                    <View style={styles.buttonContainer}>
+                        <Button transparent small onPress={() => this.setEditTripDialog(false)}>
+                            <Text style={{ color: '#5067FF' }}>Cancel</Text>
+                        </Button>
+                        <Button primary small onPress={() => this.editTrip()}>
+                            <Text style={{ color: 'white' }}>Confirm</Text>
+                        </Button>
+                    </View>
+                </ScrollView>
             </ModalWrapper>
         )
     }
-     //currencies
-     onSelectionsChange = (selectedCurrencies) => {
+    currenciesString(currencies){
+        let string = ""
+        currencies.forEach(currency => {
+            string += `${currency.value} `
+        });
+        return string
+    }
+
+    //currencies
+    onSelectionsChange = (selectedCurrencies) => {
         this.setState({ selectedCurrencies })
-      }
-    toggleCollapsible(){
-        if(this.state.isCollapsed){
-            this.setState({
-                isCollapsed: false
-            })
-        } else {
-            this.setState({
-                isCollapsed: true
-            })
-        }
+    }
+    setCurrenciesModal(visible) {
+        this.setState({
+            currenciesModal: visible
+        })
     }
     componentWillMount() {
         const trip = stateStore.getTrip(this.props.tripKey)
+        const budget = stateStore.amountToCurrency(trip.selectedCurrency, trip.budget)
         this.setState({
-            newTripName: trip.name, 
+            newTripName: trip.name,
             newTripDescription: trip.description,
-            newTripBudget: trip.budget,
+            newTripBudget: budget,
             selectedCurrencies: trip.currencies,
             currenciesArray: stateStore.currencies.keys(),
             selectedCurrency: trip.selectedCurrency
         })
     }
     setEditTripDialog(visible) {
-        this.setState({dialog: visible})
+        this.setState({ dialog: visible })
     }
     editTrip() {
         const trip = {
@@ -145,57 +181,54 @@ export default class EditTripDialog extends Component {
             currencies: this.state.selectedCurrencies,
             selectedCurrency: this.state.selectedCurrency
         }
-        if (trip.name && trip.description && trip.budget && trip.currencies.length != 0) {
-            if(this.checkSelectedCurrency() == false){
-                Alert.alert('Warning', this.state.selectedCurrency + ' is used to display your trip!')
-            }   else {
-                if(this.checkEventCurrencies().length == 0){
-                    stateStore.editTrip(this.props.tripKey, trip)
-                    this.setEditTripDialog(false)
+        
+        if (trip.name && trip.description && trip.budget && trip.currencies.length != 0 && trip.selectedCurrency) {
+            if (this.checkEventCurrencies().length == 0) {
+                stateStore.editTrip(this.props.tripKey, trip)
+                this.setEditTripDialog(false)
+            }
+            else {
+                let text = "There are still events with these currencies: "
+                for (let currency of this.checkEventCurrencies()) {
+                    text = text + "-" + currency
                 }
-                else {
-                    let text = "There are still events with these currencies: "
-                    for (let currency of this.checkEventCurrencies()){
-                        text = text + "-" + currency
-                    }
-                    Alert.alert('Warning', text)
-                }
-            } 
+                Alert.alert('Warning', text)
+            }
         } else {
             Alert.alert('Field missing', 'Every field must be filled in!', [
                 {
                     text: 'OK',
                     onPress: () => console.log('OK Pressed')
                 }
-            ], {cancelable: false})
+            ], { cancelable: false })
         }
     }
     //checks that the currencies you used in your events are still "selected" -> otherwise there will be inconsistencies
-    checkEventCurrencies(){
+    checkEventCurrencies() {
         let array = []
-        for (let event of stateStore.getEvents(this.props.tripKey)){
+        for (let event of stateStore.getEvents(this.props.tripKey)) {
             let currency = event.currency
             let bool = false
-            for (let selectedCurrency of this.state.selectedCurrencies){
-                if(currency == selectedCurrency.value){
+            for (let selectedCurrency of this.state.selectedCurrencies) {
+                if (currency == selectedCurrency.value) {
                     bool = true
                 }
             }
-            if(bool == false){
+            if (bool == false) {
                 array.push(currency)
             }
         }
         return array
     }
-    checkSelectedCurrency(){
+    /* checkSelectedCurrency() {
         let bool = false
-        for (let selectedCurrency of this.state.selectedCurrencies){
-            if( this.state.selectedCurrency == selectedCurrency.value){
+        for (let selectedCurrency of this.state.selectedCurrencies) {
+            if (this.state.selectedCurrency == selectedCurrency.value) {
                 bool = true
             }
         }
         return bool
-    }
+    } */
 }
 const styles = StyleSheet.create({
 
@@ -203,5 +236,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         marginTop: 20
+    },
+    splitTextContainer: {
+        flex:1,
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+
     }
 });

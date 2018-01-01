@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, ScrollView } from 'react-native'
+import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
 import { Icon, Badge, ListView, List, splitterItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import { firebaseApp } from '../firebaseconfig'
@@ -28,9 +28,11 @@ export default class EventScreen extends Component {
         title: 'Event'
     }
     render() {
+        const trip = stateStore.getTrip(this.state.tripKey)
         const event = stateStore.getEvent(this.state.tripKey,this.state.eventKey)
         const splitters = stateStore.getSplitters(this.state.tripKey,this.state.eventKey)
         const paidTotal = stateStore.getTotalPaidEvent(this.state.tripKey, this.state.eventKey)
+        const remaining = event.amount - paidTotal
         const divided = stateStore.getEventDivision(this.state.tripKey, this.state.eventKey)
         return (
             <Container style={{ flex: 1}}>
@@ -57,14 +59,27 @@ export default class EventScreen extends Component {
                         <View style={styles.splitTextContainer}>
                             <Text style={{}}>Amount:</Text>
                             <View style={{}}>
-                                <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red' }}>{event.amount} {event.currency}</Text>
-                                <Text style={{textAlign: 'right', color: 'green'}} >+ {paidTotal} {event.currency}</Text>
-                                <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>{(event.amount - paidTotal).toFixed(2)} {event.currency}</Text>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red', textAlign: 'right' }}>
+                                    {stateStore.amountToCurrency(event.currency,event.amount).toFixed(2)} {event.currency}
+                                </Text>
+                                <Text style={{textAlign: 'right', color: 'green'}} >
+                                    + {stateStore.amountToCurrency(event.currency, paidTotal).toFixed(2)} {event.currency}
+                                </Text>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>
+                                    {stateStore.amountToCurrency(event.currency,remaining).toFixed(2)} {event.currency}
+                                </Text>
                             </View>
                         </View>
                         <View style={styles.splitTextContainer}>
-                            <Text style={{}}>Currency:</Text>
-                            <Text>{event.currency == null ? "/" : event.currency}</Text>
+                            <Text style={{marginTop:12}}>Currency:</Text>
+                            <Picker 
+                                style={{width: 75}}
+                                selectedValue={event.currency} 
+                                onValueChange={(itemvalue, itemIndex) => stateStore.changeEventCurrency(trip.key, event.key, itemvalue)}>
+                                {trip.currencies.map(currency => (
+                                    <Picker.Item key={currency.label} label={currency.label} value={currency.value} />
+                                ))}
+                            </Picker>
                         </View>
                         <View style={styles.splitTextContainer}>
                             <Text style={{}}>Date:</Text>
@@ -120,9 +135,15 @@ export default class EventScreen extends Component {
                                     <View style={[styles.splitTextContainer,{ marginRight: 18}]}>
                                         <Text style={{ fontSize: 22, fontWeight: 'bold' }}>{splitter.name}</Text>
                                         <View style={{}}>
-                                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red', textAlign: 'right'  }}>{splitter.amount} {event.currency}</Text>
-                                            <Text style={{textAlign: 'right', color: 'green', textAlign: 'right' }} >+ {splitter.paid} {event.currency}</Text>
-                                            <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>  {(splitter.amount - splitter.paid).toFixed(2)} {event.currency}</Text>
+                                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'red', textAlign: 'right'  }}>
+                                                {stateStore.amountToCurrency(event.currency,splitter.amount).toFixed(2)} {event.currency}
+                                            </Text>
+                                            <Text style={{textAlign: 'right', color: 'green', textAlign: 'right' }} >
+                                                + {stateStore.amountToCurrency(event.currency,splitter.paid).toFixed(2)} {event.currency}
+                                            </Text>
+                                            <Text style={{ fontSize: 18, fontWeight: 'bold', textAlign: 'right' }}>
+                                                  {stateStore.amountToCurrency(event.currency,(splitter.amount - splitter.paid)).toFixed(2)} {event.currency}
+                                            </Text>
                                         </View>
                                     </View>
                                     <View style = {[styles.splitTextContainer, {marginBottom: 8}]}>
