@@ -431,14 +431,13 @@ class StateStore {
         return splitter
     }
 
-    getSplittersExpensesTrip(tripKey) {
+    getSplittersExpensesTrip(tripKeyParameter) {
         let splittersArray = []
-        if(typeof this.trips.get(tripKey) !== "undefined" && this.trips.get(tripKey)) {
-        this.trips.get(tripKey).events.keys().forEach(eventKey => {
-            this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                let splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
-                splitter.key = splitterKey
-                splitter.eventName = this.trips.get(tripKey).events.get(eventKey).name
+        if(typeof this.getTrip(tripKeyParameter) !== "undefined" && this.getTrip(tripKeyParameter)) {
+        this.trips.get(tripKeyParameter).events.keys().forEach(eventKey => {
+            this.trips.get(tripKeyParameter).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                let splitter = this.trips.get(tripKeyParameter).events.get(eventKey).splitters.get(splitterKey)
+                splitter.eventName = this.trips.get(tripKeyParameter).events.get(eventKey).name
                 splittersArray.push(splitter)
             })
         })
@@ -452,7 +451,6 @@ class StateStore {
         this.trips.keys().forEach(tripKey => {
             this.trips.get(tripKey).events.keys().forEach(eventKey => {
                 let event = this.trips.get(tripKey).events.get(eventKey)
-                event.key = eventKey
                 event.tripName = this.trips.get(tripKey).name
                 if(event.category == category) {
                     expensesArray.push(event)

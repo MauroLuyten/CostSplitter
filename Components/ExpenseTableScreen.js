@@ -13,9 +13,7 @@ export default class ExpenseTableScreen extends Component {
         super(props)
         this.state = {
             selectedExpense: null,
-            selectedExpenseName: '',
-            expenses: null,
-            splitters: null
+            selectedExpenseName: ''
         }
 
     }
@@ -24,7 +22,6 @@ export default class ExpenseTableScreen extends Component {
     }
     render() {
         const tableHead = ['Splitter', 'Trip', 'Amount (Due)', 'Paid', 'Receives/Due'];
-        const expenses = stateStore.getAllEvents();
         const splitters = stateStore.getSplittersEvent(this.state.selectedExpense);
         return (
             <View style={styles.container}>

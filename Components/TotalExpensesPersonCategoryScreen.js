@@ -52,7 +52,7 @@ export default class TotalExpensesPersonCategoryScreen extends Component {
     }
     componentWillMount() {
         splitters = stateStore.getPersons()
-        totalExpenses = stateStore. getTotalExpensesPersonCategory(this.state.selectedSplitter, this.state.selectedCategory)
+        totalExpenses = stateStore.getTotalExpensesPersonCategory(this.state.selectedSplitter, this.state.selectedCategory)
     }
 
     navigate(route) {

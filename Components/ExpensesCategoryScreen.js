@@ -13,8 +13,7 @@ export default class ExpensesCategoryScreen extends Component {
         super(props)
         this.state = {
             selectedCategory: 'Overnight stay',
-            categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.'],
-            expenses: null
+            categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.']
         }
 
     }

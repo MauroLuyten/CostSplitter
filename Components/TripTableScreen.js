@@ -15,7 +15,6 @@ export default class TripTableScreen extends Component {
             selectedTrip: null,
             selectedTripName: '',
             trips: null,
-            expenses: null
         }
 
     }
@@ -24,8 +23,7 @@ export default class TripTableScreen extends Component {
     }
     render() {
         const tableHead = ['Splitter', 'Trip', 'Amount (Due)', 'Paid', 'Receives/Due'];
-        const trips = stateStore.getTrips;
-        const expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip);
+        const expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip) 
         return (
             <View style={styles.container}>
                 <Picker
@@ -52,7 +50,7 @@ export default class TripTableScreen extends Component {
         )
     }
     componentWillMount() {
-        trips = stateStore.getTrips;
+        trips = stateStore.getTrips();
         expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip);
     }
 
@@ -66,7 +64,7 @@ export default class TripTableScreen extends Component {
             this.setState({selectedTrip: trips[val-1].key, selectedTripName: trips[val-1].name})
         } else {
             this.setState({selectedTrip: null, selectedTripName: 'none'})
-        }
+        }    
     }
 }
 const styles = StyleSheet.create({
