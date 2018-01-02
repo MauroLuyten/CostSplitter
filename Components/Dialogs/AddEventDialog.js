@@ -17,7 +17,7 @@ export default class AddEventDialog extends Component {
             newEventCategory: 'Overnight stay',
             newEventAmount: 0,
             newEventDate: '01-01-2018',
-            currencies: [],
+            currencies: stateStore.getTrip(this.props.tripKey).currencies,
             selectedCurrency: ''
         }
     }
@@ -109,7 +109,7 @@ export default class AddEventDialog extends Component {
     componentWillMount() {
         const trip = stateStore.getTrip(this.props.tripKey)
         this.setState({
-            currencies: trip.currencies,
+            //currencies: trip.currencies,
             selectedCurrency: trip.currencies[0].value
         })
     }
