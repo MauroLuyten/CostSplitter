@@ -39,13 +39,22 @@ export default class ExpensesCategoryScreen extends Component {
                         :
                         (<List style={styles.list} dataArray={expenses}
                             renderRow={(expense) =>
-                               <Row data={[expense.tripName, expense.name, expense.description, expense.amount, expense.currency]} style={styles.row} textStyle={styles.text}/>
+                               <Row data={[
+                                expense.tripName, 
+                                expense.name, 
+                                expense.description, 
+                                this.parseAmount(expense.amount), 
+                                expense.currency]} 
+                                style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
 
             </View>
         )
+    }
+    parseAmount(amount){
+        return parseFloat(amount).toFixed(2)
     }
     componentWillMount() {
         expenses = stateStore.getExpensesPerCategory(this.state.selectedCategory);

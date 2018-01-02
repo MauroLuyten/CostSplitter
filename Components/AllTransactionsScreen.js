@@ -47,7 +47,8 @@ export default class AllTransactionsScreen extends Component {
 const styles = StyleSheet.create({
     container: {
         alignSelf: 'stretch',
-        flex: 1
+        flex: 1,
+        marginBottom:40
     },
     seperator: {
         maxHeight: 35

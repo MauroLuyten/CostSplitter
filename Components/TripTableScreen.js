@@ -41,13 +41,23 @@ export default class TripTableScreen extends Component {
                         :
                         (<List style={styles.list} dataArray={expenses}
                             renderRow={(expense) =>
-                               <Row data={[expense.name, expense.eventName, expense.amount, expense.paid, parseFloat(expense.amount - expense.paid).toFixed(2)]} style={styles.row} textStyle={styles.text}/>
+                               <Row data={[
+                                  expense.name, 
+                                  expense.eventName, 
+                                  this.parseAmount(expense.amount), 
+                                  this.parseAmount(expense.paid), 
+                                  parseFloat(expense.amount - expense.paid).toFixed(2)
+                                ]} 
+                                style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
 
             </View>
         )
+    }
+    parseAmount(amount){
+        return parseFloat(amount).toFixed(2)
     }
     componentWillMount() {
         trips = stateStore.getTrips();

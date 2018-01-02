@@ -52,13 +52,16 @@ export default class ExpensesDayPersonScreen extends Component {
                         :
                         (<List style={styles.list} dataArray={expenses}
                             renderRow={(expense) =>
-                               <Row data={[expense.tripName, expense.name, expense.amount]} style={styles.row} textStyle={styles.text}/>
+                               <Row data={[expense.tripName, expense.name, this.parseAmount(expense.amount)]} style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
 
             </View>
         )
+    }
+    parseAmount(amount){
+        return parseFloat(amount).toFixed(2)
     }
     componentWillMount() {
         splitters = stateStore.getPersons()

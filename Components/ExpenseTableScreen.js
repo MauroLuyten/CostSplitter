@@ -40,13 +40,22 @@ export default class ExpenseTableScreen extends Component {
                         :
                         (<List style={styles.list} dataArray={splitters}
                             renderRow={(splitter) =>
-                               <Row data={[splitter.name, splitter.tripName, splitter.amount, splitter.paid, parseFloat(splitter.amount - splitter.paid).toFixed(2)]} style={styles.row} textStyle={styles.text}/>
+                               <Row data={[
+                                splitter.name, 
+                                splitter.tripName, 
+                                this.parseAmount(splitter.amount), 
+                                this.parseAmount(splitter.paid), 
+                                parseFloat(splitter.amount - splitter.paid).toFixed(2)]} 
+                                style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
 
             </View>
         )
+    }
+    parseAmount(amount){
+        return parseFloat(amount).toFixed(2)
     }
     componentWillMount() {
         expenses = stateStore.getAllEvents()
