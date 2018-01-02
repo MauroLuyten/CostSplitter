@@ -20,7 +20,7 @@ export default class AddSplitterDialog extends Component {
     render() {
         const persons = stateStore.getPersons()
         let pickeritems = []
-        pickeritems.push(<Picker.Item label="New splitter" value="new" />)
+        pickeritems.push(<Picker.Item key="new" label="New splitter" value="new" />)
         persons.forEach(person => {
             pickeritems.push(<Picker.Item label={person.name} key={person.key} value={person.key} />)
         })
