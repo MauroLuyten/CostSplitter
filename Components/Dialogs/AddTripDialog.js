@@ -17,7 +17,7 @@ export default class AddTripDialog extends Component {
             newTripDescription: '',
             newTripBudget: 0,
             selectedCurrencies: [{ label: 'EUR', value: 'EUR' }],
-            selectedCurrency: '',
+            selectedCurrency: 'EUR',
             currenciesModal: false,
             currenciesArray: []
         }
@@ -167,7 +167,7 @@ export default class AddTripDialog extends Component {
             selectedCurrency: this.state.selectedCurrency
 
         }
-        if (trip.name && trip.description && trip.budget && trip.currencies.length != 0 && trip.selectedCurrency) {
+        if (trip.name && trip.description && trip.budget && trip.currencies.length && trip.selectedCurrency) {
 
             stateStore.addTrip(trip)
             this.setAddTripDialog(false)
