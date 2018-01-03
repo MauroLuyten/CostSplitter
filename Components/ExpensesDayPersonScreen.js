@@ -17,7 +17,8 @@ export default class ExpensesDayPersonScreen extends Component {
             selectedDay: 'All',
             splitters: null,
             days: null,
-            expenses: null
+            expenses: null,
+            selectedCurrency: 'EUR'
         }
 
     }
@@ -43,6 +44,11 @@ export default class ExpensesDayPersonScreen extends Component {
                     <Picker.Item label="All" key="All" value="All"></Picker.Item>
                         {days.map((day) => <Picker.Item label={day} key={day} value={day}/>)}
                 </Picker>
+                <Picker
+                    selectedValue={this.state.selectedCurrency}
+                    onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
+                </Picker>
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
@@ -50,9 +56,13 @@ export default class ExpensesDayPersonScreen extends Component {
                         <Text style={{marginLeft:16}}>No expenses yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={expenses}
+                        (<List style={styles.list} dataArray={_.cloneDeep(expenses)}
                             renderRow={(expense) =>
-                               <Row data={[expense.tripName, expense.name, this.parseAmount(expense.amount)]} style={styles.row} textStyle={styles.text}/>
+                               <Row data={[
+                                expense.tripName, 
+                                expense.name, 
+                                this.parseAmount(expense.amount, this.state.selectedCurrency)]}
+                                style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
@@ -60,10 +70,11 @@ export default class ExpensesDayPersonScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount){
-        return parseFloat(amount).toFixed(2)
+    parseAmount(amount, currency){
+        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
     }
     componentWillMount() {
+        currencies = stateStore.currenciesArray
         splitters = stateStore.getPersons()
         days = stateStore.getExpenseDays()
         expenses = stateStore. getExpensesPerDayPerson(this.state.selectedSplitter, this.state.selectedDay)
@@ -88,6 +99,10 @@ export default class ExpensesDayPersonScreen extends Component {
         } else {
             this.setState({selectedDay: 'All'})
         }
+    }
+
+    handleCurrencyOption(val) {
+        this.setState({selectedCurrency: val})
     }
 }
 const styles = StyleSheet.create({

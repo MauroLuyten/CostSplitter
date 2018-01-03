@@ -13,7 +13,8 @@ export default class ExpensesCategoryScreen extends Component {
         super(props)
         this.state = {
             selectedCategory: 'Overnight stay',
-            categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.']
+            categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.'],
+            selectedCurrency: 'EUR'
         }
 
     }
@@ -21,7 +22,7 @@ export default class ExpensesCategoryScreen extends Component {
         title: 'Expenses per category'
     }
     render() {
-        const tableHead = ['Trip', 'Event', 'Description', 'Amount', 'Currency'];
+        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount', 'Paid', 'Currency'];
         const expenses = stateStore.getExpensesPerCategory(this.state.selectedCategory);
         return (
             <View style={styles.container}>
@@ -30,6 +31,11 @@ export default class ExpensesCategoryScreen extends Component {
                     onValueChange={(itemValue, itemIndex) => this.handleChangedOption(itemIndex)}>
                         {this.state.categories.map((category) => <Picker.Item label={category} key={category} value={category}/>)} 
                 </Picker>
+                <Picker
+                    selectedValue={this.state.selectedCurrency}
+                    onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
+                </Picker>
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
@@ -37,13 +43,14 @@ export default class ExpensesCategoryScreen extends Component {
                         <Text style={{marginLeft:16}}>No expenses yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={expenses}
+                        (<List style={styles.list} dataArray={_.cloneDeep(expenses)}
                             renderRow={(expense) =>
                                <Row data={[
                                 expense.tripName, 
+                                expense.eventName, 
                                 expense.name, 
-                                expense.description, 
-                                this.parseAmount(expense.amount), 
+                                this.parseAmount(expense.amount, this.state.selectedCurrency),
+                                this.parseAmount(expense.paid, this.state.selectedCurrency),
                                 expense.currency]} 
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
@@ -53,10 +60,11 @@ export default class ExpensesCategoryScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount){
-        return parseFloat(amount).toFixed(2)
+    parseAmount(amount, currency){
+        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
     }
     componentWillMount() {
+        currencies = stateStore.currenciesArray
         expenses = stateStore.getExpensesPerCategory(this.state.selectedCategory);
     }
 
@@ -67,6 +75,10 @@ export default class ExpensesCategoryScreen extends Component {
 
     handleChangedOption(val) {
         this.setState({selectedCategory: this.state.categories[val]})
+    }
+
+    handleCurrencyOption(val) {
+        this.setState({selectedCurrency: val})
     }
 }
 const styles = StyleSheet.create({

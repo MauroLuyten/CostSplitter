@@ -13,7 +13,8 @@ export default class ExpenseTableScreen extends Component {
         super(props)
         this.state = {
             selectedExpense: null,
-            selectedExpenseName: ''
+            selectedExpenseName: '',
+            selectedCurrency: 'EUR'
         }
 
     }
@@ -31,6 +32,11 @@ export default class ExpenseTableScreen extends Component {
                     <Picker.Item label="None" key="None" value="None"></Picker.Item>
                         {expenses.map((expense) => <Picker.Item label={expense.name} key={expense.key} value={expense.name}/>)} 
                 </Picker>
+                <Picker
+                    selectedValue={this.state.selectedCurrency}
+                    onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
+                </Picker>
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
@@ -38,14 +44,14 @@ export default class ExpenseTableScreen extends Component {
                         <Text style={{marginLeft:16}}>No splitters yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={splitters}
+                        (<List style={styles.list} dataArray={_.cloneDeep(splitters)}
                             renderRow={(splitter) =>
                                <Row data={[
                                 splitter.name, 
                                 splitter.tripName, 
-                                this.parseAmount(splitter.amount), 
-                                this.parseAmount(splitter.paid), 
-                                parseFloat(splitter.amount - splitter.paid).toFixed(2)]} 
+                                this.parseAmount(splitter.amount, this.state.selectedCurrency), 
+                                this.parseAmount(splitter.paid, this.state.selectedCurrency), 
+                                this.parseAmount((splitter.amount - splitter.paid), this.state.selectedCurrency)]} 
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
@@ -54,10 +60,11 @@ export default class ExpenseTableScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount){
-        return parseFloat(amount).toFixed(2)
+    parseAmount(amount, currency){
+        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
     }
     componentWillMount() {
+        currencies = stateStore.currenciesArray
         expenses = stateStore.getAllEvents()
         splitters = stateStore.getSplittersEvent(this.state.selectedExpense);
     }
@@ -73,6 +80,10 @@ export default class ExpenseTableScreen extends Component {
         } else {
             this.setState({selectedExpense: null, selectedExpenseName: 'none'})
         }
+    }
+
+    handleCurrencyOption(val) {
+        this.setState({selectedCurrency: val})
     }
 }
 const styles = StyleSheet.create({

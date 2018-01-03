@@ -15,7 +15,8 @@ export default class PersonTransactionsScreen extends Component {
             selectedSplitter: null,
             selectedSplitterName: '',
             splitters: null,
-            transactions: null
+            transactions: null,
+            selectedCurrency: 'EUR'
         }
 
     }
@@ -33,16 +34,20 @@ export default class PersonTransactionsScreen extends Component {
                     <Picker.Item label="None" key="None" value="None"></Picker.Item>
                         {splitters.map((splitter) => <Picker.Item label={splitter.name} key={splitter.key} value={splitter.name}/>)} 
                 </Picker>
-
+                <Picker
+                    selectedValue={this.state.selectedCurrency}
+                    onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
+                </Picker>
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
                     {transactions.length===0 ? (
                         <Text style={{marginLeft:16}}>No transactions yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={transactions}
+                        (<List style={styles.list} dataArray={_.cloneDeep(transactions)}
                             renderRow={(transaction) =>
-                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, transaction.amount]} style={styles.row} textStyle={styles.text}/>
+                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, this.parseAmount(transaction.amount, this.state.selectedCurrency)]} style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
@@ -50,7 +55,12 @@ export default class PersonTransactionsScreen extends Component {
             </View>
         )
     }
+    parseAmount(amount, currency){
+        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+    }
+
     componentWillMount() {
+        currencies = stateStore.currenciesArray
         splitters = stateStore.getPersons();
         transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
     }
@@ -66,6 +76,9 @@ export default class PersonTransactionsScreen extends Component {
         } else {
             this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
         }
+    }
+    handleCurrencyOption(val) {
+        this.setState({selectedCurrency: val})
     }
 }
 const styles = StyleSheet.create({

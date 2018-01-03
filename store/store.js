@@ -432,12 +432,14 @@ class StateStore {
     }
 
     getSplittersExpensesTrip(tripKeyParameter) {
+       //console.warn("Call store..")
         let splittersArray = []
         if(typeof this.getTrip(tripKeyParameter) !== "undefined" && this.getTrip(tripKeyParameter)) {
         this.trips.get(tripKeyParameter).events.keys().forEach(eventKey => {
             this.trips.get(tripKeyParameter).events.get(eventKey).splitters.keys().forEach(splitterKey => {
                 let splitter = this.trips.get(tripKeyParameter).events.get(eventKey).splitters.get(splitterKey)
                 splitter.eventName = this.trips.get(tripKeyParameter).events.get(eventKey).name
+                splitter.currency = this.getEvent(tripKeyParameter, eventKey).currency
                 splittersArray.push(splitter)
             })
         })
@@ -446,18 +448,22 @@ class StateStore {
     }
 
     getExpensesPerCategory(category) {
-        let expensesArray = []
-        if(typeof category !== "undefined" && category !== "" && category !== null)
+        let splittersArray = []
         this.trips.keys().forEach(tripKey => {
             this.trips.get(tripKey).events.keys().forEach(eventKey => {
                 let event = this.trips.get(tripKey).events.get(eventKey)
-                event.tripName = this.trips.get(tripKey).name
                 if(event.category == category) {
-                    expensesArray.push(event)
+                   this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                       let splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
+                       splitter.tripName = this.trips.get(tripKey).name
+                       splitter.eventName = event.name
+                       splitter.currency = event.currency
+                       splittersArray.push(splitter)
+                   })
                 }
             })
         })
-        return expensesArray
+        return splittersArray
     }
 
     getTransactionsSplitter(splitterKey) {

@@ -14,6 +14,7 @@ export default class TripTableScreen extends Component {
         this.state = {
             selectedTrip: null,
             selectedTripName: '',
+            selectedCurrency: 'EUR',
             trips: null,
         }
 
@@ -22,8 +23,8 @@ export default class TripTableScreen extends Component {
         title: 'Trip Table'
     }
     render() {
-        const tableHead = ['Splitter', 'Trip', 'Amount (Due)', 'Paid', 'Receives/Due'];
-        const expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip) 
+        const tableHead = ['Splitter', 'Trip', 'Amount (Due)', 'Paid', 'Receives/Due', 'Currency'];
+        const expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip)
         return (
             <View style={styles.container}>
                 <Picker
@@ -31,22 +32,27 @@ export default class TripTableScreen extends Component {
                     onValueChange={(itemValue, itemIndex) => this.handleChangedOption(itemIndex)}>
                     <Picker.Item label="None" key="None" value="None"></Picker.Item>
                         {trips.map((trip) => <Picker.Item label={trip.name} key={trip.key} value={trip.name}/>)} 
+                    </Picker>
+                <Picker
+                    selectedValue={this.state.selectedCurrency}
+                    onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
                 </Picker>
-
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
                     {expenses.length===0 ? (
                         <Text style={{marginLeft:16}}>No expenses yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={expenses}
+                        (<List style={styles.list} dataArray={_.cloneDeep(expenses)}
                             renderRow={(expense) =>
                                <Row data={[
                                   expense.name, 
                                   expense.eventName, 
-                                  this.parseAmount(expense.amount), 
-                                  this.parseAmount(expense.paid), 
-                                  parseFloat(expense.amount - expense.paid).toFixed(2)
+                                  this.parseAmount(expense.amount, this.state.selectedCurrency), 
+                                  this.parseAmount(expense.paid, this.state.selectedCurrency), 
+                                  this.parseAmount((expense.amount - expense.paid), this.state.selectedCurrency),
+                                  expense.currency
                                 ]} 
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
@@ -56,12 +62,14 @@ export default class TripTableScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount){
-        return parseFloat(amount).toFixed(2)
+    parseAmount(amount, currency){
+        //console.warn(amount)
+        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
     }
     componentWillMount() {
-        trips = stateStore.getTrips();
-        expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip);
+        currencies = stateStore.currenciesArray
+        trips = stateStore.getTrips()
+        expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip)
     }
 
     navigate(route) {
@@ -75,6 +83,10 @@ export default class TripTableScreen extends Component {
         } else {
             this.setState({selectedTrip: null, selectedTripName: 'none'})
         }    
+    }
+
+    handleCurrencyOption(val) {
+        this.setState({selectedCurrency: val})
     }
 }
 const styles = StyleSheet.create({
@@ -113,7 +125,7 @@ const styles = StyleSheet.create({
         marginBottom: 16
     },
     head: {
-        height: 40,
+        height: 50,
         backgroundColor: '#f1f8ff',
     },
     text: {

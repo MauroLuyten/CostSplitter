@@ -18,6 +18,7 @@ export default class TotalExpensesPersonCategoryScreen extends Component {
             selectedCategory: 'Overnight stay',
             categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.'],
             totalExpenses: null,
+            selectedCurrency: 'EUR'
         }
 
     }
@@ -41,16 +42,28 @@ export default class TotalExpensesPersonCategoryScreen extends Component {
                     onValueChange={(itemValue, itemIndex) => this.handleCategoryOption(itemIndex)}>
                         {this.state.categories.map((category) => <Picker.Item label={category} key={category} value={category}/>)} 
                 </Picker>
+                <Picker
+                    selectedValue={this.state.selectedCurrency}
+                    onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
+                </Picker>
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
-                    <Row data={totalExpenses} styles={styles.list} textStyle={styles.text}/>
+                    <Row data={[totalExpenses[0], this.parseAmount(totalExpenses[1], this.state.selectedCurrency), this.parseAmount(totalExpenses[2], this.state.selectedCurrency), this.parseAmount(totalExpenses[3], this.state.selectedCurrency)]} 
+                    
+                     styles={styles.list} textStyle={styles.text}/>
                 </Table>
 
             </View>
         )
     }
+    parseAmount(amount, currency){
+        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+    }
+
     componentWillMount() {
+        currencies = stateStore.currenciesArray
         splitters = stateStore.getPersons()
         totalExpenses = stateStore.getTotalExpensesPersonCategory(this.state.selectedSplitter, this.state.selectedCategory)
     }
@@ -70,6 +83,10 @@ export default class TotalExpensesPersonCategoryScreen extends Component {
 
     handleCategoryOption(val) {
         this.setState({selectedCategory: this.state.categories[val]})
+    }
+
+    handleCurrencyOption(val) {
+        this.setState({selectedCurrency: val})
     }
 }
 const styles = StyleSheet.create({

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, ListView, FlatList, Modal, TextInput } from 'react-native'
+import { View, StyleSheet, ListView, FlatList, Modal, TextInput, Picker } from 'react-native'
 import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge, Card } from 'native-base';
 import { StackNavigator } from 'react-navigation';
 import stateStore from '../store/store'
@@ -11,6 +11,7 @@ export default class AllTransactionsScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            selectedCurrency: 'EUR'
         }
 
     }
@@ -21,27 +22,39 @@ export default class AllTransactionsScreen extends Component {
         const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];
         const transactions = stateStore.getTransactions();
         return (
-        
             <View style={styles.container}>
+                <Picker
+                    selectedValue={this.state.selectedCurrency}
+                    onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
+                </Picker>
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
                     {transactions.length===0 ? (
                         <Text style={{marginLeft:16}}>No transactions yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={transactions}
+                        (<List style={styles.list} dataArray={_.cloneDeep(transactions)}
                             renderRow={(transaction) =>
-                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, transaction.amount]} style={styles.row} textStyle={styles.text}/>
+                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, this.parseAmount(transaction.amount, this.state.selectedCurrency)]} style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
             </View>
         )
     }
-
+    parseAmount(amount, currency){
+        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+    }
+    componentWillMount() {
+        currencies = stateStore.currenciesArray
+    }
     navigate(route) {
         const { navigate } = this.props.navigation
         navigate(route)
+    }
+    handleCurrencyOption(val) {
+        this.setState({selectedCurrency: val})
     }
 }
 const styles = StyleSheet.create({
