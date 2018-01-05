@@ -11,7 +11,7 @@ export default class AllTransactionsScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedCurrency: 'EUR'
+            selectedCurrency: 'Show default'
         }
 
     }
@@ -19,13 +19,14 @@ export default class AllTransactionsScreen extends Component {
         title: 'All Transactions'
     }
     render() {
-        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];
+        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount', 'Currency'];
         const transactions = stateStore.getTransactions();
         return (
             <View style={styles.container}>
                 <Picker
                     selectedValue={this.state.selectedCurrency}
                     onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    <Picker.Item label="Show default" value="Show default"/>
                     {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
                 </Picker>
                 <Table>
@@ -36,15 +37,20 @@ export default class AllTransactionsScreen extends Component {
                         :
                         (<List style={styles.list} dataArray={_.cloneDeep(transactions)}
                             renderRow={(transaction) =>
-                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, this.parseAmount(transaction.amount, this.state.selectedCurrency)]} style={styles.row} textStyle={styles.text}/>
+                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, this.parseAmount(transaction.amount, this.state.selectedCurrency, transaction.currency), transaction.currency]} style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
             </View>
         )
     }
-    parseAmount(amount, currency){
-        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+    parseAmount(amount, currency, transactionCurrency){
+        if(currency === "Show default") {
+            return parseFloat(stateStore.amountToCurrency(transactionCurrency,amount)).toFixed(2)
+        } else {
+            return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+        }
+
     }
     componentWillMount() {
         currencies = stateStore.currenciesArray

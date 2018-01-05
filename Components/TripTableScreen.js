@@ -14,7 +14,7 @@ export default class TripTableScreen extends Component {
         this.state = {
             selectedTrip: null,
             selectedTripName: '',
-            selectedCurrency: 'EUR',
+            selectedCurrency: 'Show default',
         }
 
     }
@@ -35,6 +35,7 @@ export default class TripTableScreen extends Component {
                 <Picker
                     selectedValue={this.state.selectedCurrency}
                     onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    <Picker.Item label="Show default" value="Show default"/>
                     {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
                 </Picker>
                 <Table>
@@ -48,9 +49,9 @@ export default class TripTableScreen extends Component {
                                <Row data={[
                                   expense.name, 
                                   expense.eventName, 
-                                  this.parseAmount(expense.amount, this.state.selectedCurrency), 
-                                  this.parseAmount(expense.paid, this.state.selectedCurrency), 
-                                  this.parseAmount((expense.amount - expense.paid), this.state.selectedCurrency),
+                                  this.parseAmount(expense.amount, this.state.selectedCurrency, expense.currency), 
+                                  this.parseAmount(expense.paid, this.state.selectedCurrency, expense.currency), 
+                                  this.parseAmount((expense.amount - expense.paid), this.state.selectedCurrency, expense.currency),
                                   expense.currency
                                 ]} 
                                 style={styles.row} textStyle={styles.text}/>
@@ -61,9 +62,14 @@ export default class TripTableScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount, currency){
+    parseAmount(amount, currency, expenseCurrency){
         //console.warn(amount)
-        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+        if(currency === "Show default") {
+            return parseFloat(stateStore.amountToCurrency(expenseCurrency,amount)).toFixed(2)
+        } else {
+            return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+        }
+
     }
     componentWillMount() {
         currencies = stateStore.currenciesArray
@@ -78,7 +84,7 @@ export default class TripTableScreen extends Component {
 
     handleChangedOption(val) {
         if(val != 0) {
-            this.setState({selectedTrip: trips[val-1].key, selectedTripName: trips[val-1].name, selectedCurrency: trips[val-1].currencies})
+            this.setState({selectedTrip: trips[val-1].key, selectedTripName: trips[val-1].name})
         } else {
             this.setState({selectedTrip: null, selectedTripName: 'none'})
         }

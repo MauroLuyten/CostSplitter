@@ -14,7 +14,7 @@ export default class ExpensesCategoryScreen extends Component {
         this.state = {
             selectedCategory: 'Overnight stay',
             categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.'],
-            selectedCurrency: 'EUR'
+            selectedCurrency: 'Show default'
         }
 
     }
@@ -34,6 +34,7 @@ export default class ExpensesCategoryScreen extends Component {
                 <Picker
                     selectedValue={this.state.selectedCurrency}
                     onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    <Picker.Item label="Show default" value="Show default"/>
                     {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
                 </Picker>
 
@@ -49,8 +50,8 @@ export default class ExpensesCategoryScreen extends Component {
                                 expense.tripName, 
                                 expense.eventName, 
                                 expense.name, 
-                                this.parseAmount(expense.amount, this.state.selectedCurrency),
-                                this.parseAmount(expense.paid, this.state.selectedCurrency),
+                                this.parseAmount(expense.amount, this.state.selectedCurrency, expense.currency),
+                                this.parseAmount(expense.paid, this.state.selectedCurrency, expense.currency),
                                 expense.currency]} 
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
@@ -60,8 +61,13 @@ export default class ExpensesCategoryScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount, currency){
-        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+    parseAmount(amount, currency, expenseCurrency){
+        if(currency === "Show default") {
+            return parseFloat(stateStore.amountToCurrency(expenseCurrency,amount)).toFixed(2)
+        } else {
+            return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+        }
+
     }
     componentWillMount() {
         currencies = stateStore.currenciesArray
@@ -75,9 +81,6 @@ export default class ExpensesCategoryScreen extends Component {
 
     handleChangedOption(val) {
         this.setState({selectedCategory: this.state.categories[val]})
-        if(stateStore.getExpensesPerCategory(this.state.categories[val]).length !== 0) {
-            this.setState({selectedCurrency: stateStore.getExpensesPerCategory(this.state.categories[val])[0].currency})
-        }
     }
 
     handleCurrencyOption(val) {

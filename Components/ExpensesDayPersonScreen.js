@@ -16,7 +16,7 @@ export default class ExpensesDayPersonScreen extends Component {
             selectedSplitterName: '',
             selectedDay: 'All',
             expenses: null,
-            selectedCurrency: 'EUR'
+            selectedCurrency: 'Show default'
         }
 
     }
@@ -45,6 +45,7 @@ export default class ExpensesDayPersonScreen extends Component {
                 <Picker
                     selectedValue={this.state.selectedCurrency}
                     onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
+                    <Picker.Item label="Show default" value="Show default"/>
                     {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
                 </Picker>
 
@@ -59,7 +60,7 @@ export default class ExpensesDayPersonScreen extends Component {
                                <Row data={[
                                 expense.tripName, 
                                 expense.name, 
-                                this.parseAmount(expense.amount, this.state.selectedCurrency),
+                                this.parseAmount(expense.amount, this.state.selectedCurrency, expense.currency),
                                 expense.currency]}
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
@@ -69,8 +70,13 @@ export default class ExpensesDayPersonScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount, currency){
-        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+    parseAmount(amount, currency, expenseCurrency){
+        if(currency === "Show default") {
+            return parseFloat(stateStore.amountToCurrency(expenseCurrency,amount)).toFixed(2)
+        } else {
+            return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+        }
+
     }
     componentWillMount() {
         currencies = stateStore.currenciesArray
@@ -87,10 +93,6 @@ export default class ExpensesDayPersonScreen extends Component {
     handleChangedOption(val) {
         if(val != 0) {
             this.setState({selectedSplitter: splitters[val-1].key, selectedSplitterName: splitters[val-1].name})
-             if(stateStore.getExpensesPerDayPerson(splitters[val-1].key, this.state.selectedDay).length !== 0) {
-                this.setState({selectedCurrency: stateStore.getExpensesPerDayPerson(splitters[val-1].key, this.state.selectedDay)[0].currency})
-            }
-            //console.warn(JSON.stringify(stateStore.getExpensesPerDayPerson(splitters[val-1].key, this.state.selectedDay)[0].currency))
         } else {
             this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
         }
@@ -99,11 +101,6 @@ export default class ExpensesDayPersonScreen extends Component {
     handleDayOption(val) {
         if(val != 0) {
             this.setState({selectedDay: days[val-1]})
-            if(stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, days[val-1]).length !== 0) {
-                this.setState({selectedCurrency: stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, days[val-1])[0].currency})
-                
-            }
-            //console.warn(stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, days[val-1])[0].currency)
         } else {
             this.setState({selectedDay: 'All'})
         }

@@ -65,16 +65,18 @@ class Currency {
     @persist @observable rate = 0
 }
 class Transaction {
-    constructor(splitterName, tripName, eventName, amount) {
+    constructor(splitterName, tripName, eventName, amount, currency) {
         this.splitterName = splitterName,
         this.tripName = tripName,
         this.eventName = eventName,
-        this.amount = amount
+        this.amount = amount,
+        this.currency = currency
     }
     @persist @observable splitterName = ''
     @persist @observable tripName = ''
     @persist @observable eventName = ''
     @persist @observable amount = 0
+    @persist @observable currency = ''
 }
 class Person {
     constructor(key, name) {
@@ -377,9 +379,9 @@ class StateStore {
         }
     }
 
-    addTransaction(splitterName, tripName, eventName, amount) {
+    addTransaction(splitterName, tripName, eventName, amount, currency) {
         const key = this.generateKey()
-        this.transactions.set(key, new Transaction(splitterName, tripName, eventName, parseFloat(amount).toFixed(2)))
+        this.transactions.set(key, new Transaction(splitterName, tripName, eventName, parseFloat(amount).toFixed(2), currency))
     }
 
     removeTransaction(transactionKey) {
@@ -539,6 +541,7 @@ class StateStore {
                     this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
                         let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
                         splitter.tripName = this.getTrip(tripKey).name
+                        splitter.currency = this.getEvent(tripKey,eventKey).currency
                         splittersArray.push(splitter)
                     })
                 }
@@ -610,7 +613,7 @@ class StateStore {
         const splitter = event.splitters.get(splitterKey)
         paid = this.amountToEuro(event.currency, paid)
         splitter.paid = parseFloat(splitter.paid) + paid
-        this.addTransaction(splitter.name, trip.name, event.name, this.amountToCurrency(event.currency,paid))
+        this.addTransaction(splitter.name, trip.name, event.name, this.amountToCurrency(event.currency,paid), event.currency)
     }
 
     /* login(username, password) {
