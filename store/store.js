@@ -417,22 +417,7 @@ class StateStore {
         return splittersArray;
     }
 
-    getSplitterGeneral(splitterKey) {
-        let splitter = null;
-        this.trips.keys().forEach(tripKey => {
-            this.trips.get(tripKey).events.keys().forEach(eventKey => {
-                this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKeyCheck => {
-                    if(splitterKeyCheck === splitterKey) {
-                        splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
-                    }
-                })
-            })
-        })
-        return splitter
-    }
-
     getSplittersExpensesTrip(tripKeyParameter) {
-       //console.warn("Call store..")
         let splittersArray = []
         if(typeof this.getTrip(tripKeyParameter) !== "undefined" && this.getTrip(tripKeyParameter)) {
         this.trips.get(tripKeyParameter).events.keys().forEach(eventKey => {
@@ -468,7 +453,7 @@ class StateStore {
 
     getTransactionsSplitter(splitterKey) {
         let transactionArray = []
-        let splitter = this.getSplitterGeneral(splitterKey)
+        let splitter = this.getPerson(splitterKey)
         if(typeof splitter !== "undefined" && splitter) {
         this.transactions.keys().forEach(transactionKey => {
             let transaction = this.transactions.get(transactionKey)
@@ -491,6 +476,7 @@ class StateStore {
                                 if(splitter.key === splitterParameter) {
                                     let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
                                     splitterAdd.tripName = this.getTrip(tripKey).name
+                                    splitterAdd.currency = this.getEvent(tripKey,eventKey).currency
                                     splittersArray.push(splitterAdd)
                                 }
                         })
@@ -507,6 +493,7 @@ class StateStore {
                                 if(splitter.key === splitterParameter) {
                                     let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
                                     splitterAdd.tripName = this.getTrip(tripKey).name
+                                    splitterAdd.currency = this.getEvent(tripKey,eventKey).currency
                                     splittersArray.push(splitterAdd)
                                 }
                             })
@@ -577,7 +564,6 @@ class StateStore {
                                 let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
                                 if(splitterKeyParameter === splitterKey) {
                                     totalPaid += parseFloat(splitter.paid)
-                                    //console.warn(totalPaid)
                                     totalDue += parseFloat(splitter.amount)
                                     totalRecPay += parseFloat(splitter.amount - splitter.paid)
                                 }
@@ -595,6 +581,14 @@ class StateStore {
         result.push(totalDue.toFixed(2))
         result.push(totalRecPay.toFixed(2))
         return result
+    }
+
+    getTripsWithSelectedCurrency(){
+        let tripsArray = []
+        this.trips.values().slice().forEach(trip=>{
+            tripsArray.push(new Trip(trip.key, trip.name, trip.description, trip.budget, trip.selectedCurrency))
+        })
+        return tripsArray
     }
 
     editSplitter(tripKey, eventKey, splitter){
@@ -711,6 +705,19 @@ class StateStore {
         .catch(error => {
             this.error=error
         })
+    } 
+        getSplitterGeneral(splitterKey) {
+        let splitter = null;
+        this.trips.keys().forEach(tripKey => {
+            this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKeyCheck => {
+                    if(splitterKeyCheck === splitterKey) {
+                        splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
+                    }
+                })
+            })
+        })
+        return splitter
     } */
 
 }

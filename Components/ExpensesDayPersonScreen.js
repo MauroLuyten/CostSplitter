@@ -15,8 +15,6 @@ export default class ExpensesDayPersonScreen extends Component {
             selectedSplitter: null,
             selectedSplitterName: '',
             selectedDay: 'All',
-            splitters: null,
-            days: null,
             expenses: null,
             selectedCurrency: 'EUR'
         }
@@ -26,7 +24,7 @@ export default class ExpensesDayPersonScreen extends Component {
         title: 'Expenses person per day'
     }
     render() {
-        const tableHead = ['Trip', 'Splitter', 'Amount'];
+        const tableHead = ['Trip', 'Splitter', 'Amount', 'Currency'];
         const expenses = stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, this.state.selectedDay);
         return (
             <View style={styles.container}>
@@ -61,7 +59,8 @@ export default class ExpensesDayPersonScreen extends Component {
                                <Row data={[
                                 expense.tripName, 
                                 expense.name, 
-                                this.parseAmount(expense.amount, this.state.selectedCurrency)]}
+                                this.parseAmount(expense.amount, this.state.selectedCurrency),
+                                expense.currency]}
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
@@ -77,7 +76,7 @@ export default class ExpensesDayPersonScreen extends Component {
         currencies = stateStore.currenciesArray
         splitters = stateStore.getPersons()
         days = stateStore.getExpenseDays()
-        expenses = stateStore. getExpensesPerDayPerson(this.state.selectedSplitter, this.state.selectedDay)
+        expenses = stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, this.state.selectedDay)
     }
 
     navigate(route) {
@@ -88,6 +87,10 @@ export default class ExpensesDayPersonScreen extends Component {
     handleChangedOption(val) {
         if(val != 0) {
             this.setState({selectedSplitter: splitters[val-1].key, selectedSplitterName: splitters[val-1].name})
+             if(stateStore.getExpensesPerDayPerson(splitters[val-1].key, this.state.selectedDay).length !== 0) {
+                this.setState({selectedCurrency: stateStore.getExpensesPerDayPerson(splitters[val-1].key, this.state.selectedDay)[0].currency})
+            }
+            //console.warn(JSON.stringify(stateStore.getExpensesPerDayPerson(splitters[val-1].key, this.state.selectedDay)[0].currency))
         } else {
             this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
         }
@@ -96,6 +99,11 @@ export default class ExpensesDayPersonScreen extends Component {
     handleDayOption(val) {
         if(val != 0) {
             this.setState({selectedDay: days[val-1]})
+            if(stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, days[val-1]).length !== 0) {
+                this.setState({selectedCurrency: stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, days[val-1])[0].currency})
+                
+            }
+            //console.warn(stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, days[val-1])[0].currency)
         } else {
             this.setState({selectedDay: 'All'})
         }

@@ -15,7 +15,6 @@ export default class TripTableScreen extends Component {
             selectedTrip: null,
             selectedTripName: '',
             selectedCurrency: 'EUR',
-            trips: null,
         }
 
     }
@@ -68,7 +67,7 @@ export default class TripTableScreen extends Component {
     }
     componentWillMount() {
         currencies = stateStore.currenciesArray
-        trips = stateStore.getTrips()
+        trips = stateStore.getTripsWithSelectedCurrency()
         expenses = stateStore.getSplittersExpensesTrip(this.state.selectedTrip)
     }
 
@@ -79,10 +78,11 @@ export default class TripTableScreen extends Component {
 
     handleChangedOption(val) {
         if(val != 0) {
-            this.setState({selectedTrip: trips[val-1].key, selectedTripName: trips[val-1].name})
+            this.setState({selectedTrip: trips[val-1].key, selectedTripName: trips[val-1].name, selectedCurrency: trips[val-1].currencies})
         } else {
             this.setState({selectedTrip: null, selectedTripName: 'none'})
-        }    
+        }
+        
     }
 
     handleCurrencyOption(val) {

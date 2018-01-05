@@ -76,7 +76,7 @@ export default class ExpenseTableScreen extends Component {
 
     handleChangedOption(val) {
         if(val != 0) {
-            this.setState({selectedExpense: expenses[val-1].key, selectedExpenseName: expenses[val-1].name})
+            this.setState({selectedExpense: expenses[val-1].key, selectedExpenseName: expenses[val-1].name, selectedCurrency: expenses[val-1].currency})
         } else {
             this.setState({selectedExpense: null, selectedExpenseName: 'none'})
         }

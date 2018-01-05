@@ -75,6 +75,9 @@ export default class ExpensesCategoryScreen extends Component {
 
     handleChangedOption(val) {
         this.setState({selectedCategory: this.state.categories[val]})
+        if(stateStore.getExpensesPerCategory(this.state.categories[val]).length !== 0) {
+            this.setState({selectedCurrency: stateStore.getExpensesPerCategory(this.state.categories[val])[0].currency})
+        }
     }
 
     handleCurrencyOption(val) {
