@@ -171,8 +171,10 @@ class StateStore {
         }
     }
 
-    clearTrips(){
+    clearStore(){
         this.trips.clear()
+        this.transactions.clear()
+        this.persons.clear()
     }
 
     /* getNewRateTripBudget(tripKey, oldCurrency, newCurrency){
