@@ -115,7 +115,7 @@ export default class AddSplitterDialog extends Component {
          const dividedAmountEvent = stateStore.getTotalAmountEvent(this.state.tripKey, this.state.eventKey)
          const normAmount = stateStore.amountToEuro(event.currency, splitter.amount)
          const normPaid = stateStore.amountToEuro(event.currency, splitter.paid)
-        if (splitter.name && splitter.amount && splitter.paid) {
+        if (splitter.name && splitter.amount && splitter.paid && !isNaN(splitter.amount) && !isNaN(splitter.paid)) {
             if((parseFloat(normAmount) > parseFloat(event.amount)) || (parseFloat(normPaid) > parseFloat(event.amount))) {
                 Alert.alert('Wrong amount',
                             'Amount/Paid may not exceed amount of event!',

@@ -127,7 +127,7 @@ export default class AddEventDialog extends Component {
             currency: this.state.selectedCurrency,
             date: this.state.newEventDate
         }
-        if (event.name && event.description && event.category && event.amount && event.currency) {
+        if (event.name && event.description && event.category && event.amount && event.currency && !isNaN(event.amount)) {
             if (event.amount
                 > 0) {
                 stateStore.addEvent(this.state.tripKey, event)

@@ -71,7 +71,7 @@ export default class RemoveSplitterDialog extends Component {
             Alert.alert('Wrong amount',
                         'Amount to pay may not exceed amount of splitter to pay')
         }
-        else if(this.state.paidAmount < 0) {
+        else if(this.state.paidAmount < 0 || isNaN(this.state.paidAmount)) {
             Alert.alert(
                 'Wrong amount',
                 'Amount to pay must be positive!',

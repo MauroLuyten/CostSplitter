@@ -148,7 +148,7 @@ export default class EditEventDialog extends Component {
             currency: this.state.selectedCurrency,
             date: this.state.newEventDate,
          }
-        if (event.name && event.description && event.category && event.amount && event.currency) {
+        if (event.name && event.description && event.category && event.amount && event.currency && !isNaN(event.amount)) {
             if (event.amount > 0) {
                 stateStore.editEvent(this.state.tripKey, event)
                 this.setEditEventDialog(false)

@@ -182,7 +182,7 @@ export default class EditTripDialog extends Component {
             selectedCurrency: this.state.selectedCurrency
         }
         
-        if (trip.name && trip.description && trip.budget && trip.currencies.length != 0 && trip.selectedCurrency) {
+        if (trip.name && trip.description && trip.budget && trip.currencies.length != 0 && trip.selectedCurrency && !isNan(trip.budget)) {
             if (this.checkEventCurrencies().length == 0) {
                 stateStore.editTrip(this.props.tripKey, trip)
                 this.setEditTripDialog(false)
