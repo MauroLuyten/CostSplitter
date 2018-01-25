@@ -87,7 +87,7 @@ export default class AddTripDialog extends Component {
                                 selectionColor="#5067FF"
                                 onChangeText={(budget) => {
                                     this.setState({
-                                        newTripBudget: budget
+                                        newTripBudget: budget.replace(",", ".")
                                     })
                                 }}
                                 autoFocus={false} />

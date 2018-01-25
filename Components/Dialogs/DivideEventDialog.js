@@ -54,7 +54,7 @@ export default class DivideEventDialog extends Component {
                                     selectionColor="#5067FF"
                                     onChangeText={(amount) => {
                                         this.setState({
-                                            amount: amount
+                                            amount: amount.replace(",", ".")
                                         })
                                     }}
                                     autoFocus={false} />

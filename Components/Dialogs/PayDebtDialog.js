@@ -37,7 +37,7 @@ export default class RemoveSplitterDialog extends Component {
                         keyboardType='numeric'
                         onChangeText={(amount) => {
                             this.setState({
-                                paidAmount: amount
+                                paidAmount: amount.replace(",", ".")
                             })
                         }}
                         autoFocus={false} />

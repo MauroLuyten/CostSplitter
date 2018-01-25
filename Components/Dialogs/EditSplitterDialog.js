@@ -47,7 +47,7 @@ export default class EditSplitterDialog extends Component {
                         keyboardType='numeric'
                         onChangeText={(amount) => {
                             this.setState({
-                                newSplitterAmount: amount
+                                newSplitterAmount: amount.replace(",", ".")
                             })
                         }}
                         autoFocus={false} />
@@ -60,7 +60,7 @@ export default class EditSplitterDialog extends Component {
                         keyboardType='numeric'
                         onChangeText={(paid) => {
                             this.setState({
-                                newSplitterPaid: paid
+                                newSplitterPaid: paid.replace(",", ".")
                             })
                         }}
                         autoFocus={false} />

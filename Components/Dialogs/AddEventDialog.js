@@ -78,7 +78,7 @@ export default class AddEventDialog extends Component {
                         selectionColor="#5067FF"
                         onChangeText={(amount) => {
                             this.setState({
-                                newEventAmount: amount
+                                newEventAmount: amount.replace(",", ".")
                             })
                         }}
                         autoFocus={false} />
