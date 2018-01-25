@@ -53,7 +53,7 @@ export default class ExpenseTableScreen extends Component {
                                 this.parseAmount(splitter.amount, this.state.selectedCurrency, splitter.currency), 
                                 this.parseAmount(splitter.paid, this.state.selectedCurrency, splitter.currency), 
                                 this.parseAmount((splitter.amount - splitter.paid), this.state.selectedCurrency, splitter.currency),
-                                splitter.currency]} 
+                                this.showCurrency(this.state.selectedCurrency,splitter.currency)]} 
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
@@ -69,6 +69,13 @@ export default class ExpenseTableScreen extends Component {
             return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
         }
         
+    }
+    showCurrency(currency, expenseCurrency){
+        if(currency === "Show default"){
+            return expenseCurrency
+        } else{
+            return currency
+        }
     }
     componentWillMount() {
         currencies = stateStore.currenciesArray

@@ -26,7 +26,7 @@ export default class TotalExpensesPersonCategoryScreen extends Component {
         title: 'Tot. expenses per person per cat.'
     }
     render() {
-        const tableHead = ['Splitter', 'Paid', 'Amount (Due)', 'Receives/Due']
+        const tableHead = ['Splitter', 'Amount (Due)', 'Paid', 'Receives/Due']
         const splitters = stateStore.getPersons()
         const totalExpenses = stateStore.getTotalExpensesPersonCategory(this.state.selectedSplitter, this.state.selectedCategory)
         return (
@@ -50,7 +50,11 @@ export default class TotalExpensesPersonCategoryScreen extends Component {
 
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
-                    <Row data={[totalExpenses[0], this.parseAmount(totalExpenses[1], this.state.selectedCurrency), this.parseAmount(totalExpenses[2], this.state.selectedCurrency), this.parseAmount(totalExpenses[3], this.state.selectedCurrency)]} 
+                    <Row data={
+                    [totalExpenses[0],
+                     this.parseAmount(totalExpenses[2], this.state.selectedCurrency),
+                     this.parseAmount(totalExpenses[1], this.state.selectedCurrency),
+                     this.parseAmount(totalExpenses[3], this.state.selectedCurrency)]} 
                     
                      styles={styles.list} textStyle={styles.text}/>
                 </Table>
@@ -59,7 +63,8 @@ export default class TotalExpensesPersonCategoryScreen extends Component {
         )
     }
     parseAmount(amount, currency){
-        return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+        //return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+        return `${parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)} ${currency}`
     }
 
     componentWillMount() {

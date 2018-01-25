@@ -52,7 +52,7 @@ export default class TripTableScreen extends Component {
                                   this.parseAmount(expense.amount, this.state.selectedCurrency, expense.currency), 
                                   this.parseAmount(expense.paid, this.state.selectedCurrency, expense.currency), 
                                   this.parseAmount((expense.amount - expense.paid), this.state.selectedCurrency, expense.currency),
-                                  expense.currency
+                                  this.showCurrency(this.state.selectedCurrency, expense.currency)
                                 ]} 
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
@@ -70,6 +70,13 @@ export default class TripTableScreen extends Component {
             return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
         }
 
+    }
+    showCurrency(currency, expenseCurrency){
+        if(currency === "Show default"){
+            return expenseCurrency
+        } else{
+            return currency
+        }
     }
     componentWillMount() {
         currencies = stateStore.currenciesArray

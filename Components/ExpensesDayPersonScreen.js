@@ -24,7 +24,7 @@ export default class ExpensesDayPersonScreen extends Component {
         title: 'Expenses person per day'
     }
     render() {
-        const tableHead = ['Trip', 'Splitter', 'Amount', 'Currency'];
+        const tableHead = ['Trip', 'Splitter', 'Amount'];
         const expenses = stateStore.getExpensesPerDayPerson(this.state.selectedSplitter, this.state.selectedDay);
         return (
             <View style={styles.container}>
@@ -60,8 +60,7 @@ export default class ExpensesDayPersonScreen extends Component {
                                <Row data={[
                                 expense.tripName, 
                                 expense.name, 
-                                this.parseAmount(expense.amount, this.state.selectedCurrency, expense.currency),
-                                expense.currency]}
+                                this.parseAmount(expense.amount, this.state.selectedCurrency, expense.currency)]}
                                 style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
@@ -70,11 +69,12 @@ export default class ExpensesDayPersonScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount, currency, expenseCurrency){
+    parseAmount(amount, currency, transactionCurrency){
         if(currency === "Show default") {
-            return parseFloat(stateStore.amountToCurrency(expenseCurrency,amount)).toFixed(2)
+            //return parseFloat(stateStore.amountToCurrency(transactionCurrency,amount)).toFixed(2)
+            return `${parseFloat(amount).toFixed(2)} ${transactionCurrency}`
         } else {
-            return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+            return `${parseFloat(stateStore.convertAmount(transactionCurrency,currency,amount)).toFixed(2)} ${currency}`
         }
 
     }
