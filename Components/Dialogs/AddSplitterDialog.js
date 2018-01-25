@@ -67,6 +67,7 @@ export default class AddSplitterDialog extends Component {
                 <Item floatingLabel>
                     <Label>Amount</Label>
                     <Input
+                        value={this.state.newSplitterAmount.toString()}
                         selectionColor="#5067FF"
                         keyboardType='numeric'
                         onChangeText={(amount) => {
@@ -79,6 +80,7 @@ export default class AddSplitterDialog extends Component {
                 <Item floatingLabel>
                     <Label>Paid</Label>
                     <Input
+                        value={this.state.newSplitterPaid.toString()}
                         selectionColor="#5067FF"
                         keyboardType='numeric'
                         onChangeText={(paid) => {

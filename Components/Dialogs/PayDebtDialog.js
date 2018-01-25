@@ -33,6 +33,7 @@ export default class RemoveSplitterDialog extends Component {
             <Item floatingLabel>
                     <Label>Amount</Label>
                     <Input
+                        value={this.state.paidAmount.toString()}
                         selectionColor="#5067FF"
                         keyboardType='numeric'
                         onChangeText={(amount) => {
