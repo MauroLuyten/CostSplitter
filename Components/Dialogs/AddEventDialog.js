@@ -127,6 +127,8 @@ export default class AddEventDialog extends Component {
             currency: this.state.selectedCurrency,
             date: this.state.newEventDate
         }
+        const trip = stateStore.getTrip(this.props.tripKey)
+
         if (event.name && event.description && event.category && event.amount && event.currency && !isNaN(event.amount)) {
             if (event.amount
                 > 0) {
@@ -137,7 +139,7 @@ export default class AddEventDialog extends Component {
                     newEventDescription: '',
                     newEventCategory: 'Overnight stay',
                     newEventAmount: 0,
-                    selectedCurrency: '',
+                    selectedCurrency: trip.currencies[0].value,
                     newEventDate: '01-01-2018'
                 })
             }
