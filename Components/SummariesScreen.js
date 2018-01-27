@@ -1,8 +1,7 @@
 import React, {Component} from 'react'
 import {View, StyleSheet} from 'react-native'
-import { List, ListItem, Content, Container, Text, Separator, Button} from 'native-base'
+import {Content, Container, Text, Button} from 'native-base'
 import { Col, Row, Grid } from 'react-native-easy-grid'
-import {StackNavigator} from 'react-navigation'
 import {observer} from 'mobx-react'
 import stateStore from '../store/store'
 
@@ -41,9 +40,6 @@ export default class SummariesScreen extends Component {
     navigate(route) {
         const {navigate} = this.props.navigation
         navigate(route)
-    }
-    loggedIn() {
-        return stateStore.user
     }
 }
 

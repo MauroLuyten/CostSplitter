@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, ListView, FlatList, Modal, TextInput } from 'react-native'
-import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge } from 'native-base';
-import { StackNavigator } from 'react-navigation';
+import { View, StyleSheet} from 'react-native'
+import { List, ListItem, Text, Separator, Fab, Badge } from 'native-base';
 import stateStore from '../store/store'
 import { observer } from 'mobx-react'
 import AddTripDialog from './Dialogs/AddTripDialog'
@@ -80,12 +79,9 @@ export default class OverviewScreen extends Component {
     openTrip(key) {
         this.navigate('Trip', {
             tripKey: key,
-            //OnNavigateBack: this.handleOnNavigateBack
         })
     }
-    /* handleOnNavigateBack = () => {
-        this.setState(this.state)
-    } */
+
     navigate(route, params) {
         const { navigate } = this.props.navigation
         navigate(route, params)

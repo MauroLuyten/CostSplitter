@@ -2,30 +2,33 @@ import React, { Component } from 'react'
 import { View, StyleSheet, ListView, FlatList, Modal, TextInput, Picker } from 'react-native'
 import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge, Card } from 'native-base';
 import { StackNavigator } from 'react-navigation';
-import stateStore from '../store/store'
+import stateStore from '../../store/store'
 import { observer } from 'mobx-react'
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 
 
 @observer
-export default class PersonTransactionsScreen extends Component {
+export default class TotalExpensesPersonCategoryScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            splitters: null,
             selectedSplitter: null,
             selectedSplitterName: '',
-            splitters: null,
-            transactions: null,
-            selectedCurrency: 'Show default'
+            selectedCategory: 'Overnight stay',
+            categories: ['Overnight stay', 'Transport', 'Activity', 'Food', 'Misc.'],
+            totalExpenses: null,
+            selectedCurrency: 'EUR'
         }
 
     }
     static navigationOptions = {
-        title: 'Person Transactions'
+        title: 'Tot. expenses per person per cat.'
     }
     render() {
-        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];
-        const transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        const tableHead = ['Splitter', 'Amount (Due)', 'Paid', 'Receives/Due']
+        const splitters = stateStore.getPersons()
+        const totalExpenses = stateStore.getTotalExpensesPersonCategory(this.state.selectedSplitter, this.state.selectedCategory)
         return (
             <View style={styles.container}>
                 <Picker
@@ -35,41 +38,39 @@ export default class PersonTransactionsScreen extends Component {
                         {splitters.map((splitter) => <Picker.Item label={splitter.name} key={splitter.key} value={splitter.name}/>)} 
                 </Picker>
                 <Picker
+                    selectedValue={this.state.selectedCategory}
+                    onValueChange={(itemValue, itemIndex) => this.handleCategoryOption(itemIndex)}>
+                        {this.state.categories.map((category) => <Picker.Item label={category} key={category} value={category}/>)} 
+                </Picker>
+                <Picker
                     selectedValue={this.state.selectedCurrency}
                     onValueChange={(itemValue, itemIndex) => this.handleCurrencyOption(itemValue)}>
-                    <Picker.Item label="Show default" value="Show default"/>
                     {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
                 </Picker>
+
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
-                    {transactions.length===0 ? (
-                        <Text style={{marginLeft:16}}>No transactions yet</Text>
-                    )
-                        :
-                        (<List style={styles.list} dataArray={_.cloneDeep(transactions)}
-                            renderRow={(transaction) =>
-                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, this.parseAmount(transaction.amount, this.state.selectedCurrency, transaction.currency)]} style={styles.row} textStyle={styles.text}/>
-                            }>>
-                        </List>)}
+                    <Row data={
+                    [totalExpenses[0],
+                     this.parseAmount(totalExpenses[2], this.state.selectedCurrency),
+                     this.parseAmount(totalExpenses[1], this.state.selectedCurrency),
+                     this.parseAmount(totalExpenses[3], this.state.selectedCurrency)]} 
+                    
+                     styles={styles.list} textStyle={styles.text}/>
                 </Table>
 
             </View>
         )
     }
-    parseAmount(amount, currency, transactionCurrency){
-        if(currency === "Show default") {
-            //return parseFloat(stateStore.amountToCurrency(transactionCurrency,amount)).toFixed(2)
-            return `${parseFloat(amount).toFixed(2)} ${transactionCurrency}`
-        } else {
-            return `${parseFloat(stateStore.convertAmount(transactionCurrency,currency,amount)).toFixed(2)} ${currency}`
-        }
-
+    parseAmount(amount, currency){
+        //return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+        return `${parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)} ${currency}`
     }
 
     componentWillMount() {
         currencies = stateStore.currenciesArray
-        splitters = stateStore.getPersons();
-        transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
+        splitters = stateStore.getPersons()
+        totalExpenses = stateStore.getTotalExpensesPersonCategory(this.state.selectedSplitter, this.state.selectedCategory)
     }
 
     navigate(route) {
@@ -84,6 +85,11 @@ export default class PersonTransactionsScreen extends Component {
             this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
         }
     }
+
+    handleCategoryOption(val) {
+        this.setState({selectedCategory: this.state.categories[val]})
+    }
+
     handleCurrencyOption(val) {
         this.setState({selectedCurrency: val})
     }

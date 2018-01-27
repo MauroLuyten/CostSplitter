@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
-import { Icon, Badge, ListView, List, splitterItem, Content, Container, Text, Separator, Card, Fab, Label, Item, Input, Button } from 'native-base';
-var ModalWrapper = require('react-native-modal-wrapper').default
-import { firebaseApp } from '../firebaseconfig'
+import { StyleSheet, View, ScrollView, Picker } from 'react-native'
+import { Icon, Badge, List, Container, Text, Card, Fab, Button } from 'native-base';
 import stateStore from '../store/store'
 import { observer } from 'mobx-react'
 import AddSplitterDialog from './Dialogs/AddSplitterDialog'

@@ -1,10 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     Platform,
     StyleSheet,
@@ -14,24 +8,23 @@ import {
     View,
     StatusBar
 } from 'react-native';
-import {StackNavigator} from 'react-navigation'
+import { StackNavigator } from 'react-navigation'
 import CurrencyScreen from './Components/CurrencyScreen'
 import HomeScreen from './Components/HomeScreen'
-import LoginScreen from './Components/LoginScreen'
 import OverviewScreen from './Components/OverviewScreen'
 import TripScreen from './Components/TripScreen'
-import AllTransactionsScreen from './Components/AllTransactionsScreen'
-import PersonTransactionsScreen from './Components/PersonTransactionsScreen'
-import TripTableScreen from './Components/TripTableScreen'
-import ExpensesCategoryScreen from './Components/ExpensesCategoryScreen'
-import ExpenseDayPersonScreen from './Components/ExpensesDayPersonScreen'
-import ExpenseTableScreen from './Components/ExpenseTableScreen'
-import TotalExpensePersonCatScreen from './Components/TotalExpensesPersonCategoryScreen'
+import AllTransactionsScreen from './Components/Summaries/AllTransactionsScreen'
+import PersonTransactionsScreen from './Components/Summaries/PersonTransactionsScreen'
+import TripTableScreen from './Components/Summaries/TripTableScreen'
+import ExpensesCategoryScreen from './Components/Summaries/ExpensesCategoryScreen'
+import ExpenseDayPersonScreen from './Components/Summaries/ExpensesDayPersonScreen'
+import ExpenseTableScreen from './Components/Summaries/ExpenseTableScreen'
+import TotalExpensePersonCatScreen from './Components/Summaries/TotalExpensesPersonCategoryScreen'
 import EventScreen from './Components/EventScreen'
 import SummariesScreen from './Components/SummariesScreen'
-import {firebaseApp} from './firebaseconfig.js'
+import { firebaseApp } from './firebaseconfig.js'
 import stateStore from './store/store'
-import {observer} from 'mobx-react'
+import { observer } from 'mobx-react'
 
 const Application = StackNavigator({
     Home: {
@@ -39,9 +32,6 @@ const Application = StackNavigator({
     },
     Currency: {
         screen: CurrencyScreen
-    },
-    Login: {
-        screen: LoginScreen
     },
     Overview: {
         screen: OverviewScreen
@@ -73,13 +63,13 @@ const Application = StackNavigator({
     ExpenseTable: {
         screen: ExpenseTableScreen
     },
-    TotalExpensePersonCat :{
+    TotalExpensePersonCat: {
         screen: TotalExpensePersonCatScreen
     }
 })
 @observer
 export default class App extends Component {
-    constructor(props){
+    constructor(props) {
         super(props)
     }
     render() {
@@ -94,7 +84,7 @@ export default class App extends Component {
         stateStore.loadCurrencies()
     }
 
-    
+
 }
 
 const styles = StyleSheet.create({

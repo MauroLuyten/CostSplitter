@@ -1,12 +1,11 @@
-import { observable, action, computed } from 'mobx'
+import { observable } from 'mobx'
 import { firebaseApp } from '../firebaseconfig'
-import { ListView } from "react-native";
-import {AsyncStorage, NetInfo} from 'react-native'
-import {create, persist} from 'mobx-persist'
+import { AsyncStorage, NetInfo } from 'react-native'
+import { create, persist } from 'mobx-persist'
 
 
 class Splitter {
-    constructor(key, name,amount,paid){
+    constructor(key, name, amount, paid) {
         this.key = key
         this.name = name
         this.amount = amount
@@ -18,7 +17,7 @@ class Splitter {
     @persist @observable paid = 0
 }
 class Event {
-    constructor(key, name, description, category, amount, currency, date){
+    constructor(key, name, description, category, amount, currency, date) {
         this.key = key
         this.name = name
         this.description = description
@@ -37,8 +36,7 @@ class Event {
     @persist('map', Splitter) @observable splitters = new Map()
 }
 class Trip {
-    
-    constructor(key, name, description, budget, currencies, selectedCurrency){
+    constructor(key, name, description, budget, currencies, selectedCurrency) {
         this.key = key
         this.name = name
         this.description = description
@@ -53,24 +51,22 @@ class Trip {
     @persist @observable selectedCurrency = ''
     @persist('list') @observable currencies = []
     @persist('map', Event) @observable events = new Map()
-    //@persist @observable totalAmount = 0
 }
 class Currency {
-    constructor(name, rate){
-        // key naam , value rate
+    constructor(name, rate) {
         this.name = name
         this.rate = rate
     }
-    @persist @observable  name = ''
+    @persist @observable name = ''
     @persist @observable rate = 0
 }
 class Transaction {
     constructor(splitterName, tripName, eventName, amount, currency) {
         this.splitterName = splitterName,
-        this.tripName = tripName,
-        this.eventName = eventName,
-        this.amount = amount,
-        this.currency = currency
+            this.tripName = tripName,
+            this.eventName = eventName,
+            this.amount = amount,
+            this.currency = currency
     }
     @persist @observable splitterName = ''
     @persist @observable tripName = ''
@@ -81,7 +77,7 @@ class Transaction {
 class Person {
     constructor(key, name) {
         this.key = key,
-        this.name = name
+            this.name = name
     }
     @persist @observable name = ''
     @persist @observable key = ''
@@ -93,38 +89,40 @@ class StateStore {
     @persist('map', Transaction) @observable transactions = new Map()
     @persist('map', Person) @observable persons = new Map()
     @persist('object') @observable error = {}
-    currenciesArray = ['EUR', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'GBP', 'HKD', 'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK' , 'NZD', 'PHP', 'PLN',
-    'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR']
-    @observable online = false
     @persist('map', Currency) @observable currencies = new Map()
+    @observable online = false
+    currenciesArray =
+        ['EUR', 'AUD', 'BGN', 'BRL', 'CAD', 'CHF', 'CNY', 'CZK', 'DKK', 'GBP', 'HKD',
+            'HRK', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PLN',
+            'RON', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'USD', 'ZAR']
 
 
     getRateAPI = (url) => {
         return fetch(url).then(response => response.json());
     }
-    addCurrency(currency){
+    addCurrency(currency) {
         this.currencies.set(currency.name, currency)
     }
-    getCurrency(key){
+    getCurrency(key) {
         return this.currencies.get(key)
     }
-    amountToEuro(currencyName, amount){
+    amountToEuro(currencyName, amount) {
         const currency = this.getCurrency(currencyName)
         return amount / currency.rate
     }
-    amountToCurrency(currencyName, amount){
+    amountToCurrency(currencyName, amount) {
         const currency = this.getCurrency(currencyName)
         return amount * currency.rate
     }
-    convertAmount(baseCurrency, targetCurrency, amount){
-        return this.amountToCurrency(targetCurrency, this.amountToEuro(baseCurrency, amount)) 
+    convertAmount(baseCurrency, targetCurrency, amount) {
+        return this.amountToCurrency(targetCurrency, this.amountToEuro(baseCurrency, amount))
     }
-    loadCurrencies(){
+    loadCurrencies() {
         NetInfo.isConnected.fetch().then(isConnected => {
-            if(isConnected){
-                this.getRateAPI('https://api.fixer.io/latest').then((response) =>{
+            if (isConnected) {
+                this.getRateAPI('https://api.fixer.io/latest').then((response) => {
                     const keys = Object.keys(response.rates)
-                    for (let currency of keys){
+                    for (let currency of keys) {
                         let currencyValue = response.rates[currency]
                         this.addCurrency(new Currency(currency, currencyValue))
                     }
@@ -134,7 +132,7 @@ class StateStore {
                 const response = '{"base":"EUR","date":"2017-12-29","rates":{"AUD":1.5346,"BGN":1.9558,"BRL":3.9729,"CAD":1.5039,"CHF":1.1702,"CNY":7.8044,"CZK":25.535,"DKK":7.4449,"GBP":0.88723,"HKD":9.372,"HRK":7.44,"HUF":310.33,"IDR":16239.0,"ILS":4.1635,"INR":76.606,"JPY":135.01,"KRW":1279.6,"MXN":23.661,"MYR":4.8536,"NOK":9.8403,"NZD":1.685,"PHP":59.795,"PLN":4.177,"RON":4.6585,"RUB":69.392,"SEK":9.8438,"SGD":1.6024,"THB":39.121,"TRY":4.5464,"USD":1.1993,"ZAR":14.805}}'
                 response = JSON.parse(response)
                 const keys = Object.keys(response.rates)
-                for (let currency of keys){
+                for (let currency of keys) {
                     let currencyValue = response.rates[currency]
                     this.addCurrency(new Currency(currency, currencyValue))
                 }
@@ -148,12 +146,12 @@ class StateStore {
         return firebaseApp.database().ref().push().key
     }
     addPerson(key, name) {
-        if(name!==''){
+        if (name !== '') {
             this.persons.set(key, new Person(key, name))
         }
     }
-    getPerson(key){
-        if(key!==''){
+    getPerson(key) {
+        if (key !== '') {
             return this.persons.get(key)
         }
     }
@@ -166,12 +164,12 @@ class StateStore {
         return personsArray
     }
     removePerson(key) {
-        if(key!==''){
+        if (key !== '') {
             this.persons.delete(key)
         }
     }
 
-    clearStore(){
+    clearStore() {
         this.trips.clear()
         this.transactions.clear()
         this.persons.clear()
@@ -196,24 +194,24 @@ class StateStore {
     getTrip(tripKey) {
         return this.trips.get(tripKey)
     }
-    getTrips(){
+    getTrips() {
         let tripsArray = []
-        this.trips.values().slice().forEach(trip=>{
+        this.trips.values().slice().forEach(trip => {
             tripsArray.push(new Trip(trip.key, trip.name, trip.description, trip.budget))
         })
         return tripsArray
     }
-    getTotalPaidTrip(tripKey){
+    getTotalPaidTrip(tripKey) {
         let total = 0
-        this.getEvents(tripKey).forEach(event =>{
+        this.getEvents(tripKey).forEach(event => {
             total += this.getTotalPaidEvent(tripKey, event.key)
         })
         return total
     }
-    getTotalAmountTrip(tripKey){
+    getTotalAmountTrip(tripKey) {
         let total = 0
         //let trip = this.getTrip(tripKey)
-        this.getEvents(tripKey).forEach(event =>{
+        this.getEvents(tripKey).forEach(event => {
             //total += parseFloat(this.convertAmount(event.currency, trip.selectedCurrency , event.amount))
             total += parseFloat(event.amount)
         })
@@ -229,7 +227,7 @@ class StateStore {
         oldTrip.selectedCurrency = trip.selectedCurrency
         this.trips.set(tripKey, oldTrip)
     }
-    changeTripCurrency(tripKey,currencyName){
+    changeTripCurrency(tripKey, currencyName) {
         const oldTrip = this.trips.get(tripKey)
         oldTrip.selectedCurrency = currencyName
         this.trips.set(tripKey, oldTrip)
@@ -244,13 +242,13 @@ class StateStore {
         event.splitters = observable.map()
         const key = this.generateKey()
         event.amount = this.amountToEuro(event.currency, event.amount)
-        this.trips.get(tripKey).events.set(key,new Event(
+        this.trips.get(tripKey).events.set(key, new Event(
             key,
-            event.name, 
-            event.description, 
-            event.category, 
-            parseFloat(event.amount), 
-            event.currency, 
+            event.name,
+            event.description,
+            event.category,
+            parseFloat(event.amount),
+            event.currency,
             event.date))
         if (this.online) {
             database().ref(`users/${this.user.uid}/trips`)
@@ -260,7 +258,7 @@ class StateStore {
                 .set(event)
         }
     }
-    getEvent(tripKey,eventKey){
+    getEvent(tripKey, eventKey) {
         return this.trips.get(tripKey).events.get(eventKey)
     }
     getEvents(tripKey) {
@@ -268,74 +266,74 @@ class StateStore {
         this.trips.get(tripKey).events.values().forEach(event => {
             let newEvent = new Event(
                 event.key,
-                event.name, 
-                event.description, 
-                event.category, 
-                parseFloat(event.amount), 
-                event.currency, 
+                event.name,
+                event.description,
+                event.category,
+                parseFloat(event.amount),
+                event.currency,
                 event.date)
-                newEvent.splitters = this.getSplitters(tripKey, event.key)
+            newEvent.splitters = this.getSplitters(tripKey, event.key)
             eventsArray.push(newEvent)
         });
         return eventsArray
     }
-    getTotalPaidEvent(tripKey,eventKey){
+    getTotalPaidEvent(tripKey, eventKey) {
         let total = 0
-        this.getSplitters(tripKey,eventKey).forEach(splitter => {
+        this.getSplitters(tripKey, eventKey).forEach(splitter => {
             total += parseFloat(splitter.paid)
         });
         return total
     }
-    getTotalAmountEvent(tripKey, eventKey){
+    getTotalAmountEvent(tripKey, eventKey) {
         let total = 0
-        this.getSplitters(tripKey,eventKey).forEach(splitter => {
+        this.getSplitters(tripKey, eventKey).forEach(splitter => {
             total += parseFloat(splitter.amount)
         });
         return total
     }
-    getEventDivision(tripKey, eventKey){
+    getEventDivision(tripKey, eventKey) {
         let equally = true
         let splitters = this.getSplitters(tripKey, eventKey)
-        if(splitters.length==0){
+        if (splitters.length == 0) {
             equally = false
-        } else{
+        } else {
             let firstAmount = splitters[0].amount
             splitters.forEach(splitter => {
-                if(splitter.amount!==firstAmount){
+                if (splitter.amount !== firstAmount) {
                     equally = false
                 }
             })
         }
         return equally ? "Equally" : "Individually"
     }
-    divideEvent(tripKey, eventKey, eventDivision, amountType, amount){
+    divideEvent(tripKey, eventKey, eventDivision, amountType, amount) {
         const currentDivision = this.getEventDivision(tripKey, eventKey)
         const event = this.getEvent(tripKey, eventKey)
-        if(eventDivision=="Equally"){
-            if(amountType=="Fixed Amount"){
+        if (eventDivision == "Equally") {
+            if (amountType == "Fixed Amount") {
                 this.setSplitterAmounts(tripKey, eventKey, parseFloat(amount))
             }
-            if(amountType=="Custom Percentage"){
-                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount*amount/100))
+            if (amountType == "Custom Percentage") {
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount * amount / 100))
             }
-            if(amountType=="Equal Share"){
-                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount/amount))
+            if (amountType == "Equal Share") {
+                this.setSplitterAmounts(tripKey, eventKey, parseFloat(event.amount / amount))
             }
-        } else if(eventDivision=="Individually"){
-            if(currentDivision=="Equally"){
+        } else if (eventDivision == "Individually") {
+            if (currentDivision == "Equally") {
                 this.setSplitterAmounts(tripKey, eventKey, parseFloat(0))
             }
         }
     }
-    setSplitterAmounts(tripKey, eventKey, amount){
+    setSplitterAmounts(tripKey, eventKey, amount) {
         this.getSplitters(tripKey, eventKey).forEach(splitter => {
             this.getSplitter(tripKey, eventKey, splitter.key).amount = amount
         })
     }
-    
-    editEvent(tripKey, event){
+
+    editEvent(tripKey, event) {
         const eventKey = event.key
-        const oldEvent = this.getEvent(tripKey,eventKey)
+        const oldEvent = this.getEvent(tripKey, eventKey)
         event.amount = this.amountToEuro(event.currency, event.amount)
         oldEvent.name = event.name
         oldEvent.description = event.description
@@ -344,40 +342,40 @@ class StateStore {
         oldEvent.currency = event.currency
         oldEvent.date = event.date
     }
-    changeEventCurrency(tripKey, eventKey, currencyName){
+    changeEventCurrency(tripKey, eventKey, currencyName) {
         const oldEvent = this.getEvent(tripKey, eventKey)
         oldEvent.currency = currencyName
     }
-    removeEvent(tripKey, eventKey){
+    removeEvent(tripKey, eventKey) {
         this.trips.get(tripKey).events.delete(eventKey)
-        if(this.online){
+        if (this.online) {
             firebaseApp.database().ref(`users/${this.user.uid}/trips`)
-            .child(tripKey)
-            .child('events')
-            .child(eventKey)
-            .remove()
+                .child(tripKey)
+                .child('events')
+                .child(eventKey)
+                .remove()
         }
     }
-    addSplitter(tripKey, eventKey, splitter, key){
-        if(key=='' || key==null){
+    addSplitter(tripKey, eventKey, splitter, key) {
+        if (key == '' || key == null) {
             key = this.generateKey()
         }
         const event = this.trips.get(tripKey).events.get(eventKey)
         splitter.amount = this.amountToEuro(event.currency, splitter.amount)
         event.splitters.set(
-            key,new Splitter(key, splitter.name, parseFloat(splitter.amount), parseFloat(0)))
-            this.addPerson(key, splitter.name)
-        if(splitter.paid>0){
+            key, new Splitter(key, splitter.name, parseFloat(splitter.amount), parseFloat(0)))
+        this.addPerson(key, splitter.name)
+        if (splitter.paid > 0) {
             this.payDebtSplitter(tripKey, eventKey, key, splitter.paid)
         }
-        if(this.online){
+        if (this.online) {
             firebaseApp.database().ref(`users/${this.user.uid}/trips`)
-            .child(tripKey)
-            .child('events')
-            .child(eventKey)
-            .child('splitters')
-            .child(key)
-            .set(splitter)
+                .child(tripKey)
+                .child('events')
+                .child(eventKey)
+                .child('splitters')
+                .child(key)
+                .set(splitter)
         }
     }
 
@@ -400,10 +398,10 @@ class StateStore {
         return transactionsArray;
     }
 
-    getSplitter(tripKey, eventKey, splitterKey){
+    getSplitter(tripKey, eventKey, splitterKey) {
         return this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
     }
-    getSplitters(tripKey, eventKey){
+    getSplitters(tripKey, eventKey) {
         return this.trips.get(tripKey).events.get(eventKey).splitters.values()
     }
 
@@ -423,16 +421,16 @@ class StateStore {
 
     getSplittersExpensesTrip(tripKeyParameter) {
         let splittersArray = []
-        if(typeof this.getTrip(tripKeyParameter) !== "undefined" && this.getTrip(tripKeyParameter)) {
-        this.trips.get(tripKeyParameter).events.keys().forEach(eventKey => {
-            this.trips.get(tripKeyParameter).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                let splitter = this.trips.get(tripKeyParameter).events.get(eventKey).splitters.get(splitterKey)
-                splitter.eventName = this.trips.get(tripKeyParameter).events.get(eventKey).name
-                splitter.currency = this.getEvent(tripKeyParameter, eventKey).currency
-                splittersArray.push(splitter)
+        if (typeof this.getTrip(tripKeyParameter) !== "undefined" && this.getTrip(tripKeyParameter)) {
+            this.trips.get(tripKeyParameter).events.keys().forEach(eventKey => {
+                this.trips.get(tripKeyParameter).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                    let splitter = this.trips.get(tripKeyParameter).events.get(eventKey).splitters.get(splitterKey)
+                    splitter.eventName = this.trips.get(tripKeyParameter).events.get(eventKey).name
+                    splitter.currency = this.getEvent(tripKeyParameter, eventKey).currency
+                    splittersArray.push(splitter)
+                })
             })
-        })
-    }
+        }
         return splittersArray
     }
 
@@ -441,14 +439,14 @@ class StateStore {
         this.trips.keys().forEach(tripKey => {
             this.trips.get(tripKey).events.keys().forEach(eventKey => {
                 let event = this.trips.get(tripKey).events.get(eventKey)
-                if(event.category == category) {
-                   this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                       let splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
-                       splitter.tripName = this.trips.get(tripKey).name
-                       splitter.eventName = event.name
-                       splitter.currency = event.currency
-                       splittersArray.push(splitter)
-                   })
+                if (event.category == category) {
+                    this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                        let splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
+                        splitter.tripName = this.trips.get(tripKey).name
+                        splitter.eventName = event.name
+                        splitter.currency = event.currency
+                        splittersArray.push(splitter)
+                    })
                 }
             })
         })
@@ -458,46 +456,46 @@ class StateStore {
     getTransactionsSplitter(splitterKey) {
         let transactionArray = []
         let splitter = this.getPerson(splitterKey)
-        if(typeof splitter !== "undefined" && splitter) {
-        this.transactions.keys().forEach(transactionKey => {
-            let transaction = this.transactions.get(transactionKey)
-            if(transaction.splitterName === splitter.name) {
-                transactionArray.push(transaction)
-            }
-        })
-    }
+        if (typeof splitter !== "undefined" && splitter) {
+            this.transactions.keys().forEach(transactionKey => {
+                let transaction = this.transactions.get(transactionKey)
+                if (transaction.splitterName === splitter.name) {
+                    transactionArray.push(transaction)
+                }
+            })
+        }
         return transactionArray;
     }
 
     getExpensesPerDayPerson(splitterParameter, day) {
         let splittersArray = []
-        if(day === "All") {
-            if(splitterParameter !== null) {
+        if (day === "All") {
+            if (splitterParameter !== null) {
                 this.trips.keys().forEach(tripKey => {
                     this.trips.get(tripKey).events.keys().forEach(eventKey => {
-                            this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                                let splitter = this.getPerson(splitterKey)
-                                if(splitter.key === splitterParameter) {
-                                    let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
-                                    splitterAdd.tripName = this.getTrip(tripKey).name
-                                    splitterAdd.currency = this.getEvent(tripKey,eventKey).currency
-                                    splittersArray.push(splitterAdd)
-                                }
+                        this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                            let splitter = this.getPerson(splitterKey)
+                            if (splitter.key === splitterParameter) {
+                                let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
+                                splitterAdd.tripName = this.getTrip(tripKey).name
+                                splitterAdd.currency = this.getEvent(tripKey, eventKey).currency
+                                splittersArray.push(splitterAdd)
+                            }
                         })
                     })
                 })
             }
         } else {
-            if(splitterParameter !== null) {
+            if (splitterParameter !== null) {
                 this.trips.keys().forEach(tripKey => {
                     this.trips.get(tripKey).events.keys().forEach(eventKey => {
-                        if(day === this.getEvent(tripKey,eventKey).date) {
+                        if (day === this.getEvent(tripKey, eventKey).date) {
                             this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
                                 let splitter = this.getPerson(splitterKey)
-                                if(splitter.key === splitterParameter) {
+                                if (splitter.key === splitterParameter) {
                                     let splitterAdd = this.getSplitter(tripKey, eventKey, splitterKey)
                                     splitterAdd.tripName = this.getTrip(tripKey).name
-                                    splitterAdd.currency = this.getEvent(tripKey,eventKey).currency
+                                    splitterAdd.currency = this.getEvent(tripKey, eventKey).currency
                                     splittersArray.push(splitterAdd)
                                 }
                             })
@@ -513,7 +511,7 @@ class StateStore {
         let daysArray = []
         this.trips.keys().forEach(tripKey => {
             this.trips.get(tripKey).events.keys().forEach(eventKey => {
-                let day = this.getEvent(tripKey,eventKey).date
+                let day = this.getEvent(tripKey, eventKey).date
                 daysArray.push(day)
             })
         })
@@ -536,20 +534,20 @@ class StateStore {
 
     getSplittersEvent(eventKeyParameter) {
         let splittersArray = []
-        if(typeof eventKeyParameter !== "undefined" && eventKeyParameter) {
-        this.trips.keys().forEach(tripKey => {
-            this.trips.get(tripKey).events.keys().forEach(eventKey => {
-                if(eventKey == eventKeyParameter) {
-                    this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
-                        let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
-                        splitter.tripName = this.getTrip(tripKey).name
-                        splitter.currency = this.getEvent(tripKey,eventKey).currency
-                        splittersArray.push(splitter)
-                    })
-                }
+        if (typeof eventKeyParameter !== "undefined" && eventKeyParameter) {
+            this.trips.keys().forEach(tripKey => {
+                this.trips.get(tripKey).events.keys().forEach(eventKey => {
+                    if (eventKey == eventKeyParameter) {
+                        this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
+                            let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
+                            splitter.tripName = this.getTrip(tripKey).name
+                            splitter.currency = this.getEvent(tripKey, eventKey).currency
+                            splittersArray.push(splitter)
+                        })
+                    }
+                })
             })
-        })
-    }
+        }
         return splittersArray;
     }
 
@@ -558,16 +556,16 @@ class StateStore {
         let totalPaid = 0
         let totalDue = 0
         let totalRecPay = 0
-        if(typeof splitterKeyParameter !== "undefined" && splitterKeyParameter) {
-            if(typeof category !== "undefined" && category) {
+        if (typeof splitterKeyParameter !== "undefined" && splitterKeyParameter) {
+            if (typeof category !== "undefined" && category) {
                 result.push(this.getPerson(splitterKeyParameter).name)
                 this.trips.keys().forEach(tripKey => {
                     this.trips.get(tripKey).events.keys().forEach(eventKey => {
                         let expense = this.getEvent(tripKey, eventKey)
-                        if(expense.category === category) {
+                        if (expense.category === category) {
                             this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKey => {
                                 let splitter = this.getSplitter(tripKey, eventKey, splitterKey)
-                                if(splitterKeyParameter === splitterKey) {
+                                if (splitterKeyParameter === splitterKey) {
                                     totalPaid += parseFloat(splitter.paid)
                                     totalDue += parseFloat(splitter.amount)
                                     totalRecPay += parseFloat(splitter.amount - splitter.paid)
@@ -588,15 +586,15 @@ class StateStore {
         return result
     }
 
-    getTripsWithSelectedCurrency(){
+    getTripsWithSelectedCurrency() {
         let tripsArray = []
-        this.trips.values().slice().forEach(trip=>{
+        this.trips.values().slice().forEach(trip => {
             tripsArray.push(new Trip(trip.key, trip.name, trip.description, trip.budget, trip.selectedCurrency))
         })
         return tripsArray
     }
 
-    editSplitter(tripKey, eventKey, splitter){
+    editSplitter(tripKey, eventKey, splitter) {
         const event = this.trips.get(tripKey).events.get(eventKey)
         const oldSplitter = event.splitters.get(splitter.key)
         splitter.amount = this.amountToEuro(event.currency, splitter.amount)
@@ -605,7 +603,7 @@ class StateStore {
         oldSplitter.amount = splitter.amount
         oldSplitter.paid = splitter.paid
     }
-    removeSplitter(tripKey, eventKey, splitterKey){
+    removeSplitter(tripKey, eventKey, splitterKey) {
         this.trips.get(tripKey).events.get(eventKey).splitters.delete(splitterKey)
     }
 
@@ -615,121 +613,13 @@ class StateStore {
         const splitter = event.splitters.get(splitterKey)
         paid = this.amountToEuro(event.currency, paid)
         splitter.paid = parseFloat(splitter.paid) + paid
-        this.addTransaction(splitter.name, trip.name, event.name, this.amountToCurrency(event.currency,paid), event.currency)
+        this.addTransaction(splitter.name, trip.name, event.name, this.amountToCurrency(event.currency, paid), event.currency)
     }
-
-    /* login(username, password) {
-        firebaseApp.auth().signInWithEmailAndPassword(`${username}@costsplitter.com`, password)
-            .then(user => {
-                this.setUser(user)
-            }).catch(error => {
-                this.error = error
-            })
-    }
-    register(username, password) {
-        firebaseApp.auth().createUserWithEmailAndPassword(`${username}@costsplitter.com`, password)
-            .then((data) => {
-                firebaseApp.database().ref(`users/${data.uid}`).set({
-                    email: `${username}@costsplitter.com`,
-                    username: username,
-                    trips: 0
-                })
-            }).catch((error) => {
-                this.error = error
-            })
-    }
-    logout() {
-        firebaseApp
-            .auth()
-            .signOut().then(() => {
-                this.setUser({})
-                this.trips = []
-            })
-            .catch(error => {
-                this.error = error
-            })
-    }
-    setUser(user) {
-        this.user = user
-        if(user){
-            //this.loadTrips()
-        }
-    } */
-    /*
-    loadTrips() {
-        if (this.user) {
-            firebaseApp
-            .database()
-            .ref(`users/${this.user.uid}/trips`).on('value', (snap) => {
-                this.trips = []
-                snap.forEach((item) => {
-                    let trip = item.val()
-                    trip.key = item.key
-                    this.trips.push(trip)
-                })
-            })
-        }
-    }
-    addTrip(trip){
-        firebaseApp.database().ref(`users/${this.user.uid}/trips`).push(trip)
-        .then()
-        .catch(error => {
-            this.error=error
-        })
-    }
-    removeTrip(key){
-        firebaseApp
-        .database()
-        .ref(`users/${this.user.uid}/trips`).child(key).remove()
-        .catch(error=>{
-            this.error=error
-        })
-    }
-    editTrip(trip, key){
-        firebaseApp.database().ref(`users/${this.user.uid}/trips`).child(key).update(trip)
-        .then()
-        .catch(error=> {
-            this.error=error
-        })
-    }
-    getTrip(tripKey) {
-        return this.trips.find(trip => trip.key === tripKey)
-    }
-    addSplitterToEvent(eventKey, name, currency, amount, paid) {
-        //console.warn(name)
-        //console.warn(currency)
-        //console.warn(amount)
-        //console.warn(paid)
-        firebaseApp.database().ref(`users/${this.user.uid}/trips/${tripKey}/events`).push({
-            name: name,
-            currency: currency,
-            amount: amount,
-            paid: paid
-        })
-        .then()
-        .catch(error => {
-            this.error=error
-        })
-    } 
-        getSplitterGeneral(splitterKey) {
-        let splitter = null;
-        this.trips.keys().forEach(tripKey => {
-            this.trips.get(tripKey).events.keys().forEach(eventKey => {
-                this.trips.get(tripKey).events.get(eventKey).splitters.keys().forEach(splitterKeyCheck => {
-                    if(splitterKeyCheck === splitterKey) {
-                        splitter = this.trips.get(tripKey).events.get(eventKey).splitters.get(splitterKey)
-                    }
-                })
-            })
-        })
-        return splitter
-    } */
-
 }
 const stateStore = new StateStore()
-    const hydrate = create({
-        storage: AsyncStorage,
-        jsonify: true
-    })
-    hydrate('state', stateStore)
+const hydrate = create({
+    storage: AsyncStorage,
+    jsonify: true
+})
+hydrate('state', stateStore)
 export default stateStore;

@@ -2,35 +2,37 @@ import React, { Component } from 'react'
 import { View, StyleSheet, ListView, FlatList, Modal, TextInput, Picker } from 'react-native'
 import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge, Card } from 'native-base';
 import { StackNavigator } from 'react-navigation';
-import stateStore from '../store/store'
+import stateStore from '../../store/store'
 import { observer } from 'mobx-react'
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 
 
 @observer
-export default class ExpenseTableScreen extends Component {
+export default class PersonTransactionsScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selectedExpense: null,
-            selectedExpenseName: '',
+            selectedSplitter: null,
+            selectedSplitterName: '',
+            splitters: null,
+            transactions: null,
             selectedCurrency: 'Show default'
         }
 
     }
     static navigationOptions = {
-        title: 'Expense Table'
+        title: 'Person Transactions'
     }
     render() {
-        const tableHead = ['Splitter', 'Trip', 'Amount (Due)', 'Paid', 'Receives/Due', 'Currency'];
-        const splitters = stateStore.getSplittersEvent(this.state.selectedExpense);
+        const tableHead = ['Trip', 'Event', 'Splitter', 'Amount'];
+        const transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
         return (
             <View style={styles.container}>
                 <Picker
-                    selectedValue={this.state.selectedExpenseName}
+                    selectedValue={this.state.selectedSplitterName}
                     onValueChange={(itemValue, itemIndex) => this.handleChangedOption(itemIndex)}>
                     <Picker.Item label="None" key="None" value="None"></Picker.Item>
-                        {expenses.map((expense) => <Picker.Item label={expense.name} key={expense.key} value={expense.name}/>)} 
+                        {splitters.map((splitter) => <Picker.Item label={splitter.name} key={splitter.key} value={splitter.name}/>)} 
                 </Picker>
                 <Picker
                     selectedValue={this.state.selectedCurrency}
@@ -38,23 +40,15 @@ export default class ExpenseTableScreen extends Component {
                     <Picker.Item label="Show default" value="Show default"/>
                     {currencies.map((currency) => <Picker.Item label={currency} key={currency} value={currency}/>)}
                 </Picker>
-
                 <Table>
                     <Row data={tableHead} style={styles.head} textStyle={styles.text}/>
-                    {splitters.length===0 ? (
-                        <Text style={{marginLeft:16}}>No splitters yet</Text>
+                    {transactions.length===0 ? (
+                        <Text style={{marginLeft:16}}>No transactions yet</Text>
                     )
                         :
-                        (<List style={styles.list} dataArray={_.cloneDeep(splitters)}
-                            renderRow={(splitter) =>
-                               <Row data={[
-                                splitter.name, 
-                                splitter.tripName, 
-                                this.parseAmount(splitter.amount, this.state.selectedCurrency, splitter.currency), 
-                                this.parseAmount(splitter.paid, this.state.selectedCurrency, splitter.currency), 
-                                this.parseAmount((splitter.amount - splitter.paid), this.state.selectedCurrency, splitter.currency),
-                                this.showCurrency(this.state.selectedCurrency,splitter.currency)]} 
-                                style={styles.row} textStyle={styles.text}/>
+                        (<List style={styles.list} dataArray={_.cloneDeep(transactions)}
+                            renderRow={(transaction) =>
+                               <Row data={[transaction.tripName, transaction.eventName, transaction.splitterName, this.parseAmount(transaction.amount, this.state.selectedCurrency, transaction.currency)]} style={styles.row} textStyle={styles.text}/>
                             }>>
                         </List>)}
                 </Table>
@@ -62,25 +56,20 @@ export default class ExpenseTableScreen extends Component {
             </View>
         )
     }
-    parseAmount(amount, currency, expenseCurrency){
+    parseAmount(amount, currency, transactionCurrency){
         if(currency === "Show default") {
-            return parseFloat(stateStore.amountToCurrency(expenseCurrency,amount)).toFixed(2)
+            //return parseFloat(stateStore.amountToCurrency(transactionCurrency,amount)).toFixed(2)
+            return `${parseFloat(amount).toFixed(2)} ${transactionCurrency}`
         } else {
-            return parseFloat(stateStore.amountToCurrency(currency,amount)).toFixed(2)
+            return `${parseFloat(stateStore.convertAmount(transactionCurrency,currency,amount)).toFixed(2)} ${currency}`
         }
-        
+
     }
-    showCurrency(currency, expenseCurrency){
-        if(currency === "Show default"){
-            return expenseCurrency
-        } else{
-            return currency
-        }
-    }
+
     componentWillMount() {
         currencies = stateStore.currenciesArray
-        expenses = stateStore.getAllEvents()
-        splitters = stateStore.getSplittersEvent(this.state.selectedExpense);
+        splitters = stateStore.getPersons();
+        transactions = stateStore.getTransactionsSplitter(this.state.selectedSplitter);
     }
 
     navigate(route) {
@@ -90,12 +79,11 @@ export default class ExpenseTableScreen extends Component {
 
     handleChangedOption(val) {
         if(val != 0) {
-            this.setState({selectedExpense: expenses[val-1].key, selectedExpenseName: expenses[val-1].name})
+            this.setState({selectedSplitter: splitters[val-1].key, selectedSplitterName: splitters[val-1].name})
         } else {
-            this.setState({selectedExpense: null, selectedExpenseName: 'none'})
+            this.setState({selectedSplitter: null, selectedSplitterName: 'none'})
         }
     }
-
     handleCurrencyOption(val) {
         this.setState({selectedCurrency: val})
     }
@@ -136,7 +124,7 @@ const styles = StyleSheet.create({
         marginBottom: 16
     },
     head: {
-        height: 50,
+        height: 40,
         backgroundColor: '#f1f8ff',
     },
     text: {

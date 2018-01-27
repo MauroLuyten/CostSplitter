@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { View, StyleSheet, ListView, FlatList, Modal, TextInput, ScrollView, Picker, NetInfo} from 'react-native'
-import { List, ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge, Card } from 'native-base';
-import { StackNavigator } from 'react-navigation';
+import { View, StyleSheet, ScrollView, Picker} from 'react-native'
+import { List, ListItem, Container, Text, Icon, Fab, Card } from 'native-base';
 import stateStore from '../store/store'
 import { observer } from 'mobx-react'
 import AddEventDialog from './Dialogs/AddEventDialog'
@@ -159,7 +158,6 @@ export default class TripScreen extends Component {
         this.navigate('Event', {
             tripKey: this.state.tripKey,
             eventKey: key,
-            //uid: stateStore.user.uid
         })
     }
 

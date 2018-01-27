@@ -1,8 +1,6 @@
 import React, {Component} from 'react'
-import {ActivityIndicator, ListView, View, StyleSheet, NetInfo} from 'react-native'
-import {ListItem, Content, Container, Text, Separator, Icon, Fab, Button, Form, Item, Input, Label, Badge, Picker } from 'native-base'
-import {Col, Row, Grid } from 'react-native-easy-grid'
-import {StackNavigator} from 'react-navigation'
+import {ActivityIndicator, View, StyleSheet, NetInfo} from 'react-native'
+import { Content, Container, Text, Button, Picker } from 'native-base'
 import {observer} from 'mobx-react'
 import stateStore from '../store/store'
 

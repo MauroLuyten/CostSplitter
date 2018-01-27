@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert } from 'react-native'
-import { Text, Label, Item, Input, Button } from 'native-base';
+import { StyleSheet, View} from 'react-native'
+import { Text, Button } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
 

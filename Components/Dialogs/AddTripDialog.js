@@ -4,7 +4,7 @@ import { Text, Label, Item, Input, Button, Icon } from 'native-base';
 var ModalWrapper = require('react-native-modal-wrapper').default
 import stateStore from '../../store/store'
 import SelectMultiple from 'react-native-select-multiple'
-import Collapsible from 'react-native-collapsible';
+//import Collapsible from 'react-native-collapsible';
 
 
 export default class AddTripDialog extends Component {

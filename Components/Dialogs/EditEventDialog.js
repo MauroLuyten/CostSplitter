@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Alert, ScrollView, Picker, NetInfo } from 'react-native'
+import { StyleSheet, View, Alert, ScrollView, Picker } from 'react-native'
 import { Text, Label, Item, Input, Button } from 'native-base'
 import DatePicker from 'react-native-datepicker'
 var ModalWrapper = require('react-native-modal-wrapper').default
